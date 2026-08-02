@@ -687,8 +687,12 @@ Test-driven throughout — tests precede implementation for each unit.
 **API (`apps/api`)**
 - Unit: Jest on services with the Prisma client mocked — lead validation, slug
   generation, refresh-token rotation and reuse detection, publish-gating rules
-- Integration: supertest against a real Postgres in Docker, migrated per run —
-  every endpoint's auth boundary, both roles, plus the throttler limits
+- Integration: supertest against a real Postgres, migrated per run — every
+  endpoint's auth boundary, both roles, plus the throttler limits. The dev
+  machine has no Docker and no passwordless sudo, so the test database is a
+  **project-local, user-owned cluster** at `.pgdata` on port 5433, started with
+  `pg_ctl` (see §14). This is real PostgreSQL 18, not an emulation, so there is
+  no dev/prod engine divergence — only the process supervisor differs.
 - Contract: every DTO round-trips through its Zod schema
 
 **Web (`apps/web`)**
@@ -718,8 +722,25 @@ client's own hosting provider later. Vercel + a managed Postgres is the
 alternative if the client prefers zero server administration; the code does not
 change either way.
 
+**Local development does not use Docker.** The dev machine (CachyOS) has neither
+Docker nor podman, and no passwordless sudo, so containers are not an option
+here. Instead:
+
+```
+pnpm db:init    # initdb -D .pgdata   (once)
+pnpm db:start   # pg_ctl -D .pgdata -o "-p 5433" start
+pnpm db:stop
+```
+
+The cluster lives inside the repo, is owned by the developer, is gitignored, and
+touches no system service. It requires the `postgresql` package for the server
+binaries (`initdb`, `pg_ctl`) — the machine ships only `postgresql-libs` by
+default, so this is a one-time `sudo pacman -S postgresql`.
+
+Production still deploys as Docker Compose on the VPS; that host has Docker.
+The version floor is pinned to PostgreSQL 18 in both places so the engine matches.
+
 - Postgres backed up nightly to object storage, restore verified before launch
-- `docker compose up` for local development, matching production image versions
 - GitHub Actions: lint → typecheck → unit → integration → e2e → build
 - Migrations run as a release step, never at container boot
 - Uploaded media on a mounted volume, excluded from image builds
