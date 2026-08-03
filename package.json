@@ -1,0 +1,22 @@
+{
+  "name": "homeinn",
+  "private": true,
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:init": "bash scripts/pg.sh init",
+    "db:start": "bash scripts/pg.sh start",
+    "db:stop": "bash scripts/pg.sh stop",
+    "db:status": "bash scripts/pg.sh status"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.2"
+  }
+}
