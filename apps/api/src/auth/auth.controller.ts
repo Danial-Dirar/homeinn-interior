@@ -1,8 +1,10 @@
-import { Body, Controller, HttpCode, Post, Req, Res, UnauthorizedException, UsePipes } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards, UsePipes } from "@nestjs/common";
 import type { Request, Response } from "express";
-import { loginSchema, type LoginInput } from "@homeinn/types";
+import { loginSchema, type AuthUser, type LoginInput } from "@homeinn/types";
 import { ZodValidationPipe } from "../common/zod-validation.pipe";
 import { AuthService } from "./auth.service";
+import { CurrentUser } from "./current-user.decorator";
+import { JwtGuard } from "./jwt.guard";
 import { TokenService } from "./token.service";
 import { UsersService } from "./users.service";
 
@@ -34,6 +36,12 @@ export class AuthController {
     const { user, access, refresh } = await this.auth.login(body);
     res.cookie(ACCESS_COOKIE, access, cookieOptions(15 * 60_000));
     res.cookie(REFRESH_COOKIE, refresh, cookieOptions(7 * 86_400_000));
+    return { user };
+  }
+
+  @Get("me")
+  @UseGuards(JwtGuard)
+  me(@CurrentUser() user: AuthUser) {
     return { user };
   }
 
