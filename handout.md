@@ -158,3 +158,63 @@ against the plan's own specs, the rest are CRUD covered by e2e.
 - `pnpm test:e2e` (apps/api) — 62 passed, 4 suites
 - `pnpm test` (root) — 48 passed (api), 21 passed (types)
 - `pnpm typecheck` — clean
+
+---
+
+## Task 14 — Seed the real business data — 2026-08-04 — PARTIAL (blocked on source)
+
+Plan section: Task 14. Everything the sources support is seeded and verified. The two
+client tables are blocked — details below.
+
+### Files
+
+| File | Change |
+| --- | --- |
+| `apps/api/prisma/seed-data/working-areas.ts` | **new** — the 9 areas from spec §2, English verbatim, Bangla translated, slugs written out |
+| `apps/api/prisma/seed-data/services.ts` | **new** — the 7 services from spec §2, English verbatim, Bangla translated |
+| `apps/api/prisma/seed-data/corporate-clients.ts` | **new** — typed shape + empty array; header records what the transcription must contain |
+| `apps/api/prisma/seed-data/residential-clients.ts` | **new** — same, plus the rules for serials 17/33 and `publiclyListed` |
+| `apps/api/prisma/seed.ts` | **new** — exports `seed(prisma)`; upserts settings, working areas, services, client rows, 3 certifications and one ADMIN user |
+| `apps/api/test/seed.e2e-spec.ts` | **new** — 10 passing assertions + 3 `it.todo` for the blocked rows |
+
+### BLOCKED — the client tables need the company profile PDF
+
+`corporate-clients.ts` and `residential-clients.ts` are empty arrays, not oversights.
+
+The plan says to transcribe 73 corporate and 57 residential rows "from spec §2's
+source tables", but **spec §2 contains no such tables** — it records only the counts,
+the 13-district list, and the 8 flagship names. The profile PDF itself is not in this
+repository (no PDF anywhere in the tree, nothing in git history).
+
+Inventing the rows would fabricate company names, private individuals' names, and
+their home addresses — exactly what spec §12 forbids. So the shapes and the seeding
+loop are written and working; they iterate over empty arrays until the source lands.
+
+**To unblock:** drop the profile PDF in the repo, or paste the two tables as text.
+Then fill the two arrays and flip the three `it.todo`s in `seed.e2e-spec.ts` into real
+assertions (73 / 57 / serials 17 and 33 flagged).
+
+Note that `SiteSettings.corporateProjectCount = 73` and `residentialProjectCount = 57`
+**are** seeded — those counts are stated in spec §2, so the public headline stats are
+already truthful even with the row tables empty.
+
+### Decisions worth knowing
+
+- **`seed.ts` exports `seed(prisma)`** instead of only running on import. The e2e calls
+  it in `beforeAll` — twice — so idempotency is proven by the assertions themselves
+  rather than by the operator remembering to run `pnpm seed` twice first. It also makes
+  the suite independent of test-file ordering, which matters because every other e2e
+  file truncates the database in `beforeEach`.
+- **Service `summary`/`body` copy is a placeholder.** Only the 7 titles are in the spec.
+  The copy restates the title and claims nothing further; replace it with the profile's
+  own paragraphs when the PDF is available. Flagged in the file header too.
+- **Services are seeded `published: true`** — they are real, verbatim offerings, so the
+  public list is not empty. Project case studies stay `published: false` per spec §12.
+
+### Verification
+
+- `pnpm seed` twice against the dev database — counts steady at 7 services, 9 areas,
+  3 certifications, 1 admin
+- `pnpm test:e2e` — 72 passed, 3 todo, 5 suites
+- `pnpm test` (root) — 48 passed (api), 21 passed (types)
+- `pnpm typecheck` — clean
