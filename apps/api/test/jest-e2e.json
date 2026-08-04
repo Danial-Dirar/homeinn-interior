@@ -1,0 +1,12 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": { "^.+\\.ts$": "ts-jest" },
+  "setupFiles": ["<rootDir>/e2e-env.ts"],
+  "moduleNameMapper": {
+    "^@homeinn/types$": "<rootDir>/../../../packages/types/src/index.ts",
+    "^(\\.{1,2}/.*)\\.js$": "$1"
+  }
+}
