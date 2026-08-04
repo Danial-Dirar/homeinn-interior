@@ -110,3 +110,51 @@ is covered. It also pins the role split, slug suffixing, draft hiding, and the
 `@homeinn/types` resolves from `dist/`, so after editing anything in `packages/types`
 run `pnpm --filter @homeinn/types build` or the API's jest run fails with
 "has no exported member".
+
+---
+
+## Task 13 — Clients, hero, blog, testimonials, team, certifications, settings — 2026-08-04 — DONE
+
+Plan section: Task 13. Seven resources; the two with real logic were written test-first
+against the plan's own specs, the rest are CRUD covered by e2e.
+
+### Files
+
+| File | Change |
+| --- | --- |
+| `apps/api/src/content/clients.service.spec.ts` | **new** — 4 tests, the privacy suite from the plan |
+| `apps/api/src/content/clients.service.ts` | **new** — `listCorporatePublic`, `residentialSummary` (count + districts, `select: { address: true }` so names are never loaded), `listResidentialPublic` (consented rows only) |
+| `apps/api/src/content/hero.service.spec.ts` | **new** — 3 tests: desktop returns all active, mobile narrows to `showOnMobile`, inactive never returned |
+| `apps/api/src/content/hero.service.ts` | **new** — `listActive(target)`, `listAll`, CRUD |
+| `apps/api/src/content/blog.service.spec.ts` | **new** — 6 tests incl. future-dated posts staying hidden and `publishedAt` stamping |
+| `apps/api/src/content/blog.service.ts` | **new** — public list requires `published && publishedAt <= now`; create/update stamp `publishedAt` when a post goes live without a date |
+| `apps/api/src/content/{testimonials,team,certifications}.service.ts` | **new** — `listPublic` / `listAll` / CRUD; certifications have no `published` column so both lists agree |
+| `apps/api/src/content/{clients,hero,blog,testimonials,team,certifications}.controller.ts` | **new** — public reads, writes behind ADMIN/EDITOR, deletes ADMIN-only |
+| `apps/api/src/content/content.module.ts` | now wires all nine content services/controllers |
+| `apps/api/src/settings/settings.{service,controller,module}.ts` | **new** — singleton row; both read and write upsert so a fresh database never 404s |
+| `packages/types/src/content.ts` | added blog, testimonial, team, certification and hero-segment schemas + `heroQuerySchema` |
+| `packages/types/src/settings.ts` | **new** — `updateSettingsSchema` (fully partial; one row, only ever edited) |
+| `packages/types/src/index.ts` | export `./settings.js` |
+| `apps/api/src/app.module.ts` | registered `SettingsModule` |
+| `apps/api/test/site-content.e2e-spec.ts` | **new** — 21 e2e tests across all seven resources |
+
+### Decisions worth knowing
+
+- **Clients are read-only over HTTP.** Both lists come from the company profile and are
+  owned by the seed, so there is no admin CRUD and — deliberately — no route that can
+  return a non-consenting residential row. The e2e asserts the private name never
+  appears on any of the three client routes.
+- **`GET /api/settings` upserts.** A fresh database would otherwise 404 on a route the
+  footer always calls. The placeholder row uses empty strings for contact details
+  (nothing invented) and `establishedYear: 2015`, which is spec-backed; Task 14's seed
+  replaces it.
+- **Settings writes are ADMIN-only** — an editor changing the company phone number is a
+  different class of change from editing a blog post.
+- **Blog publishing stamps a date.** `listPublic` filters on `publishedAt`, so a post
+  published without one would have been invisible; create/update fill it in.
+
+### Verification
+
+- `pnpm test:e2e` (apps/api) — 62 passed, 4 suites
+- `pnpm test` (root) — 48 passed (api), 21 passed (types)
+- `pnpm typecheck` — clean

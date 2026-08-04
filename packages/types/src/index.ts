@@ -3,3 +3,4 @@ export * from "./auth.js";
 export * from "./media.js";
 export * from "./lead.js";
 export * from "./content.js";
+export * from "./settings.js";

@@ -6,6 +6,7 @@ import { ContentModule } from "./content/content.module";
 import { LeadsModule } from "./leads/leads.module";
 import { MediaModule } from "./media/media.module";
 import { PrismaModule } from "./prisma/prisma.module";
+import { SettingsModule } from "./settings/settings.module";
 
 @Controller("health")
 export class HealthController {
@@ -24,6 +25,7 @@ export class HealthController {
     MediaModule,
     LeadsModule,
     ContentModule,
+    SettingsModule,
   ],
   controllers: [HealthController],
 })
