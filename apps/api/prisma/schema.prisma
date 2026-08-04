@@ -1,0 +1,280 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Infrastructure ----------
+
+model Media {
+  id         String   @id @default(cuid())
+  storageKey String // opaque to callers
+  mimeType   String
+  width      Int
+  height     Int
+  bytes      Int
+  blurhash   String?
+  altEn      String // required — enforced at API layer
+  altBn      String
+  createdAt  DateTime @default(now())
+
+  // Back-relations. Prisma refuses to generate a client without them; every
+  // relation Media participates in is named so the pairs stay unambiguous.
+  serviceCovers      Service[]       @relation("ServiceCover")
+  serviceGalleries   Service[]       @relation("ServiceGallery")
+  projectCovers      Project[]       @relation("ProjectCover")
+  projectGalleries   Project[]       @relation("ProjectGallery")
+  certificationDocs  Certification[] @relation("CertificationDocument")
+  heroBackgrounds    HeroSegment[]   @relation("HeroBg")
+  heroForegrounds    HeroSegment[]   @relation("HeroFg")
+  blogCovers         BlogPost[]      @relation("BlogCover")
+  testimonialAvatars Testimonial[]   @relation("TestimonialAvatar")
+  teamPhotos         TeamMember[]    @relation("TeamPhoto")
+  seoOgImages        Seo[]           @relation("SeoOgImage")
+}
+
+model Seo {
+  id            String  @id @default(cuid())
+  titleEn       String?
+  titleBn       String?
+  descriptionEn String?
+  descriptionBn String?
+  ogImageId     String?
+  ogImage       Media?  @relation("SeoOgImage", fields: [ogImageId], references: [id])
+
+  // The content row owns the FK (`seoId`); these are its back-relations.
+  service  Service?  @relation("ServiceSeo")
+  project  Project?  @relation("ProjectSeo")
+  blogPost BlogPost? @relation("BlogPostSeo")
+}
+
+// ---------- Content ----------
+
+model Service {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  titleEn   String
+  titleBn   String
+  summaryEn String
+  summaryBn String
+  bodyEn    String  @db.Text // rich text (HTML from editor)
+  bodyBn    String  @db.Text
+  icon      String // lucide icon name
+  coverId   String?
+  cover     Media?  @relation("ServiceCover", fields: [coverId], references: [id])
+  gallery   Media[] @relation("ServiceGallery")
+  sortOrder Int     @default(0)
+  published Boolean @default(false)
+  seoId     String? @unique
+  seo       Seo?    @relation("ServiceSeo", fields: [seoId], references: [id])
+  leads     Lead[]
+  // Phase 2 hangs ShopProduct[] off this row; the row itself does not change.
+}
+
+model WorkingArea {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  nameEn    String
+  nameBn    String
+  sortOrder Int       @default(0)
+  projects  Project[]
+}
+
+model Project {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  titleEn       String
+  titleBn       String
+  clientName    String? // nullable — residential clients may not consent
+  locationEn    String
+  locationBn    String
+  areaSqft      Int?
+  year          Int?
+  descriptionEn String      @db.Text
+  descriptionBn String      @db.Text
+  workingAreaId String
+  workingArea   WorkingArea @relation(fields: [workingAreaId], references: [id])
+  coverId       String?
+  cover         Media?      @relation("ProjectCover", fields: [coverId], references: [id])
+  gallery       Media[]     @relation("ProjectGallery")
+  featured      Boolean     @default(false)
+  published     Boolean     @default(false)
+  sortOrder     Int         @default(0)
+  seoId         String?     @unique
+  seo           Seo?        @relation("ProjectSeo", fields: [seoId], references: [id])
+}
+
+model CorporateClient {
+  id                String  @id @default(cuid())
+  serial            Int // preserve profile ordering
+  companyName       String
+  address           String
+  isFlagship        Boolean @default(false)
+  needsVerification Boolean @default(false)
+}
+
+model ResidentialClient {
+  id                String  @id @default(cuid())
+  serial            Int
+  clientName        String
+  address           String
+  needsVerification Boolean @default(false)
+  // displayed only with consent; see spec §11 privacy note
+  publiclyListed    Boolean @default(false)
+}
+
+model Certification {
+  id         String  @id @default(cuid())
+  titleEn    String
+  titleBn    String
+  issuer     String?
+  reference  String? // e.g. BIN 001489494-0804
+  documentId String?
+  document   Media?  @relation("CertificationDocument", fields: [documentId], references: [id])
+  sortOrder  Int     @default(0)
+}
+
+model HeroSegment {
+  id           String  @id @default(cuid())
+  sortOrder    Int
+  imageId      String
+  image        Media   @relation("HeroBg", fields: [imageId], references: [id])
+  foregroundId String? // parallax layer that hides the joint
+  foreground   Media?  @relation("HeroFg", fields: [foregroundId], references: [id])
+  labelEn      String // "Living Room"
+  labelBn      String
+  captionEn    String?
+  captionBn    String?
+  focalX       Float   @default(0.5) // 0–1, keeps the subject framed on crop
+  active       Boolean @default(true)
+  showOnMobile Boolean @default(false) // see spec §7: mobile renders this subset
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  titleEn     String
+  titleBn     String
+  excerptEn   String
+  excerptBn   String
+  bodyEn      String    @db.Text
+  bodyBn      String    @db.Text
+  coverId     String?
+  cover       Media?    @relation("BlogCover", fields: [coverId], references: [id])
+  tags        String[]
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  seoId       String?   @unique
+  seo         Seo?      @relation("BlogPostSeo", fields: [seoId], references: [id])
+}
+
+model Testimonial {
+  id         String  @id @default(cuid())
+  authorName String
+  roleEn     String?
+  roleBn     String?
+  quoteEn    String
+  quoteBn    String
+  rating     Int? // 1–5
+  avatarId   String?
+  avatar     Media?  @relation("TestimonialAvatar", fields: [avatarId], references: [id])
+  published  Boolean @default(false)
+  sortOrder  Int     @default(0)
+}
+
+model TeamMember {
+  id        String  @id @default(cuid())
+  name      String
+  roleEn    String
+  roleBn    String
+  bioEn     String?
+  bioBn     String?
+  photoId   String?
+  photo     Media?  @relation("TeamPhoto", fields: [photoId], references: [id])
+  sortOrder Int     @default(0)
+  published Boolean @default(false)
+}
+
+// ---------- Leads ----------
+
+enum LeadType {
+  CONTACT
+  CONSULTATION
+  QUOTE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  WON
+  LOST
+}
+
+model Lead {
+  id            String     @id @default(cuid())
+  type          LeadType
+  status        LeadStatus @default(NEW)
+  name          String
+  phone         String
+  email         String?
+  message       String?    @db.Text
+  serviceId     String? // "I'm interested in X"
+  service       Service?   @relation(fields: [serviceId], references: [id])
+  sourcePath    String? // which page it came from
+  locale        String // en | bn
+  internalNotes String?    @db.Text
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([status, createdAt])
+}
+
+// ---------- Settings and auth ----------
+
+model SiteSettings {
+  id              String  @id @default("singleton")
+  phone           String
+  whatsapp        String
+  email           String
+  addressEn       String
+  addressBn       String
+  hoursEn         String
+  hoursBn         String
+  facebookUrl     String?
+  instagramUrl    String?
+  youtubeUrl      String?
+  establishedYear Int
+  // headline stats, editable so they stay true as work is added
+  corporateProjectCount   Int
+  residentialProjectCount Int
+  districtCount           Int
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(EDITOR)
+  createdAt    DateTime @default(now())
+}
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  replacedBy String?
+
+  @@index([userId])
+}
