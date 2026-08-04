@@ -2,6 +2,7 @@ import { Controller, Get, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { AuthModule } from "./auth/auth.module";
+import { ContentModule } from "./content/content.module";
 import { LeadsModule } from "./leads/leads.module";
 import { MediaModule } from "./media/media.module";
 import { PrismaModule } from "./prisma/prisma.module";
@@ -22,6 +23,7 @@ export class HealthController {
     AuthModule,
     MediaModule,
     LeadsModule,
+    ContentModule,
   ],
   controllers: [HealthController],
 })
