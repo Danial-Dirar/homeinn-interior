@@ -218,3 +218,72 @@ already truthful even with the row tables empty.
 - `pnpm test:e2e` — 72 passed, 3 todo, 5 suites
 - `pnpm test` (root) — 48 passed (api), 21 passed (types)
 - `pnpm typecheck` — clean
+
+---
+
+## Task 15 — Public API surface and full green run — 2026-08-04 — DONE
+
+Plan section: Task 15, the contract test Plan 1B consumes.
+
+### Files
+
+| File | Change |
+| --- | --- |
+| `apps/api/test/public-api.e2e-spec.ts` | **new** — 12 tests over the unauthenticated read surface plus the residential-privacy assertion |
+
+No `app.module.ts` change was needed — every module was already registered by the end
+of Task 13.
+
+### Honest note on the TDD cycle
+
+This suite passed on its first run. It is a contract test over routes that Tasks 12–14
+had already built, which is what the plan expects at this point ("FAIL on any route not
+yet registered" — none were missing). It was not a red-green cycle, and it should be
+read as a regression net for Plan 1B rather than as a driver of new code.
+
+### Decisions worth knowing
+
+- **The suite seeds itself** in `beforeAll` (`resetDb` → `seed`), like `seed.e2e-spec.ts`.
+  Every other e2e file truncates in `beforeEach`, so a suite that expected seeded data
+  to already be there would break depending on which file jest ran first.
+- **Two fixtures are created beyond the seed**: a non-consenting residential row and two
+  hero segments. Without them the privacy and `?target=mobile` assertions would pass
+  vacuously against empty tables — the seed intentionally creates neither.
+- **Count assertions compare against the seed source** (`workingAreas.length`,
+  `corporateClients.length`) rather than hardcoded 9 / 73. Data completeness is asserted
+  in `seed.e2e-spec.ts`, where the 73/57 checks are the blocked `it.todo`s; here the
+  contract is "the route returns everything that was seeded", which holds either way.
+
+### Verification — full green run, per the plan's Step 4
+
+```
+pnpm db:start
+DATABASE_URL="$TEST_DATABASE_URL" pnpm prisma migrate deploy   → no pending migrations
+DATABASE_URL="$TEST_DATABASE_URL" pnpm seed                    → seed complete
+DATABASE_URL="$TEST_DATABASE_URL" pnpm test:e2e                → 84 passed, 3 todo, 6 suites
+pnpm test                                                      → 48 (api) + 21 (types)
+pnpm typecheck                                                 → clean
+pnpm lint                                                      → no lint task defined anywhere
+```
+
+---
+
+## Phase 1A status — 2026-08-04
+
+Tasks 1–15 complete except the one blocked piece.
+
+| Task | State |
+| --- | --- |
+| 1–10 (monorepo, Postgres, schemas, Prisma, Nest, auth, media) | done before this session |
+| 11 Leads | done — `2e0ed52` |
+| 12 Services / working areas / projects | done — `9eafe39` |
+| 13 Clients, hero, blog, testimonials, team, certifications, settings | done — `5e3e634` |
+| 14 Seed | **partial** — `eaad29a`; client tables blocked on the profile PDF |
+| 15 Public API surface | done |
+
+**The one open item:** transcribe 73 corporate + 57 residential rows into
+`apps/api/prisma/seed-data/`. Needs the company profile PDF, which is not in the repo.
+Three `it.todo`s in `apps/api/test/seed.e2e-spec.ts` are waiting on it.
+
+**Not done and not in Plan 1A's scope:** `pnpm lint` runs nothing — no package defines a
+`lint` task, so the root script is a no-op. Worth adding ESLint before Plan 1B.
