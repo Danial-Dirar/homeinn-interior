@@ -379,3 +379,50 @@ None to run — no code was written. The plan's own gates are per task.
 ### Next
 
 Awaiting the choice between subagent-driven and inline execution before Task 1.
+
+---
+
+## Phase 1B execution — 2026-08-05 — IN PROGRESS
+
+Branch: `feat/phase1b-public-web` (cut from `main` at `06f501c`). Inline execution,
+no subagents. Commits are one per plan task.
+
+### Tasks 1–4 — DONE
+
+| Task | Commit | What landed |
+| --- | --- | --- |
+| 1 API blurhash + media view | `6952617` | `apps/api/src/media/blurhash.ts` + spec; `MediaService.ingest` now stores a blurhash; `MediaService.view` / `viewMany`; `publicMediaSchema` / `PublicMedia` in `packages/types/src/media.ts` |
+| 2 API media on public reads | `ed16489` | `ContentModule` imports `MediaModule`; `hero`, `services`, `projects`, `blog`, `testimonials`, `team`, `certifications` services now include and serialise their media (+ `seo` on detail routes); 3 new e2e in `public-api.e2e-spec.ts` |
+| 3 Scaffold `apps/web` | `ddb9868` | `package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `vitest.config.ts`, `vitest.setup.ts`, `app/{layout,page}.tsx`, `app/globals.css`, `lib/env.ts` + test; `.env` / `.env.example` gained `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`, `WEB_ORIGIN` |
+| 4 Design tokens | (pending commit) | `app/globals.css` — the nine §8 colours, the bilingual type scale, `.display-1/2`, `.heading`, `.eyebrow`, `.section-numeral`; `lib/typography.ts`, `lib/fonts.ts`; `app/theme.test.ts` guards the palette |
+
+### Versions that actually resolved
+
+Next 15.5.22 · React 19.2.8 · Tailwind 4.3.3 · Vitest 2.1.9 · next-intl 4.13.4.
+The plan's `next-intl` code targets `defineRouting` / `createNavigation` /
+`getRequestConfig({ requestLocale })`, all present in 4.x.
+
+### Gotchas hit
+
+- **`pnpm install` exits non-zero on `ERR_PNPM_IGNORED_BUILDS`.** Three packages
+  needed approving in `pnpm-workspace.yaml` `allowBuilds`: `unrs-resolver`
+  (eslint's native resolver, via `eslint-config-next`), `@parcel/watcher` and
+  `@swc/core` (via `next-intl`). When pnpm writes the placeholder
+  `set this to true or false` into that file it becomes invalid YAML and every
+  later pnpm command fails — replace the placeholder with `true`, don't leave it.
+- **`eslint-config-next` is still eslintrc-shaped**, so `eslint.config.mjs` needs
+  `FlatCompat` from `@eslint/eslintrc` (added as a devDependency).
+- **Three content service unit specs broke on constructor arity** once
+  `MediaService` was injected. Each got an inert stub
+  (`toPublic: (m) => m, view: (m) => m ?? null, viewMany: (rows) => rows`) —
+  they assert filtering behaviour, not serialisation, which
+  `media.service.spec.ts` covers.
+
+### Verification so far
+
+- `pnpm --filter @homeinn/api test` — 55 passed, 11 suites (was 48/8)
+- `DATABASE_URL="$TEST_DATABASE_URL" pnpm --filter @homeinn/api test:e2e` — 87 passed, 3 todo, 6 suites (was 84)
+- `pnpm --filter @homeinn/web test` — 17 passed, 3 files
+- `pnpm --filter @homeinn/web build` — clean, 4 static pages
+- `pnpm --filter @homeinn/web lint` — 0 errors, 0 warnings
+- `pnpm typecheck` — clean across 4 packages
