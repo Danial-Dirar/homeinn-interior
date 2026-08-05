@@ -14,6 +14,7 @@
   "dependencies": {
     "@homeinn/types": "workspace:*",
     "@homeinn/ui": "workspace:*",
+    "lenis": "^1.3.25",
     "lucide-react": "^0.469.0",
     "next": "^15.1.0",
     "next-intl": "^4.13.4",

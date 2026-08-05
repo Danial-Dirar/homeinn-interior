@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SkipLink } from "@/components/layout/skip-link";
+import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { routing } from "@/i18n/routing";
 import { getSettings } from "@/lib/content";
 import { fontVariables } from "@/lib/fonts";
@@ -32,6 +33,7 @@ export default async function LocaleLayout({
     <html lang={locale} className={fontVariables}>
       <body className={fontClassFor(locale)}>
         <NextIntlClientProvider>
+          <SmoothScroll />
           <SkipLink />
           <SiteHeader locale={locale} settings={settings} />
           {children}

@@ -1,4 +1,5 @@
 import type { Locale } from "@homeinn/types";
+import type { CSSProperties } from "react";
 import type { MediaView } from "@/lib/api.types";
 import { blurhashAverageColor, largestSrc } from "@/lib/media";
 
@@ -10,6 +11,8 @@ interface PictureProps {
   /** Set on the LCP element only — the first hero segment (spec §7). */
   priority?: boolean;
   className?: string;
+  /** Merged over the blurhash ground — `objectPosition` for a focal crop, say. */
+  style?: CSSProperties;
 }
 
 /**
@@ -17,7 +20,9 @@ interface PictureProps {
  * the sharp pipeline in `apps/api` has already produced every width in both
  * formats, and re-encoding them through the Next loader would repeat that work.
  */
-export function Picture({ media, locale, sizes, priority = false, className }: PictureProps) {
+export function Picture({
+  media, locale, sizes, priority = false, className, style,
+}: PictureProps) {
   const webp = media.sources.find((source) => source.type === "image/webp");
   const alt = locale === "bn" ? media.altBn : media.altEn;
 
@@ -36,7 +41,7 @@ export function Picture({ media, locale, sizes, priority = false, className }: P
         fetchPriority={priority ? "high" : "auto"}
         decoding={priority ? "sync" : "async"}
         className={className}
-        style={{ backgroundColor: blurhashAverageColor(media.blurhash) }}
+        style={{ backgroundColor: blurhashAverageColor(media.blurhash), ...style }}
       />
     </picture>
   );
