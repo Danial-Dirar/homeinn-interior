@@ -2,8 +2,9 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { Prisma, type Media } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
-import type { PaginationQuery } from "@homeinn/types";
+import type { PaginationQuery, PublicMedia } from "@homeinn/types";
 import { PrismaService } from "../prisma/prisma.service";
+import { blurhashOf } from "./blurhash";
 import { StorageService } from "./storage/storage.interface";
 
 const WIDTHS = [480, 960, 1440, 1920] as const;
@@ -60,6 +61,7 @@ export class MediaService {
         width: meta.width,
         height: meta.height,
         bytes: file.buffer.byteLength,
+        blurhash: await blurhashOf(file.buffer),
         altEn: alt.altEn.trim(),
         altBn: alt.altBn.trim(),
       },
@@ -67,7 +69,7 @@ export class MediaService {
   }
 
   /** A media row plus the srcset strings the web app renders from. */
-  toPublic(media: Media) {
+  toPublic(media: Media): PublicMedia {
     const widths = derivativeWidths(media.width);
     return {
       ...media,
@@ -78,6 +80,15 @@ export class MediaService {
           .join(", "),
       })),
     };
+  }
+
+  /** Serialises an optional relation. Content services call this on every include. */
+  view(media: Media | null | undefined): PublicMedia | null {
+    return media ? this.toPublic(media) : null;
+  }
+
+  viewMany(rows: Media[]): PublicMedia[] {
+    return rows.map((m) => this.toPublic(m));
   }
 
   async list(query: PaginationQuery) {

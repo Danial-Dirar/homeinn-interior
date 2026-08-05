@@ -63,4 +63,38 @@ describe("MediaService.ingest", () => {
     expect(row.altEn).toBe("A living room");
     expect(row.altBn).toBe("একটি বসার ঘর");
   });
+
+  it("stores a blurhash placeholder", async () => {
+    const svc = new MediaService(fakePrisma() as never, fakeStorage());
+    const row = await svc.ingest(
+      { buffer: await png(600, 400), mimetype: "image/png", originalname: "a.png" }, alt);
+    expect(typeof row.blurhash).toBe("string");
+    expect((row.blurhash as string).length).toBeGreaterThan(6);
+  });
+});
+
+describe("MediaService.view", () => {
+  const row = {
+    id: "m1", storageKey: "abc", mimeType: "image/jpeg",
+    width: 1920, height: 1080, bytes: 100, blurhash: "LEHV6nWB",
+    altEn: "A room", altBn: "একটি ঘর", createdAt: new Date(),
+  };
+
+  it("returns null for a missing relation", () => {
+    const svc = new MediaService(fakePrisma() as never, fakeStorage());
+    expect(svc.view(null)).toBeNull();
+    expect(svc.view(undefined)).toBeNull();
+  });
+
+  it("adds one source per format, widest last", () => {
+    const svc = new MediaService(fakePrisma() as never, fakeStorage());
+    const view = svc.view(row);
+    expect(view?.sources.map((s) => s.type)).toEqual(["image/avif", "image/webp"]);
+    expect(view?.sources[0]?.srcset).toContain("http://cdn.test/abc/1920.avif 1920w");
+  });
+
+  it("maps a list", () => {
+    const svc = new MediaService(fakePrisma() as never, fakeStorage());
+    expect(svc.viewMany([row, row])).toHaveLength(2);
+  });
 });
