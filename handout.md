@@ -287,3 +287,95 @@ Three `it.todo`s in `apps/api/test/seed.e2e-spec.ts` are waiting on it.
 
 **Not done and not in Plan 1A's scope:** `pnpm lint` runs nothing — no package defines a
 `lint` task, so the root script is a no-op. Worth adding ESLint before Plan 1B.
+
+---
+
+## Plan 1B written — 2026-08-05 — DONE (no code changed)
+
+Planning session only. Nothing in `apps/` or `packages/` was touched.
+
+### Files
+
+| File | Change |
+| --- | --- |
+| `docs/superpowers/plans/2026-08-05-phase1b-public-web-app.md` | **new** — 19 tasks, 155 steps, the public web app (spec §6 IA, §7 hero, §8 visual, §9 i18n, §11 SEO/privacy, §12 honest content, §13 testing) |
+| `handout.md` | this entry |
+
+### The gap the planning found
+
+`GET /api/services`, `/hero`, `/blog`, `/projects` and the rest return bare Prisma
+rows — `coverId` and `imageId`, no URL, no alt text, no dimensions, no `srcset`.
+`MediaService.toPublic` exists and builds the srcset, but only the authenticated
+`/api/media` routes call it. Separately, `Media.blurhash` has been a nullable
+column since Plan 1A Task 4 and **nothing has ever written to it**, although spec
+§7 names it as the hero's LCP placeholder.
+
+So the web app as of `06f501c` cannot render a single image. Plan 1B's Tasks 1
+and 2 close both before any Next.js work starts.
+
+### Three deliberate deviations from spec §8's motion stack
+
+Stated at the top of the plan with reasons, and reversible — only Tasks 9, 10
+and 12 are affected.
+
+1. **No GSAP ScrollTrigger.** Spec §7's own markup is `sticky top-0 h-dvh`, which
+   *is* the pin; ScrollTrigger would only be computing a number. Sticky plus a
+   rAF-throttled progress hook saves ~60 KB against §7's stated budget of
+   LCP < 2.5 s on mid-range Android over 4G, and makes progress→transform a pure
+   function — which §13 explicitly asks to test as one.
+2. **No Framer Motion.** Entrances are fade-and-rise; a 25-line
+   IntersectionObserver hook does that without an animation runtime.
+3. **No 21st.dev registry.** Of the four blocks §8 names, only the marquee has a
+   use in Phase 1B (testimonials seed empty and hide; bento and comparison
+   slider are not in the §6 IA). A CSS marquee is ~20 lines and gates on
+   reduced-motion more cleanly than a JS one.
+
+Lenis is kept — it is what produces the cinematic feel §8 asks for, and it is small.
+
+### Decisions worth knowing
+
+- **The lead form POSTs from the browser directly to the API**, never through a
+  Server Action or route handler. `POST /api/leads` is capped at 5/hour **per IP**;
+  proxying through the Next server would put every visitor in the country behind
+  one IP and one shared budget. This is written into the plan's global constraints.
+- **`<picture>`, not `next/image`.** The API's sharp pipeline already emits AVIF +
+  WebP at 480/960/1440/1920; the Next loader would re-encode finished work.
+- **Blurhash is decoded server-side to an average colour**, not to a canvas.
+  Characters 2–6 of a blurhash are the base83-encoded 24-bit sRGB DC component,
+  so a ~15-line pure function gives a server-renderable placeholder with zero
+  client JS — which matters because hero segment 1 is the LCP element.
+- **Response shapes are TypeScript types in `apps/web/lib/api.types.ts`, not Zod
+  in `@homeinn/types`.** `@homeinn/types` keeps request DTOs, which both sides
+  genuinely validate. Hand-writing response schemas would create a second source
+  of truth that can drift from the Prisma schema silently; `public-api.e2e-spec.ts`
+  enforces the contract instead.
+- **`packages/ui` is created as spec §4 and §8 specify**, even though its only
+  consumer in Phase 1 is `apps/web` (the admin lives in the same app). Flagged as
+  a cost rather than silently dropped — reversing it is a one-task change.
+
+### How the blocked profile PDF is handled
+
+Same principle as Plan 1A Task 14: nothing is invented, and every section whose
+only source is that document degrades to a hidden section or an honest empty state.
+
+- Vision / Mission / Values / Strengths / Philosophy → five empty keys in **both**
+  message catalogues; `CopyBlock` renders nothing for a blank body
+- "How we work" (the six key strengths) → `home.processTitle` empty; section hides
+- Testimonials, team → tables seed empty; sections hide (spec §12)
+- Corporate client rows → `/clients` still states the real 73/57/13 counts, and the
+  home track-record section surfaces flagship names only if rows ever exist
+- Project case studies → `/projects` shows the honest "being prepared" copy
+- Images → `ASSET-CHECKLIST.md` at the repo root plus a `pnpm seed:hero` pipeline
+  that ingests whatever is dropped in `prisma/seed-data/placeholders/`
+
+A message-catalogue test enforces the §9 failure mode directly: no key may have a
+non-empty English string and an empty Bangla one. Deliberately-blocked copy is
+empty in both, which passes.
+
+### Verification
+
+None to run — no code was written. The plan's own gates are per task.
+
+### Next
+
+Awaiting the choice between subagent-driven and inline execution before Task 1.
