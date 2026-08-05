@@ -1,11 +1,7 @@
 import type { ReactNode } from "react";
-import { fontVariables } from "@/lib/fonts";
-import "./globals.css";
 
+// `[locale]/layout.tsx` renders <html> and <body>; this shell only exists
+// because the App Router requires a root layout.
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en" className={fontVariables}>
-      <body className="font-sans">{children}</body>
-    </html>
-  );
+  return children;
 }
