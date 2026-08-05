@@ -1,5 +1,13 @@
 import { ServicesService } from "./services.service";
 
+/** The media serialiser is exercised in media.service.spec; here it is inert. */
+const fakeMedia = {
+  toPublic: (m: unknown) => m,
+  view: (m: unknown) => m ?? null,
+  viewMany: (rows: unknown[]) => rows,
+} as never;
+
+
 function fakePrisma(rows: { slug: string; published: boolean }[]) {
   return {
     service: {
@@ -19,18 +27,18 @@ const rows = [
 
 describe("ServicesService", () => {
   it("listPublic returns only published rows", async () => {
-    const svc = new ServicesService(fakePrisma(rows) as never);
+    const svc = new ServicesService(fakePrisma(rows) as never, fakeMedia);
     const out = await svc.listPublic();
     expect(out.map((r) => r.slug)).toEqual(["interior-design"]);
   });
 
   it("listAll returns drafts too", async () => {
-    const svc = new ServicesService(fakePrisma(rows) as never);
+    const svc = new ServicesService(fakePrisma(rows) as never, fakeMedia);
     expect(await svc.listAll()).toHaveLength(2);
   });
 
   it("findPublicBySlug returns null for a draft", async () => {
-    const svc = new ServicesService(fakePrisma(rows) as never);
+    const svc = new ServicesService(fakePrisma(rows) as never, fakeMedia);
     expect(await svc.findPublicBySlug("draft-thing")).toBeNull();
   });
 });

@@ -117,6 +117,40 @@ describe("public read surface", () => {
   });
 });
 
+describe("media on the public read surface", () => {
+  it("returns the hero background as a rendered image, not an id", async () => {
+    const res = await request(server()).get("/api/hero").expect(200);
+
+    const segment = res.body[0];
+    expect(segment.image).toBeTruthy();
+    expect(segment.image.altEn).toBe("A living room");
+    expect(segment.image.altBn).toBe("একটি বসার ঘর");
+    expect(segment.image.width).toBe(1920);
+    expect(segment.image.sources.map((s: { type: string }) => s.type))
+      .toEqual(["image/avif", "image/webp"]);
+    expect(segment.image.sources[0].srcset).toMatch(/\d+w$/);
+    expect(segment.foreground).toBeNull();
+  });
+
+  it("returns a null cover rather than omitting the key", async () => {
+    const res = await request(server()).get("/api/services").expect(200);
+
+    expect(res.body.length).toBeGreaterThan(0);
+    for (const service of res.body) {
+      expect(service).toHaveProperty("cover");
+    }
+  });
+
+  it("returns gallery and seo on a service detail", async () => {
+    const list = await request(server()).get("/api/services").expect(200);
+    const slug = list.body[0].slug;
+
+    const res = await request(server()).get(`/api/services/${slug}`).expect(200);
+    expect(Array.isArray(res.body.gallery)).toBe(true);
+    expect(res.body).toHaveProperty("seo");
+  });
+});
+
 describe("residential privacy", () => {
   it("never exposes a non-consenting residential client name on any public route", async () => {
     const routes = [

@@ -1,5 +1,13 @@
 import { BlogService } from "./blog.service";
 
+/** The media serialiser is exercised in media.service.spec; here it is inert. */
+const fakeMedia = {
+  toPublic: (m: unknown) => m,
+  view: (m: unknown) => m ?? null,
+  viewMany: (rows: unknown[]) => rows,
+} as never;
+
+
 const yesterday = new Date(Date.now() - 86_400_000);
 const tomorrow = new Date(Date.now() + 86_400_000);
 
@@ -28,27 +36,27 @@ function fakePrisma() {
 
 describe("BlogService", () => {
   it("listPublic returns a post whose publish date has passed", async () => {
-    const svc = new BlogService(fakePrisma() as never);
+    const svc = new BlogService(fakePrisma() as never, fakeMedia);
     expect((await svc.listPublic()).map((p) => p.slug)).toContain("live");
   });
 
   it("listPublic hides a future-dated post", async () => {
-    const svc = new BlogService(fakePrisma() as never);
+    const svc = new BlogService(fakePrisma() as never, fakeMedia);
     expect((await svc.listPublic()).map((p) => p.slug)).not.toContain("scheduled");
   });
 
   it("listPublic hides a draft", async () => {
-    const svc = new BlogService(fakePrisma() as never);
+    const svc = new BlogService(fakePrisma() as never, fakeMedia);
     expect((await svc.listPublic()).map((p) => p.slug)).not.toContain("draft");
   });
 
   it("listAll keeps drafts and scheduled posts", async () => {
-    const svc = new BlogService(fakePrisma() as never);
+    const svc = new BlogService(fakePrisma() as never, fakeMedia);
     expect(await svc.listAll()).toHaveLength(4);
   });
 
   it("stamps publishedAt when a post is created already published without a date", async () => {
-    const svc = new BlogService(fakePrisma() as never);
+    const svc = new BlogService(fakePrisma() as never, fakeMedia);
     const row = await svc.create({
       titleEn: "T", titleBn: "ট", excerptEn: "E", excerptBn: "ই",
       bodyEn: "B", bodyBn: "ব", tags: [], published: true,
@@ -57,7 +65,7 @@ describe("BlogService", () => {
   });
 
   it("leaves publishedAt unset on a draft", async () => {
-    const svc = new BlogService(fakePrisma() as never);
+    const svc = new BlogService(fakePrisma() as never, fakeMedia);
     const row = await svc.create({
       titleEn: "T", titleBn: "ট", excerptEn: "E", excerptBn: "ই",
       bodyEn: "B", bodyBn: "ব", tags: [], published: false,

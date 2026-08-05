@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AuthModule } from "../auth/auth.module";
+import { MediaModule } from "../media/media.module";
 import { BlogController } from "./blog.controller";
 import { BlogService } from "./blog.service";
 import { CertificationsController } from "./certifications.controller";
@@ -25,7 +26,7 @@ const services = [
 ];
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, MediaModule],
   controllers: [
     ServicesController, WorkingAreasController, ProjectsController, ClientsController,
     HeroController, BlogController, TestimonialsController, TeamController,

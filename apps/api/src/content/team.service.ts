@@ -2,16 +2,25 @@ import { Injectable } from "@nestjs/common";
 import type { TeamMember } from "@prisma/client";
 import type { CreateTeamMemberInput, UpdateTeamMemberInput } from "@homeinn/types";
 import { PrismaService } from "../prisma/prisma.service";
+import { MediaService } from "../media/media.service";
 import { notFoundIfMissing } from "./content.helpers";
 
 const PUBLIC_ORDER = { sortOrder: "asc" } as const;
 
 @Injectable()
 export class TeamService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly media: MediaService,
+  ) {}
 
-  listPublic(): Promise<TeamMember[]> {
-    return this.prisma.teamMember.findMany({ where: { published: true }, orderBy: PUBLIC_ORDER });
+  async listPublic() {
+    const rows = await this.prisma.teamMember.findMany({
+      where: { published: true },
+      orderBy: PUBLIC_ORDER,
+      include: { photo: true },
+    });
+    return rows.map((r) => ({ ...r, photo: this.media.view(r.photo) }));
   }
 
   listAll(): Promise<TeamMember[]> {
