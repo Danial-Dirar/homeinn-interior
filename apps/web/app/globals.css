@@ -1,1 +1,105 @@
 @import "tailwindcss";
+
+@theme {
+  /* Spec §8 — these nine values, verbatim. `brand` is CTA, active nav, focus
+     ring and section numerals only; it is never a background wash. */
+  --color-ink: #0B0B0C;
+  --color-ink-raised: #141416;
+  --color-ink-line: #232326;
+  --color-bone: #F6F2EC;
+  --color-sand: #E7DFD2;
+  --color-sand-dim: #9C948A;
+  --color-walnut: #7A5537;
+  --color-amber: #C9A227;
+  --color-brand: #E01B24;
+
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-geist), system-ui, -apple-system, sans-serif;
+  --font-bangla: var(--font-anek), "Noto Sans Bengali", system-ui, sans-serif;
+
+  --animate-marquee: marquee var(--marquee-duration, 45s) linear infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+}
+
+@layer base {
+  :root {
+    /* Latin baseline. Bangla and Latin do not share an x-height, so the whole
+       scale carries one per-locale adjustment rather than per-component tweaks. */
+    --type-scale: 1;
+    --heading-leading: 1.04;
+    --body-leading: 1.65;
+  }
+
+  html[lang="bn"] {
+    --type-scale: 0.94;
+    --heading-leading: 1.42;
+    --body-leading: 1.85;
+  }
+
+  body {
+    background-color: var(--color-bone);
+    color: var(--color-ink);
+    line-height: var(--body-leading);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: var(--color-bone);
+  }
+}
+
+@layer components {
+  .display-1 {
+    font-family: var(--font-display);
+    font-size: calc(var(--type-scale) * clamp(2.75rem, 7vw, 5.5rem));
+    line-height: var(--heading-leading);
+    letter-spacing: -0.02em;
+    font-weight: 400;
+  }
+
+  .display-2 {
+    font-family: var(--font-display);
+    font-size: calc(var(--type-scale) * clamp(2rem, 4.5vw, 3.25rem));
+    line-height: var(--heading-leading);
+    letter-spacing: -0.015em;
+    font-weight: 400;
+  }
+
+  .heading {
+    font-family: var(--font-display);
+    font-size: calc(var(--type-scale) * clamp(1.25rem, 2vw, 1.6rem));
+    line-height: calc(var(--heading-leading) + 0.12);
+    font-weight: 500;
+  }
+
+  .eyebrow {
+    font-size: calc(var(--type-scale) * 0.75rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-sand-dim);
+  }
+
+  /* Bangla has no letter case, so `uppercase` is a no-op there — but the wide
+     tracking is not: it breaks conjuncts apart. Tighten it for bn. */
+  html[lang="bn"] .eyebrow {
+    letter-spacing: 0.04em;
+  }
+
+  /* Spec §8 names section numerals as one of the four sanctioned uses of brand. */
+  .section-numeral {
+    font-family: var(--font-display);
+    font-size: calc(var(--type-scale) * 0.8rem);
+    color: var(--color-brand);
+    letter-spacing: 0.1em;
+  }
+}
