@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@homeinn/types": "workspace:*",
+    "@homeinn/ui": "workspace:*",
+    "lucide-react": "^0.469.0",
     "next": "^15.1.0",
     "next-intl": "^4.13.4",
     "react": "^19.0.0",

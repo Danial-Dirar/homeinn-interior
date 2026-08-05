@@ -4,7 +4,12 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { "@": resolve(__dirname, "./") } },
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "./"),
+      "@homeinn/ui": resolve(__dirname, "../../packages/ui/src"),
+    },
+  },
   test: {
     environment: "jsdom",
     globals: true,

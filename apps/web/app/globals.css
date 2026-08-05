@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* packages/ui ships class names Tailwind must see; it is outside this app's tree. */
+@source "../../../packages/ui/src";
+
 @theme {
   /* Spec §8 — these nine values, verbatim. `brand` is CTA, active nav, focus
      ring and section numerals only; it is never a background wash. */

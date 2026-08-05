@@ -1,0 +1,12 @@
+{
+  "extends": "@homeinn/config/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "declaration": false,
+    "lib": ["dom", "dom.iterable", "ES2023"]
+  },
+  "include": ["src/**/*", "vitest.setup.ts", "vitest.config.ts"]
+}
