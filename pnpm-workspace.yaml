@@ -8,3 +8,5 @@ allowBuilds:
   esbuild: true
   prisma: true
   sharp: true
+  # eslint's native module resolver, pulled in by eslint-config-next
+  unrs-resolver: true
