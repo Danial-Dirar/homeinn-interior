@@ -24,7 +24,7 @@ export default async function ClientsPage({ params }: { params: Promise<{ locale
         <section className="mt-24">
           <h2 className="display-2">{t("residentialTitle")}</h2>
           <div className="mt-8">
-            <ResidentialSummary locale={locale} summary={summary} settings={settings} />
+            <ResidentialSummary summary={summary} settings={settings} />
           </div>
         </section>
 

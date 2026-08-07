@@ -1,4 +1,3 @@
-import type { Locale } from "@homeinn/types";
 import { useTranslations } from "next-intl";
 import type { ResidentialSummaryView, SiteSettingsView } from "@/lib/api.types";
 
@@ -7,13 +6,13 @@ import type { ResidentialSummaryView, SiteSettingsView } from "@/lib/api.types";
  * doctors, professors, a brigadier. Consent for a PDF sent to one corporate
  * prospect is not consent for a public web page, so this component receives an
  * aggregate and has no way to render a name even if one were passed to it.
+ *
+ * No `locale` prop: the only number here is formatted by the ICU message.
  */
 export function ResidentialSummary({
-  locale,
   summary,
   settings,
 }: {
-  locale: Locale;
   summary: ResidentialSummaryView;
   settings: SiteSettingsView;
 }) {
