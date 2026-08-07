@@ -1,9 +1,26 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProjectCard } from "@/components/project-card";
 import { ProjectFilterBar } from "@/components/project-filter-bar";
 import { getProjects, getWorkingAreas } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 import { areaFromSearchParams } from "@/lib/project-filter";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "projects" });
+  return pageMetadata({
+    locale,
+    path: "/projects",
+    title: t("title"),
+    description: t("intro"),
+  });
+}
 
 export default async function ProjectsPage({
   params,

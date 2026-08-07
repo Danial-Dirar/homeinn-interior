@@ -1,15 +1,46 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Picture } from "@/components/media/picture";
+import { JsonLd } from "@/components/seo/json-ld";
 import { RichText } from "@/components/rich-text";
 import { getBlogPost, getBlogPosts } from "@/lib/content";
 import { formatDate } from "@/lib/dates";
 import { text } from "@/lib/locale-text";
+import { largestSrc } from "@/lib/media";
+import { articleJsonLd, breadcrumbJsonLd, metadataFromSeo, pageMetadata } from "@/lib/seo";
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
   return posts.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const post = await getBlogPost(slug);
+  if (!post) return {};
+
+  const { title, description } = metadataFromSeo(post.seo, locale, {
+    title: text(post, "title", locale),
+    description: text(post, "excerpt", locale),
+  });
+
+  return pageMetadata({
+    locale,
+    path: `/blog/${slug}`,
+    title,
+    description,
+    image: post.seo?.ogImage
+      ? largestSrc(post.seo.ogImage.sources[1]?.srcset ?? "")
+      : post.cover
+        ? largestSrc(post.cover.sources[1]?.srcset ?? "")
+        : undefined,
+  });
 }
 
 export default async function BlogPostPage({
@@ -28,6 +59,13 @@ export default async function BlogPostPage({
 
   return (
     <main id="main" className="bg-bone">
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t("title"), path: "/blog" },
+          { name: text(post, "title", locale), path: `/blog/${slug}` },
+        ])}
+      />
+      <JsonLd data={articleJsonLd(post, locale)} />
       <article className="mx-auto max-w-3xl px-5 py-28">
         <h1 className="display-1">{text(post, "title", locale)}</h1>
         {published ? (

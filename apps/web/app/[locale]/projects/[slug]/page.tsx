@@ -1,15 +1,46 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Picture } from "@/components/media/picture";
+import { JsonLd } from "@/components/seo/json-ld";
 import { RichText } from "@/components/rich-text";
 import { Link } from "@/i18n/navigation";
 import { getProject, getProjects } from "@/lib/content";
 import { text } from "@/lib/locale-text";
+import { largestSrc } from "@/lib/media";
+import { breadcrumbJsonLd, metadataFromSeo, pageMetadata } from "@/lib/seo";
 
 export async function generateStaticParams() {
   const projects = await getProjects();
   return projects.map((project) => ({ slug: project.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const project = await getProject(slug);
+  if (!project) return {};
+
+  const { title, description } = metadataFromSeo(project.seo, locale, {
+    title: text(project, "title", locale),
+    description: text(project, "location", locale),
+  });
+
+  return pageMetadata({
+    locale,
+    path: `/projects/${slug}`,
+    title,
+    description,
+    image: project.seo?.ogImage
+      ? largestSrc(project.seo.ogImage.sources[1]?.srcset ?? "")
+      : project.cover
+        ? largestSrc(project.cover.sources[1]?.srcset ?? "")
+        : undefined,
+  });
 }
 
 export default async function ProjectDetailPage({
@@ -36,6 +67,12 @@ export default async function ProjectDetailPage({
 
   return (
     <main id="main" className="bg-bone">
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t("title"), path: "/projects" },
+          { name: text(project, "title", locale), path: `/projects/${slug}` },
+        ])}
+      />
       {project.cover ? (
         <Picture
           media={project.cover}

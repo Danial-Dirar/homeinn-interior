@@ -1,14 +1,31 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Picture } from "@/components/media/picture";
 import { CopyBlock } from "@/components/sections/copy-block";
 import { Credentials } from "@/components/sections/credentials";
 import { getCertifications, getSettings, getTeam } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 import { text, textOrNull } from "@/lib/locale-text";
 
 // Spec §12: these five come from the profile PDF, which is not in the repo.
 // Each renders only once its message is written; see CopyBlock.
 const COPY_BLOCKS = ["vision", "mission", "values", "strengths", "philosophy"] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "about" });
+  return pageMetadata({
+    locale,
+    path: "/about",
+    title: t("title"),
+    description: t("storyBody"),
+  });
+}
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

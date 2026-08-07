@@ -1,7 +1,24 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PostCard } from "@/components/blog/post-card";
 import { getBlogPosts } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "blog" });
+  return pageMetadata({
+    locale,
+    path: "/blog",
+    title: t("title"),
+    description: t("intro"),
+  });
+}
 
 export default async function BlogPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

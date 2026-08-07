@@ -1,8 +1,25 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LeadForm } from "@/components/forms/lead-form";
 import { getServices, getSettings } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 import { text } from "@/lib/locale-text";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "contact" });
+  return pageMetadata({
+    locale,
+    path: "/contact",
+    title: t("title"),
+    description: t("intro"),
+  });
+}
 
 export default async function ContactPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

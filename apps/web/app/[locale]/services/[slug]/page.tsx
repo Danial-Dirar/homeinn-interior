@@ -1,15 +1,46 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { LeadForm } from "@/components/forms/lead-form";
 import { Picture } from "@/components/media/picture";
+import { JsonLd } from "@/components/seo/json-ld";
 import { RichText } from "@/components/rich-text";
 import { getService, getServices } from "@/lib/content";
 import { text } from "@/lib/locale-text";
+import { largestSrc } from "@/lib/media";
+import { breadcrumbJsonLd, metadataFromSeo, pageMetadata } from "@/lib/seo";
 
 export async function generateStaticParams() {
   const services = await getServices();
   return services.map((service) => ({ slug: service.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const service = await getService(slug);
+  if (!service) return {};
+
+  const { title, description } = metadataFromSeo(service.seo, locale, {
+    title: text(service, "title", locale),
+    description: text(service, "summary", locale),
+  });
+
+  return pageMetadata({
+    locale,
+    path: `/services/${slug}`,
+    title,
+    description,
+    image: service.seo?.ogImage
+      ? largestSrc(service.seo.ogImage.sources[1]?.srcset ?? "")
+      : service.cover
+        ? largestSrc(service.cover.sources[1]?.srcset ?? "")
+        : undefined,
+  });
 }
 
 export default async function ServiceDetailPage({
@@ -28,6 +59,12 @@ export default async function ServiceDetailPage({
 
   return (
     <main id="main" className="bg-bone">
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t("title"), path: "/services" },
+          { name: text(service, "title", locale), path: `/services/${slug}` },
+        ])}
+      />
       {service.cover ? (
         <Picture
           media={service.cover}

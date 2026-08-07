@@ -1,8 +1,25 @@
 import type { Locale } from "@homeinn/types";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CorporateTable } from "@/components/clients/corporate-table";
 import { ResidentialSummary } from "@/components/clients/residential-summary";
 import { getCorporateClients, getResidentialSummary, getSettings } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "clients" });
+  return pageMetadata({
+    locale,
+    path: "/clients",
+    title: t("title"),
+    description: t("intro"),
+  });
+}
 
 export default async function ClientsPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
