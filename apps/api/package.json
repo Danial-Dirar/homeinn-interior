@@ -13,7 +13,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
-    "seed:hero": "tsx prisma/seed-hero.ts"
+    "seed:hero": "tsx prisma/seed-hero.ts",
+    "media:inventory": "tsx scripts/media-inventory.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
