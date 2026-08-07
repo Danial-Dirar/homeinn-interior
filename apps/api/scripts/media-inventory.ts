@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { readdir, stat, writeFile } from "node:fs/promises";
-import { extname, join, relative, sep } from "node:path";
+import { extname, join, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 import sharp from "sharp";
 
@@ -63,11 +63,15 @@ async function walk(root: string, dir = root, out: Entry[] = []): Promise<Entry[
 
     if (kind === "video") {
       try {
+        // `-i` rather than a bare positional: this script exists to read a
+        // folder supplied by someone else, and a file named `-loglevel` would
+        // otherwise be parsed by ffprobe as an option instead of a path.
         const { stdout } = await run("ffprobe", [
           "-v", "error",
           "-select_streams", "v:0",
           "-show_entries", "stream=width,height:format=duration",
-          "-of", "json", full,
+          "-of", "json",
+          "-i", full,
         ]);
         const probe = JSON.parse(stdout) as {
           streams?: { width?: number; height?: number }[];
@@ -149,7 +153,8 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const entries = await walk(root);
+  // Absolute, so no path handed to ffprobe can begin with a dash.
+  const entries = await walk(resolve(root));
   summarise(entries);
 
   const report = join(process.cwd(), "media-inventory.json");

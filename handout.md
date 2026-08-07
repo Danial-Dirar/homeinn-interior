@@ -579,3 +579,118 @@ posted from the browser lands in Postgres with its phone normalised to `01…`.
 - **`pnpm lint` covers `apps/web` only.** `apps/api`, `packages/types` and
   `packages/ui` still define no lint task.
 - **Plan 1C** — the admin CMS (spec §10) and the admin half of §13's e2e list.
+
+---
+
+## Media intake — prepared, awaiting the client's photo/video folder — 2026-08-07
+
+Muhammad is bringing a large, possibly unsorted folder of real project
+photography and video into the repo. This section is the state to resume from.
+
+### Files
+
+| File | Change |
+| --- | --- |
+| `apps/api/scripts/media-inventory.ts` | **new** — read-only triage: walks a folder, classifies image/video/raw, reads dimensions via sharp and duration via `ffprobe`, groups by top-level directory, writes `media-inventory.json` |
+| `apps/api/package.json` | added `media:inventory` script |
+| `apps/api/.gitignore` | ignore the generated report |
+
+Run it with `pnpm --filter @homeinn/api media:inventory <folder>`. It writes
+nothing to the database and modifies no file in the source folder.
+
+### Security fix on that script
+
+A background commit review flagged **argument injection into an external
+process**, and it was right. `execFile` runs without a shell, so there was no
+shell injection — but the video path was passed to `ffprobe` as a bare
+positional argument, and a file named `-loglevel` (or any leading dash) would
+have been parsed as an option instead of a path. This script's entire purpose is
+reading a folder supplied by someone else, so that is a live path, not a
+theoretical one. Fixed two ways: the path now goes through `-i`, and the walk
+root is `resolve()`d so no path can begin with a dash. Verified by dropping a
+file literally named `-loglevel.mp4` into a test folder — it is now probed
+correctly instead of swallowed as a flag.
+
+### The hero video: NOT previously planned, and nothing supports it today
+
+To be explicit, because it was asked: **no, this was never in the plan.** Spec
+§7 and all of Plan 1B describe an image panorama — a strip of stills that pans
+horizontally on scroll. Video appears nowhere in the spec, the schema, the media
+pipeline, or `ASSET-CHECKLIST.md`. It is new scope.
+
+What is actually missing:
+
+| Layer | State |
+| --- | --- |
+| `Media` model | no `duration`, no `poster`, no video kind — only `width`/`height`/`blurhash` |
+| `MediaService.ingest` | hard-rejects any mime that is not `image/*`, then runs sharp for AVIF/WebP derivatives |
+| `HeroSegment.imageId` | **required** FK to `Media` — a video-only segment cannot exist |
+| `PanoramaHero` | renders `<Picture>` per segment; no `<video>` path, no poster, no autoplay/reduced-motion gate for it |
+
+Good news: `ffmpeg` and `ffprobe` are installed on this machine, so poster-frame
+extraction and transcoding to a web-safe MP4/WebM are both possible locally.
+
+### The open question, deferred by Muhammad until the folder lands
+
+Three options were put to him; he chose to defer and asked to be asked again
+once the real footage is in hand. Ask this again then:
+
+1. **Background loop, panorama dropped.** A 10–20s muted autoplay loop behind
+   the tagline. Simplest and the most familiar interior-studio look — but the
+   whole §7 scroll-driven pan goes unused: `hero-math.ts`, the sticky pin, the
+   seam masks and the light pool all become dead code.
+2. **Video as one segment inside the panorama.** The pan survives; one or two of
+   the six rooms become moving shots instead of stills. Everything built stays.
+   Requires each clip to loop cleanly and to match the colour temperature of the
+   stills either side of it.
+3. **Video first, panorama below it.** Both survive, at the cost of a much
+   longer home page and of loading a video *and* six hero images — which spec
+   §7's budget (LCP < 2.5s on a mid-range Android over 4G) will not absorb
+   without dropping the video on mobile.
+
+Whichever is chosen, mobile almost certainly gets a poster image rather than the
+video, per that same budget.
+
+### How to make the folder import cleanly
+
+Nothing needs sorting perfectly — the inventory script exists precisely to make
+sense of a messy drop. But the import is far more automatic if the top level of
+the folder is **one directory per completed project**, because that directory
+name becomes the project grouping:
+
+```
+<folder>/
+  bfidc-head-office/          → one Project, its images become cover + gallery
+  cmh-dermatology-dhaka/
+  prime-medical-college/
+  loose files at the root     → reported as "(loose files)", sorted by hand
+```
+
+A `README.txt` or filename hint naming the district and the year helps; both are
+real `Project` columns (`locationEn/Bn`, `year`).
+
+### What can and cannot be created automatically
+
+This is the spec §12 boundary, and it constrains the importer:
+
+- **Can** be derived: the project grouping, cover and gallery `Media` rows,
+  slug, `workingArea` (mapped to one of the nine seeded categories), sort order.
+- **Cannot** be invented: descriptive copy, client names, areas, years, or
+  Bangla translations. Every imported project therefore lands as
+  `published: false` with its title taken from the folder name, for a human to
+  confirm — which matches the existing rule that case studies stay unpublished
+  until the client confirms details.
+- The 73 corporate / 57 residential **client tables stay blocked** regardless.
+  Photographs do not substitute for the profile PDF's row data.
+
+### Still to build when the folder arrives
+
+1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with
+   a confirm step rather than a silent guess.
+2. `seed-projects.ts`, alongside the existing `seed-hero.ts`: one draft `Project`
+   per folder, cover = first usable image, rest into the gallery.
+3. HEIC/RAW conversion, if the inventory reports any — sharp cannot decode them
+   without libheif.
+4. Alt text. `Media.altEn`/`altBn` are **required** and cannot be auto-written
+   truthfully; the importer will need to stage placeholders that the admin
+   (Plan 1C) forces someone to fill.
