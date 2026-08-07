@@ -2,6 +2,7 @@ import type { Locale } from "@homeinn/types";
 import { setRequestLocale } from "next-intl/server";
 import { PanoramaHero } from "@/components/hero/panorama-hero";
 import { Credentials } from "@/components/sections/credentials";
+import { Cta } from "@/components/sections/cta";
 import { Process } from "@/components/sections/process";
 import { SelectedProjects } from "@/components/sections/selected-projects";
 import { ServicesGrid } from "@/components/sections/services-grid";
@@ -41,6 +42,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
       <Process />
       <Testimonials locale={locale} testimonials={testimonials} />
       <Credentials locale={locale} certifications={certifications} />
+      <Cta locale={locale} services={services} settings={settings} />
     </main>
   );
 }
