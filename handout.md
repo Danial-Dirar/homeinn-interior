@@ -490,3 +490,92 @@ pnpm --filter @homeinn/api build && pnpm --filter @homeinn/api seed
 pnpm --filter @homeinn/api start                 # :4000
 PORT=3100 pnpm --filter @homeinn/web dev         # :3100 — 3000 is taken
 ```
+
+---
+
+## Phase 1B — COMPLETE — 2026-08-07
+
+All 19 tasks landed on `feat/phase1b-public-web`.
+
+### Tasks 12–19
+
+| Task | Commit | What landed |
+| --- | --- | --- |
+| 12 Home sections 4–8 | `1cfc97a` | `SelectedProjects`, `TrackRecord`, `Process`, `Testimonials`, `Credentials`, `ProjectCard` |
+| 13 Lead form | `db87e59` | `lib/leads.ts`, `LeadForm`, `Cta`, `/contact` |
+| 14 Services pages | `e54e4b2` | `/services`, `/services/[slug]`, `lib/rich-text.ts` + `RichText` |
+| 15 Projects pages | `4c202b4` | `/projects`, `/projects/[slug]`, `ProjectFilterBar`, `lib/project-filter.ts` |
+| 16 Clients + about | `1db180b`, `2fe2a1c` | `/clients`, `/about`, `CorporateTable`, `ResidentialSummary`, `CopyBlock` |
+| 17 Blog | `9db9615` | `/blog`, `/blog/[slug]`, `PostCard`, `lib/dates.ts` |
+| 18 SEO | `b987b0f` | `lib/seo.ts`, `JsonLd`, per-page `generateMetadata`, `sitemap.ts`, `robots.ts` |
+| 19 E2E + a11y | `d6d7123` | error boundaries, `[locale]/[...rest]` catch-all, Playwright config, 5 e2e specs |
+
+### What the e2e suite caught that nothing else did
+
+These were all real defects, found only once a browser rendered the pages:
+
+1. **The header was invisible on six of seven pages.** `SiteHeader` was
+   `text-sand` with a transparent background on every route, but only the home
+   page opens on a dark hero — everywhere else the ground is `bone`, and
+   sand-on-bone is **1.18:1**. It now keeps an ink scrim always, slightly
+   lighter over the hero. Legibility no longer depends on what is behind it.
+2. **The lead form could not submit at all.** `main.ts` allowed a single CORS
+   origin and the dev server runs on :3100. `WEB_ORIGIN` now accepts a
+   comma-separated list — worth having anyway, since local and production
+   origins differ.
+3. **`brand` failed AA wherever it was small text.** `#E01B24` is 4.32:1 on
+   `bone` and 4.07:1 on `ink`. Fixed without touching the §8 palette: the
+   section numeral is fixed at 24px (large-text threshold, and deliberately
+   outside `--type-scale`, which would have shrunk it to 22.56px on Bangla
+   pages); the solid button uses `text-white` (bone on brand is 4.32:1); the
+   active filter chip is filled rather than brand-coloured text; "view all"
+   links are ink with a brand hover — which also puts them back inside §8's
+   "brand is CTA, active nav, focus ring, section numerals — nothing else".
+4. **`.eyebrow` hardcoded `sand-dim`**, which is 2.68:1 over `bone`. It now
+   inherits `currentColor` and each ground picks its own value.
+5. **The localised 404 never rendered.** An unmatched path under `[locale]`
+   falls through to the root `app/not-found.tsx`, not `[locale]/not-found.tsx`.
+   Added `app/[locale]/[...rest]/page.tsx` calling `notFound()`.
+
+### Deliberate test-design decisions
+
+- **The lead e2e runs on one browser only** and accepts either the success or
+  the throttled message. `POST /api/leads` is capped at 5/hour/IP and every
+  Playwright project shares this machine's IP, so a second browser would just
+  exhaust the budget. The assertion still fails on the *generic* error — which
+  is exactly what the CORS bug produced, so the test that found it still would.
+- **No hero visual-regression baselines yet.** Spec §13 asks for screenshots at
+  five scroll positions, but with zero hero segments seeded the baselines would
+  capture the text-only fallback and would all have to be thrown away the moment
+  real images land. Deferred until `ASSET-CHECKLIST.md`'s hero slots are filled;
+  the reduced-motion and keyboard tests are in place.
+
+### Final verification
+
+```
+pnpm test        → api 55 · web 172 (33 files) · ui 4 · types 21
+pnpm typecheck   → clean, 5 packages
+pnpm lint        → clean
+apps/api e2e     → 87 passed, 3 todo, 6 suites
+apps/web e2e     → 50 passed, 2 skipped (desktop + mobile, axe on 7 routes × 2 locales)
+pnpm --filter @homeinn/web build → 33 pages
+```
+
+Live smoke on `:3100`: all 7 routes × 2 locales return 200, `/` → 307 → `/en`,
+`robots.txt` and a 28-URL `sitemap.xml` serve, `LocalBusiness` + `Organization`
+JSON-LD present, hreflang `en`/`bn`/`x-default` on every page, and a real lead
+posted from the browser lands in Postgres with its phone normalised to `01…`.
+
+### Still open
+
+- **Everything blocked on the company profile PDF** (see `ASSET-CHECKLIST.md`):
+  73 corporate + 57 residential rows, the five About copy blocks, the "How we
+  work" strengths, and every image slot. Each degrades to a hidden section or an
+  honest empty state, never to invented content.
+- **Hero images.** The panorama currently renders its text-only variant because
+  `HeroSegment` is empty. Drop files in
+  `apps/api/prisma/seed-data/placeholders/` and run
+  `pnpm --filter @homeinn/api seed:hero`.
+- **`pnpm lint` covers `apps/web` only.** `apps/api`, `packages/types` and
+  `packages/ui` still define no lint task.
+- **Plan 1C** — the admin CMS (spec §10) and the admin half of §13's e2e list.
