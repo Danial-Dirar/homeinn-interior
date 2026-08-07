@@ -69,7 +69,7 @@ export default async function BlogPostPage({
       <article className="mx-auto max-w-3xl px-5 py-28">
         <h1 className="display-1">{text(post, "title", locale)}</h1>
         {published ? (
-          <p className="eyebrow mt-6 text-ink/40">
+          <p className="eyebrow mt-6 text-ink/70">
             <time dateTime={post.publishedAt ?? undefined}>
               {t("published", { date: published })}
             </time>
@@ -93,7 +93,7 @@ export default async function BlogPostPage({
 
         {post.tags.length > 0 ? (
           <footer className="mt-16 border-t border-ink/10 pt-6">
-            <h2 className="eyebrow text-ink/40">{t("tags")}</h2>
+            <h2 className="eyebrow text-ink/70">{t("tags")}</h2>
             <ul className="mt-3 flex flex-wrap gap-3 text-sm text-ink/60">
               {post.tags.map((tag) => <li key={tag}>{tag}</li>)}
             </ul>

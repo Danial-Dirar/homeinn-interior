@@ -92,7 +92,7 @@ export default async function ProjectDetailPage({
         <dl className="mt-12 grid gap-8 border-y border-ink/10 py-8 sm:grid-cols-4">
           {facts.map((fact) => (
             <div key={fact.label}>
-              <dt className="eyebrow text-ink/50">{fact.label}</dt>
+              <dt className="eyebrow text-ink/70">{fact.label}</dt>
               <dd className="mt-2">{fact.value}</dd>
             </div>
           ))}

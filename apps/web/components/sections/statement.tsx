@@ -28,7 +28,7 @@ export function Statement({ locale, settings }: { locale: Locale; settings: Site
         {stats.map((stat) => (
           // Reversed so the DOM keeps dt-before-dd while the number reads first.
           <div key={stat.label} className="flex flex-col-reverse">
-            <dt className="eyebrow mt-3 text-ink/50">{stat.label}</dt>
+            <dt className="eyebrow mt-3 text-ink/70">{stat.label}</dt>
             <dd className="display-1 leading-none">{format.format(stat.value)}</dd>
           </div>
         ))}

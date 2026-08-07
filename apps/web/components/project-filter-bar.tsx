@@ -22,7 +22,11 @@ export function ProjectFilterBar({
         aria-current={isActive ? "true" : undefined}
         className={[
           "inline-block border px-4 py-2 text-sm transition-colors",
-          isActive ? "border-brand text-brand" : "border-ink/15 hover:border-ink/40",
+          // Filled rather than brand-coloured text: brand on bone is 4.32:1 at
+          // 14px. Spec §8 sanctions brand for active nav, and this passes AA.
+          isActive
+            ? "border-brand bg-brand text-white"
+            : "border-ink/15 hover:border-ink/40",
         ].join(" ")}
       >
         {label}

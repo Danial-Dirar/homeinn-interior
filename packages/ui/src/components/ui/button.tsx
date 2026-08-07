@@ -12,7 +12,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        solid: "bg-brand text-bone hover:bg-brand/90",
+        // `text-white`, not `text-bone`: bone on brand is 4.32:1, just under AA.
+        solid: "bg-brand text-white hover:bg-brand/90",
         outline: "border border-current bg-transparent hover:bg-current/5",
         ghost: "bg-transparent hover:bg-current/5",
       },

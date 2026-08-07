@@ -33,7 +33,7 @@ export function SelectedProjects({
       </div>
       <Link
         href="/projects"
-        className="mt-12 inline-block text-brand underline-offset-4 hover:underline"
+        className="mt-12 inline-block underline underline-offset-4 hover:text-brand"
       >
         {common("viewAll")}
       </Link>

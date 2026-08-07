@@ -29,7 +29,7 @@ export function ResidentialSummary({
 
       {summary.districts.length > 0 ? (
         <>
-          <h3 className="eyebrow mt-12 text-ink/50">{t("districtsTitle")}</h3>
+          <h3 className="eyebrow mt-12 text-ink/70">{t("districtsTitle")}</h3>
           <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
             {summary.districts.map((district) => (
               <li key={district} className="text-ink/80">{district}</li>

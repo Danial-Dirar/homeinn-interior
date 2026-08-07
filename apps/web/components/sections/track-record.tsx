@@ -43,7 +43,7 @@ export function TrackRecord({
 
       {flagship.length > 0 ? (
         <div className="mt-12 border-y border-ink/10 py-6">
-          <p className="eyebrow mb-4 text-ink/50">{c("flagship")}</p>
+          <p className="eyebrow mb-4 text-ink/70">{c("flagship")}</p>
           <Marquee speedSeconds={50}>
             {flagship.map((client) => (
               <span key={client.id} className="heading whitespace-nowrap text-ink/70">
@@ -56,7 +56,7 @@ export function TrackRecord({
 
       <Link
         href="/clients"
-        className="mt-12 inline-block text-brand underline-offset-4 hover:underline"
+        className="mt-12 inline-block underline underline-offset-4 hover:text-brand"
       >
         {t("trackRecordCta")}
       </Link>

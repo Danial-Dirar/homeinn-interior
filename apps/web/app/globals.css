@@ -89,7 +89,6 @@
     font-size: calc(var(--type-scale) * 0.75rem);
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-sand-dim);
   }
 
   /* Bangla has no letter case, so `uppercase` is a no-op there — but the wide
@@ -101,8 +100,13 @@
   /* Spec §8 names section numerals as one of the four sanctioned uses of brand. */
   .section-numeral {
     font-family: var(--font-display);
-    font-size: calc(var(--type-scale) * 0.8rem);
+    /* Fixed at 24px, deliberately outside --type-scale: brand is 4.32:1 on
+       bone and 4.07:1 on ink, which clears the 3:1 large-text threshold but
+       not the 4.5:1 small-text one. Scaling it to 0.94 for Bangla would drop
+       it to 22.56px and fail. A numeral needs no optical adjustment anyway. */
+    font-size: 1.5rem;
+    line-height: 1;
     color: var(--color-brand);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.02em;
   }
 }

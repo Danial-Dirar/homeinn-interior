@@ -29,7 +29,7 @@ export function CorporateTable({
       <tbody>
         {sorted.map((client) => (
           <tr key={client.id} className="border-b border-ink/10 align-top">
-            <th scope="row" className="w-16 py-3 pr-4 font-normal text-ink/40">
+            <th scope="row" className="w-16 py-3 pr-4 font-normal text-ink/70">
               {format.format(client.serial)}
             </th>
             <td className="py-3 pr-6">{client.companyName}</td>
