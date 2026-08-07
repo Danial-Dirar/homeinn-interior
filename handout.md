@@ -418,11 +418,75 @@ The plan's `next-intl` code targets `defineRouting` / `createNavigation` /
   they assert filtering behaviour, not serialisation, which
   `media.service.spec.ts` covers.
 
+### Tasks 5–11 — DONE
+
+| Task | Commit | What landed |
+| --- | --- | --- |
+| 5 Locale routing | `0ef46bd` | `i18n/{routing,request,navigation}.ts`, `middleware.ts`, `messages/{en,bn}.json` (+ parity test), `app/[locale]/{layout,page}.tsx`; root `app/layout.tsx` became a pass-through |
+| 6 `packages/ui` | `4a351b2` | `Button`, `Input`, `Textarea`, `Label`, `Sheet`, `Marquee`, `cn`; consumed via `transpilePackages` + a Tailwind `@source` |
+| 7 Data layer | `c3c9519` | `lib/{api,api.types,content,locale-text,media}.ts`, `components/media/picture.tsx` |
+| 8 Site chrome | `b15dd2e` | `SiteHeader`, `SiteFooter`, `LocaleSwitcher`, `WhatsAppButton`, `SkipLink`, `useScrolled`, `lib/whatsapp.ts`, `test/render.tsx` |
+| 9 Hero maths | `4a56a89` | `components/hero/hero-math.ts` — 10 pure functions, 26 assertions |
+| 10 Panorama hero | `a34e8fa` | `PanoramaHero`, `HeroStack`, `usePrefersReducedMotion`, `usePinProgress`, `SmoothScroll` (Lenis), `prisma/seed-hero.ts`, `ASSET-CHECKLIST.md` |
+| 11 Home sections 1–3 | `459bae4` | `Section`, `Statement`, `ServicesGrid`, `WorkingAreas`, `lib/icons.ts`, `useReveal` |
+
+### Deviation from the plan worth recording
+
+**Task 6 did not run the shadcn CLI.** It needs interactive prompts and a
+network round trip; the five primitives were hand-written against the same Radix
+packages instead, so the accessibility guarantees that motivated shadcn are
+intact. `packages/ui/src/components/ui/*` is ordinary editable source either way.
+
+### Bugs the tests caught in Tasks 9–11
+
+1. **`-0` reaching CSS.** `stripTranslateX` returned `-0` at rest, which would
+   have emitted `translate3d(-0vw, 0, 0)`. Normalised to `0`.
+2. **Stat labels announced twice.** `<Statement>` had the label in both an
+   `sr-only <dt>` and a visible `<span>`. Restructured to a real `dt`/`dd` pair
+   with `flex-col-reverse`, so the DOM order stays valid and it is spoken once.
+3. **Working-area links were named "01 Landscaping".** The decorative numeral
+   was inside the link's accessible name; it is now `aria-hidden`.
+4. **A too-tight test, not a bug.** `lightPoolX` continuity was asserted across a
+   0.002 step of `p`, which legitimately moves the pool ~1.4% of the viewport.
+   Replaced with a fine sweep asserting no adjacent-sample jump.
+
+### Gotchas hit (continued)
+
+- **`next-intl` under Vitest.** It imports `next/navigation` extensionless, which
+  Node's ESM resolver rejects from inside the package. Fixed with a `resolve.alias`
+  to `next/navigation.js` **plus** `test.server.deps.inline: ["next-intl"]` — the
+  alias does nothing until Vite actually transforms the package. The
+  `next/navigation` mock in `vitest.setup.ts` then needs the full surface
+  (`useParams`, `redirect`, `RedirectType`, …), not just `usePathname`.
+- **The API was serving a stale `dist/`.** `pnpm --filter @homeinn/api start` runs
+  `node dist/main.js`, and that build predated Plan 1A's content modules — every
+  content route 404'd and the web build died on `GET /settings`. Run
+  `pnpm --filter @homeinn/api build` after pulling API changes.
+- **Port 3000 is taken by another project on this machine.** The web scripts were
+  changed from `next dev --port 3000` to plain `next dev` so `PORT` decides;
+  local runs use `PORT=3100`. `next start` fails to bind but leaves the previous
+  server running, which silently serves a stale build — check `ss -ltnp | grep 3100`
+  before trusting what you curl.
+- **lucide icons are objects, not functions** (`forwardRef` components), so
+  `expect(icon).toBeTypeOf("function")` fails.
+
 ### Verification so far
 
 - `pnpm --filter @homeinn/api test` — 55 passed, 11 suites (was 48/8)
 - `DATABASE_URL="$TEST_DATABASE_URL" pnpm --filter @homeinn/api test:e2e` — 87 passed, 3 todo, 6 suites (was 84)
-- `pnpm --filter @homeinn/web test` — 17 passed, 3 files
-- `pnpm --filter @homeinn/web build` — clean, 4 static pages
+- `pnpm --filter @homeinn/ui test` — 4 passed
+- `pnpm --filter @homeinn/web test` — 104 passed, 17 files
+- `pnpm --filter @homeinn/web build` — clean; `/en` and `/bn` prerendered
 - `pnpm --filter @homeinn/web lint` — 0 errors, 0 warnings
-- `pnpm typecheck` — clean across 4 packages
+- `pnpm typecheck` — clean across 5 packages
+- Live check on `PORT=3100`: `/` → 307 → `/en`; `/bn` carries `lang="bn"`,
+  `font-bangla`, `৭৩`, and Bangla service and area names with no English leaking.
+
+### How to run it locally
+
+```bash
+pnpm db:start
+pnpm --filter @homeinn/api build && pnpm --filter @homeinn/api seed
+pnpm --filter @homeinn/api start                 # :4000
+PORT=3100 pnpm --filter @homeinn/web dev         # :3100 — 3000 is taken
+```
