@@ -683,6 +683,29 @@ This is the spec §12 boundary, and it constrains the importer:
 - The 73 corporate / 57 residential **client tables stay blocked** regardless.
   Photographs do not substitute for the profile PDF's row data.
 
+### `prompt_for_sort.md` — the off-machine sorting brief
+
+`prompt_for_sort.md` at the repo root is a self-contained prompt to hand to an
+AI agent on whichever machine holds the archive. It needs neither this repo nor
+the database. It carries: the nine `WorkingArea` slugs verbatim (an unrecognised
+slug fails the import), the §15 minimum image widths, the target folder layout,
+a `manifest.json` schema, the §7 hero-set criteria, and — first, before
+anything else — the §12 honest-content rule, spelled out as "never invent a
+fact, `null` is the correct answer".
+
+Three things in it are deliberate and should not be softened if it is edited:
+
+- **`year` and `location` may only come from a source filename or folder name**,
+  never from reading a signboard in a photo. Those two fields are real `Project`
+  columns and a guess there becomes a false public claim.
+- **Nothing is deleted** — rejects move to `_rejected/`, so a wrong call is
+  always recoverable.
+- **Video is copied, never transcoded**, because the hero-video decision is
+  still open and re-encoding now would destroy the source we would need.
+
+The manifest example in it is checked as valid JSON and all nine slugs are
+verified present against `seed-data/working-areas.ts`.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with
