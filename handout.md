@@ -706,6 +706,79 @@ Three things in it are deliberate and should not be softened if it is edited:
 The manifest example in it is checked as valid JSON and all nine slugs are
 verified present against `seed-data/working-areas.ts`.
 
+### The folder arrived — 2026-08-09
+
+`media_dump/` landed at the repo root: **207 files, 1.1 GB, completely flat** —
+197 JPEG + 10 MP4, phone-camera names like `IMG_20240608_160750.jpg`. Added to
+`.gitignore`; 1.1 GB of binaries does not belong in the repository.
+
+Inventory says **192 of 197 photos are ≥1920px** (hero-grade) and 193 are
+≥1440px (cover-grade). Only 4 are too small. The 10 videos are all 1280×720,
+15–144 s, ~570 MB total — usable but not high resolution.
+
+**The filenames carry timestamps, which is the honest grouping signal.** Photos
+taken minutes apart on one date are one site visit, so clustering with a >6h gap
+yields **29 sessions**. That is a real project split derived from the data, not
+a guess about content.
+
+### What is in the archive
+
+I built one contact sheet per session and looked at all 25 that contain stills
+(four sessions are video-only). Written to
+`apps/api/prisma/seed-data/media-dump-classification.json`, with the category,
+a confidence level and a note on what is actually visible in each.
+
+| Category | Sessions | Photos |
+| --- | --- | --- |
+| `home-furniture-interior-exterior` | 11 | 134 |
+| `factory-works` | 6 | 23 |
+| `corporate-office-bank-furniture` | 5 | 22 |
+| `showroom-outlet` | 2 | 7 |
+| `industrial-building-steel-structure` | 1 | 6 |
+
+Session 17 is flagged **low confidence** — deep shelving bays around a window,
+which could be a pharmacy, a library or a retail back wall. Sessions 13, 15, 20
+and 21 are video-only and unclassified.
+
+### `factory-works` — a tenth working area
+
+Added to `seed-data/working-areas.ts` at `sortOrder: 9` and seeded. Unlike the
+other nine it is **not** from the company profile's list, and that is recorded
+in a comment beside it. It is defensible as a separate category because
+`industrial-building-steel-structure` means a building the company erects, while
+this is what the workshop *makes* before it reaches a site — and six sessions of
+the archive are exactly that. It appears automatically in the home page's "Where
+we work" list and in the `/projects` filter, because both render from the API.
+
+### Stock photography: where it is and is not allowed
+
+Muhammad asked for professional images pulled from the internet. The split I am
+working to, and why:
+
+- **Projects: real photographs only.** Publishing someone else's interiors as
+  this company's completed work is both a copyright problem and precisely what
+  spec §12 exists to prevent. It is also unnecessary — 192 usable photos of
+  their own work now exist, covering five categories.
+- **Hero: free-licence placeholders are legitimate.** The hero is atmosphere,
+  not a claim about a specific job, and spec §15 already sanctions
+  Unsplash/Pexels placeholders provided each licence is recorded per file in
+  `ASSET-CHECKLIST.md` and the slot is marked as a stand-in. Outbound network
+  access from this machine is confirmed working.
+
+Worth knowing before that step: many archive photos are mid-finish — packaging
+on worktops, loose wiring, tools in frame — and phone-camera quality. That is
+presumably why polished images were wanted. The answer is to pick the cleanest
+real frames for projects and let the hero carry the polish.
+
+### Two things found while looking that need a human
+
+1. **Client names are legible on signage** in sessions 3, 6 and 8 (a reception
+   sign and an IELTS consultancy frontage). Spec §11 does permit publishing
+   corporate client names — but not on my reading of a photograph. Confirm the
+   names before any of them go near a `clientName` field.
+2. **Identifiable faces** appear in at least sessions 8 and 29 (a man at a desk,
+   a reflection in a mirror). Those frames must not be published.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with
