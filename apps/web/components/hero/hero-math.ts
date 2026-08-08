@@ -108,3 +108,25 @@ export function pinProgress(
 export function objectPosition(focalX: number): string {
   return `${clamp01(focalX) * 100}% 50%`;
 }
+
+/** Closer than this to the target and it may as well be the target. */
+const SETTLED = 0.0001;
+
+/**
+ * Moves `current` a fraction of the way toward `target`, exponentially.
+ *
+ * This is what stops the strip being welded to the scrollbar. Raw scroll
+ * position drives the *target*; the strip chases it, so a flick of the wheel
+ * sets a destination and the camera glides there instead of stepping with each
+ * wheel notch.
+ *
+ * `lambda` is a rate, not a per-frame fraction, and `dt` is in seconds — so the
+ * motion is identical on a 60Hz and a 144Hz display. A naive
+ * `current += (target - current) * 0.1` would run nearly two and a half times
+ * faster on the 144Hz screen.
+ */
+export function approach(current: number, target: number, lambda: number, dt: number): number {
+  if (dt <= 0) return current;
+  const next = target + (current - target) * Math.exp(-lambda * dt);
+  return Math.abs(target - next) < SETTLED ? target : next;
+}

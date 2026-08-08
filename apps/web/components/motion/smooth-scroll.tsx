@@ -16,7 +16,8 @@ export function SmoothScroll() {
     if (reduced) return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
 
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+    // Shorter than the default: the hero adds its own damping on top.
+    const lenis = new Lenis({ duration: 0.9, smoothWheel: true });
     let frame = 0;
     const raf = (time: number) => {
       lenis.raf(time);

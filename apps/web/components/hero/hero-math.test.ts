@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  FOREGROUND_RATE, clamp01, foregroundTranslateX, labelOpacity, lightPoolX, objectPosition,
-  pinProgress, scrollDistanceVh, segmentWindow, stripTranslateX, stripWidth,
+  FOREGROUND_RATE, approach, clamp01, foregroundTranslateX, labelOpacity, lightPoolX,
+  objectPosition, pinProgress, scrollDistanceVh, segmentWindow, stripTranslateX, stripWidth,
 } from "./hero-math";
 
 describe("clamp01", () => {
@@ -154,6 +154,49 @@ describe("pinProgress", () => {
 
   it("returns 0 when the section is shorter than the viewport", () => {
     expect(pinProgress(-100, 500, 900)).toBe(0);
+  });
+});
+
+describe("approach", () => {
+  it("moves toward the target without overshooting", () => {
+    const next = approach(0, 1, 6, 1 / 60);
+    expect(next).toBeGreaterThan(0);
+    expect(next).toBeLessThan(1);
+  });
+
+  it("never moves away from the target, and settles on it", () => {
+    let value = 0;
+    let previous = 0;
+    for (let i = 0; i < 400; i++) {
+      value = approach(value, 1, 6, 1 / 60);
+      expect(value).toBeGreaterThanOrEqual(previous);
+      previous = value;
+    }
+    expect(value).toBe(1);
+  });
+
+  it("snaps to the target once the gap stops mattering", () => {
+    expect(approach(0.99999, 1, 6, 1 / 60)).toBe(1);
+  });
+
+  it("runs at the same speed on 60Hz and 144Hz", () => {
+    // A per-frame fraction would move ~2.4x faster on the faster display; this
+    // is the property that stops the pan feeling different per monitor.
+    let slow = 0;
+    for (let i = 0; i < 60; i++) slow = approach(slow, 1, 6, 1 / 60);
+    let fast = 0;
+    for (let i = 0; i < 144; i++) fast = approach(fast, 1, 6, 1 / 144);
+    expect(fast).toBeCloseTo(slow, 4);
+  });
+
+  it("works downward as well as upward", () => {
+    expect(approach(1, 0, 6, 1 / 60)).toBeLessThan(1);
+    expect(approach(1, 0, 6, 1 / 60)).toBeGreaterThan(0);
+  });
+
+  it("does nothing for a zero or negative frame time", () => {
+    expect(approach(0.3, 1, 6, 0)).toBe(0.3);
+    expect(approach(0.3, 1, 6, -0.5)).toBe(0.3);
   });
 });
 
