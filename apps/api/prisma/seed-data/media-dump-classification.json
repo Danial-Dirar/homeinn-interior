@@ -1,0 +1,497 @@
+[
+ {
+  "session": 1,
+  "date": "20240523",
+  "category": "factory-works",
+  "confidence": "medium",
+  "seen": "Carved wooden wardrobe standing in a workshop, not yet installed",
+  "images": [
+   "IMG_20240523_230957.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 2,
+  "date": "20240608",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Flat interior — wardrobe, dressing table, prayer niche, stained-glass doors, kitchen counter",
+  "images": [
+   "IMG_20240608_160750.jpg",
+   "IMG_20240608_160758.jpg",
+   "IMG_20240608_160855.jpg",
+   "IMG_20240608_160904.jpg",
+   "IMG_20240608_160909.jpg",
+   "IMG_20240608_160923.jpg",
+   "IMG_20240608_161005.jpg",
+   "IMG_20240608_161028.jpg",
+   "IMG_20240608_161138.jpg",
+   "IMG_20240608_161148.jpg",
+   "IMG_20240608_161151.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 3,
+  "date": "20240828",
+  "category": "corporate-office-bank-furniture",
+  "confidence": "high",
+  "seen": "Office reception desk under a company sign",
+  "images": [
+   "IMG_20240828_170425.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 4,
+  "date": "20240912",
+  "category": "factory-works",
+  "confidence": "high",
+  "seen": "Desks and table tops being built on a workshop floor",
+  "images": [
+   "IMG_20240912_215733.jpg",
+   "IMG_20240912_215742.jpg",
+   "IMG_20240912_215907.jpg",
+   "IMG_20240912_215918.jpg",
+   "IMG_20240912_220433.jpg",
+   "IMG_20240912_220436.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 5,
+  "date": "20240930",
+  "category": "corporate-office-bank-furniture",
+  "confidence": "high",
+  "seen": "Open-plan workstation cubicles with red/blue screens, chairs still wrapped",
+  "images": [
+   "IMG_20240930_200528.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 6,
+  "date": "20241008",
+  "category": "corporate-office-bank-furniture",
+  "confidence": "high",
+  "seen": "Study-abroad consultancy frontage, glass partitions, artificial-grass feature wall",
+  "images": [
+   "IMG_20241008_183900.jpg",
+   "IMG_20241008_184010.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 7,
+  "date": "20241009",
+  "category": "showroom-outlet",
+  "confidence": "high",
+  "seen": "Retail racks of folded fabric, showroom lighting",
+  "images": [
+   "IMG_20241009_152319.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 8,
+  "date": "20241021",
+  "category": "corporate-office-bank-furniture",
+  "confidence": "high",
+  "seen": "Consultancy office — reception, glass-partitioned classrooms, library shelving, private offices",
+  "images": [
+   "IMG_20241021_172900.jpg",
+   "IMG_20241021_172911.jpg",
+   "IMG_20241021_172920.jpg",
+   "IMG_20241021_172935.jpg",
+   "IMG_20241021_172948.jpg",
+   "IMG_20241021_172958.jpg",
+   "IMG_20241021_173259.jpg",
+   "IMG_20241021_173347.jpg",
+   "IMG_20241021_173409.jpg",
+   "IMG_20241021_173414.jpg",
+   "IMG_20241021_173608.jpg",
+   "IMG_20241021_173615.jpg",
+   "IMG_20241021_173618.jpg",
+   "IMG_20241021_173631.jpg",
+   "IMG_20241021_173640.jpg",
+   "IMG_20241021_173649.jpg",
+   "IMG_20241021_173724.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 9,
+  "date": "20241023",
+  "category": "factory-works",
+  "confidence": "high",
+  "seen": "Bare steel frames stacked in a fabrication shop",
+  "images": [
+   "IMG_20241023_130835.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 10,
+  "date": "20241024",
+  "category": "factory-works",
+  "confidence": "high",
+  "seen": "Steel display racks under fabrication",
+  "images": [
+   "IMG_20241024_172437.jpg",
+   "IMG_20241024_172517.jpg",
+   "IMG_20241024_172522.jpg",
+   "IMG_20241024_172532.jpg",
+   "IMG_20241024_200832.jpg",
+   "IMG_20241024_200839.jpg",
+   "IMG_20241024_200849.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 11,
+  "date": "20241025",
+  "category": "factory-works",
+  "confidence": "high",
+  "seen": "Steel-and-glass display cabinets being assembled, packaging still on",
+  "images": [
+   "IMG_20241025_145225.jpg",
+   "IMG_20241025_145236.jpg",
+   "IMG_20241025_145249.jpg",
+   "IMG_20241025_145305.jpg",
+   "IMG_20241025_145315.jpg",
+   "IMG_20241025_145324.jpg",
+   "IMG_20241025_145345.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 12,
+  "date": "20250115",
+  "category": "industrial-building-steel-structure",
+  "confidence": "medium",
+  "seen": "Industrial ceiling — exposed ducting, pipework, steel roof",
+  "images": [
+   "IMG_20250115_121328.jpg",
+   "IMG_20250115_121512.jpg",
+   "IMG_20250115_121517.jpg",
+   "IMG_20250115_121538.jpg",
+   "IMG_20250115_121611.jpg",
+   "IMG_20250115_121633.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 13,
+  "date": "o_202502",
+  "category": null,
+  "confidence": "none",
+  "seen": "Video only — no stills to classify from",
+  "images": [],
+  "videos": [
+   "video_20250212_191248.mp4",
+   "video_20250212_195218.mp4"
+  ]
+ },
+ {
+  "session": 14,
+  "date": "20250213",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Living room with wood-slice feature wall and hanging chair",
+  "images": [
+   "IMG_20250213_145047.jpg",
+   "IMG_20250213_145125.jpg",
+   "IMG_20250213_145137.jpg",
+   "IMG_20250213_145214.jpg",
+   "IMG_20250213_145227.jpg",
+   "IMG_20250213_145235.jpg",
+   "IMG_20250213_145248.jpg",
+   "IMG_20250213_145319.jpg",
+   "IMG_20250213_145327.jpg",
+   "IMG_20250213_145337.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 15,
+  "date": "o_202502",
+  "category": null,
+  "confidence": "none",
+  "seen": "Video only — no stills to classify from",
+  "images": [],
+  "videos": [
+   "video_20250216_183231.mp4"
+  ]
+ },
+ {
+  "session": 16,
+  "date": "20250218",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Residential TV wall unit and panelled feature wall",
+  "images": [
+   "IMG_20250218_165816.jpg",
+   "IMG_20250218_170011.jpg",
+   "IMG_20250218_170027.jpg",
+   "IMG_20250218_170606.jpg",
+   "IMG_20250218_170612.jpg",
+   "IMG_20250218_170616.jpg",
+   "IMG_20250218_170634.jpg",
+   "IMG_20250218_170643.jpg",
+   "IMG_20250218_170653.jpg",
+   "IMG_20250218_170700.jpg",
+   "IMG_20250218_171036.jpg"
+  ],
+  "videos": [
+   "video_20250218_170132.mp4"
+  ]
+ },
+ {
+  "session": 17,
+  "date": "20250224",
+  "category": "showroom-outlet",
+  "confidence": "low",
+  "seen": "Deep shelving bays around a window — could be a pharmacy, library or retail back wall. Needs your eye.",
+  "images": [
+   "IMG_20250224_162624.jpg",
+   "IMG_20250224_162940.jpg",
+   "IMG_20250224_163058.jpg",
+   "IMG_20250224_195449.jpg",
+   "IMG_20250224_195532.jpg",
+   "IMG_20250224_195547.jpg"
+  ],
+  "videos": [
+   "video_20250224_162634.mp4",
+   "video_20250224_162820.mp4",
+   "video_20250224_195055.mp4"
+  ]
+ },
+ {
+  "session": 18,
+  "date": "20250429",
+  "category": "corporate-office-bank-furniture",
+  "confidence": "high",
+  "seen": "Executive desk and chair in a glass-walled office",
+  "images": [
+   "IMG_20250429_131355.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 19,
+  "date": "20250504",
+  "category": "factory-works",
+  "confidence": "high",
+  "seen": "Desks and a conference table being assembled in the workshop",
+  "images": [
+   "IMG_20250504_154016.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 20,
+  "date": "o_202506",
+  "category": null,
+  "confidence": "none",
+  "seen": "Video only — no stills to classify from",
+  "images": [],
+  "videos": [
+   "video_20250625_124632.mp4"
+  ]
+ },
+ {
+  "session": 21,
+  "date": "o_202509",
+  "category": null,
+  "confidence": "none",
+  "seen": "Video only — no stills to classify from",
+  "images": [],
+  "videos": [
+   "video_20250905_170323.mp4"
+  ]
+ },
+ {
+  "session": 22,
+  "date": "20251004",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Residential TV wall with stone panel",
+  "images": [
+   "IMG_20251004_150303.jpg",
+   "IMG_20251004_150307.jpg",
+   "IMG_20251004_150318.jpg",
+   "IMG_20251004_150326.jpg"
+  ],
+  "videos": [
+   "video_20251004_150407.mp4"
+  ]
+ },
+ {
+  "session": 23,
+  "date": "20251219",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Bedroom wardrobe with integrated study unit",
+  "images": [
+   "IMG_20251219_183618.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 24,
+  "date": "20251226",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Whole flat — kitchen, wardrobes, gypsum ceilings, TV wall, decorative door",
+  "images": [
+   "IMG_20251226_135741.jpg",
+   "IMG_20251226_135754.jpg",
+   "IMG_20251226_135832.jpg",
+   "IMG_20251226_135851.jpg",
+   "IMG_20251226_135929.jpg",
+   "IMG_20251226_135936.jpg",
+   "IMG_20251226_135945.jpg",
+   "IMG_20251226_140000.jpg",
+   "IMG_20251226_140012.jpg",
+   "IMG_20251226_140043.jpg",
+   "IMG_20251226_140126.jpg",
+   "IMG_20251226_140203.jpg",
+   "IMG_20251226_140213.jpg",
+   "IMG_20251226_140306.jpg",
+   "IMG_20251226_140332.jpg",
+   "IMG_20251226_140342.jpg",
+   "IMG_20251226_140410.jpg",
+   "IMG_20251226_140428.jpg",
+   "IMG_20251226_140513.jpg",
+   "IMG_20251226_140532.jpg",
+   "IMG_20251226_142001_Burst01.jpg",
+   "IMG_20251226_142015.jpg",
+   "IMG_20251226_162740.jpg",
+   "IMG_20251226_162748.jpg",
+   "IMG_20251226_162753.jpg",
+   "IMG_20251226_171039.jpg",
+   "IMG_20251226_171054.jpg",
+   "IMG_20251226_171059.jpg",
+   "IMG_20251226_171132.jpg",
+   "IMG_20251226_171908.jpg",
+   "IMG_20251226_171914.jpg",
+   "IMG_20251226_171934.jpg",
+   "IMG_20251226_171949.jpg",
+   "IMG_20251226_171956.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 25,
+  "date": "20260209",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "medium",
+  "seen": "Panelled interior with cove-lit ceiling and display niches",
+  "images": [
+   "IMG_20260209_151754.jpg",
+   "IMG_20260209_151812.jpg",
+   "IMG_20260209_151848.jpg",
+   "IMG_20260209_151934_Burst03.jpg",
+   "IMG_20260209_152010.jpg",
+   "IMG_20260209_152111.jpg",
+   "IMG_20260209_152117.jpg",
+   "IMG_20260209_152126.jpg",
+   "IMG_20260209_152206.jpg",
+   "IMG_20260209_152230.jpg",
+   "IMG_20260209_152307.jpg",
+   "IMG_20260209_152315.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 26,
+  "date": "20260227",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Living room — blue sofa, damask wallpaper, timber panelling",
+  "images": [
+   "IMG_20260227_120230-2.jpg",
+   "IMG_20260227_120230.jpg",
+   "IMG_20260227_120246-2.jpg",
+   "IMG_20260227_120246.jpg",
+   "IMG_20260227_120256-2.jpg",
+   "IMG_20260227_120256.jpg",
+   "IMG_20260227_120312-2.jpg",
+   "IMG_20260227_120312.jpg",
+   "IMG_20260227_140758-2.jpg",
+   "IMG_20260227_140805-2.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 27,
+  "date": "20260515",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "medium",
+  "seen": "Leather sofa set and centre table on a finished floor",
+  "images": [
+   "IMG_20260515_160252.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 28,
+  "date": "20260523",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Dining hall with panelled walls and a slatted ceiling",
+  "images": [
+   "IMG_20260523_151645.jpg",
+   "IMG_20260523_151710.jpg",
+   "IMG_20260523_151813.jpg",
+   "IMG_20260523_152112.jpg",
+   "IMG_20260523_152139.jpg",
+   "IMG_20260523_152155.jpg",
+   "IMG_20260523_152203.jpg",
+   "IMG_20260523_152209.jpg",
+   "IMG_20260523_152220.jpg",
+   "IMG_20260523_152506.jpg",
+   "IMG_20260523_152529.jpg",
+   "IMG_20260523_152659.jpg",
+   "IMG_20260523_152943.jpg"
+  ],
+  "videos": []
+ },
+ {
+  "session": 29,
+  "date": "20260728",
+  "category": "home-furniture-interior-exterior",
+  "confidence": "high",
+  "seen": "Furnished flat — reception seating, living room, bedroom, kitchen, dining",
+  "images": [
+   "IMG_20260728_174032.jpg",
+   "IMG_20260728_174045.jpg",
+   "IMG_20260728_174105.jpg",
+   "IMG_20260728_175025.jpg",
+   "IMG_20260728_175036.jpg",
+   "IMG_20260728_175048.jpg",
+   "IMG_20260728_175204.jpg",
+   "IMG_20260728_175216.jpg",
+   "IMG_20260728_175309.jpg",
+   "IMG_20260728_175317.jpg",
+   "IMG_20260728_175323.jpg",
+   "IMG_20260728_175334.jpg",
+   "IMG_20260728_180526.jpg",
+   "IMG_20260728_180538.jpg",
+   "IMG_20260728_180551.jpg",
+   "IMG_20260728_180602.jpg",
+   "IMG_20260728_180612.jpg",
+   "IMG_20260728_180623.jpg",
+   "IMG_20260728_180646.jpg",
+   "IMG_20260728_180657.jpg",
+   "IMG_20260728_180730.jpg",
+   "IMG_20260728_180745.jpg",
+   "IMG_20260728_180748.jpg",
+   "IMG_20260728_180836.jpg",
+   "IMG_20260728_180857.jpg",
+   "IMG_20260728_180906.jpg",
+   "IMG_20260728_182234.jpg"
+  ],
+  "videos": []
+ }
+]

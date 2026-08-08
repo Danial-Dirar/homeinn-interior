@@ -1,4 +1,4 @@
-# Prompt — sort the Home Inn photo/video archive
+<!-- # Prompt — sort the Home Inn photo/video archive
 
 Copy everything below the line into your AI agent (Antigravity or similar) on
 the machine that holds the photos. It is self-contained: it does not need this
@@ -8,7 +8,7 @@ folder into a folder the importer here can read.
 Point it at the archive folder, then bring back **the whole sorted folder plus
 `manifest.json`**.
 
----
+--- -->
 
 ## Your task
 

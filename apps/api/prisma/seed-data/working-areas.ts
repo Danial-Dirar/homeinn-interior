@@ -59,4 +59,15 @@ export const workingAreas = [
     nameBn: "সরকারি প্রকল্পের কাজ",
     sortOrder: 8,
   },
+  // Added 2026-08-09 at Muhammad's request, and unlike the nine above it is not
+  // from the company profile's own list. It covers the in-house workshop —
+  // furniture and steel fabrication before it reaches a site — which is
+  // genuinely a different thing from `industrial-building-steel-structure`
+  // (that one is a building the company erects; this one is what it makes).
+  {
+    slug: "factory-works",
+    nameEn: "Factory Works",
+    nameBn: "ফ্যাক্টরির কাজ",
+    sortOrder: 9,
+  },
 ];
