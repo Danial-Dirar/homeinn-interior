@@ -22,9 +22,11 @@ export function Credentials({
       title={t("credentialsTitle")}
       tone="bone"
     >
-      <ul className="grid gap-px border border-ink/10 bg-ink/10 sm:grid-cols-3">
+      {/* Same border-per-cell approach as the services grid: three credentials
+          fill a row today, but a fourth would leave two grey cells behind. */}
+      <ul className="grid border-l border-t border-ink/10 sm:grid-cols-3">
         {certifications.map((certification) => (
-          <li key={certification.id} className="bg-bone p-8">
+          <li key={certification.id} className="border-b border-r border-ink/10 bg-bone p-8">
             <h3 className="heading">{text(certification, "title", locale)}</h3>
             {certification.issuer ? (
               <p className="mt-2 text-sm text-ink/60">{certification.issuer}</p>

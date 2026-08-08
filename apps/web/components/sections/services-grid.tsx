@@ -29,11 +29,15 @@ export function ServicesGrid({
       {services.length === 0 ? (
         <p className="text-ink/60">{s("empty")}</p>
       ) : (
-        <ul className="grid gap-px border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-3">
+        // Hairlines are drawn by each cell's own right/bottom border rather than
+        // by a background showing through `gap-px`. Seven services never fill a
+        // three-column row, and the background trick paints those empty cells
+        // grey, which reads as a broken tile.
+        <ul className="grid border-l border-t border-ink/10 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => {
             const Icon = iconFor(service.icon);
             return (
-              <li key={service.id} className="bg-bone">
+              <li key={service.id} className="border-b border-r border-ink/10 bg-bone">
                 <Link
                   href={`/services/${service.slug}`}
                   className="flex h-full flex-col gap-4 p-8 transition-colors hover:bg-sand/40"
