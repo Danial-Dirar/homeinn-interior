@@ -779,6 +779,93 @@ real frames for projects and let the hero carry the polish.
 2. **Identifiable faces** appear in at least sessions 8 and 29 (a man at a desk,
    a reflection in a mirror). Those frames must not be published.
 
+### The archive is imported — 2026-08-09
+
+`apps/api/prisma/seed-projects.ts` (`pnpm --filter @homeinn/api seed:projects`)
+turned the 29 sessions into **25 draft projects**, one per session, cover plus up
+to 8 gallery images each. Idempotent on slug, so re-running is safe. The run
+took roughly 15 minutes — every image goes through sharp for eight derivatives.
+
+What it writes, and only this:
+
+- `workingArea` from the classification file, `year` from the filename date,
+  `sortOrder` from the session number, and the photographs.
+- `titleEn` / `titleBn` are **provisional**: category name + month + year, e.g.
+  "Factory Works — October 2024" / "ফ্যাক্টরির কাজ — অক্টোবর ২০২৪". Both are
+  derived from facts, neither is a real project name. Rename them.
+- `locationEn/Bn`, `descriptionEn/Bn` are empty strings, `clientName` and
+  `areaSqft` null. The columns are non-nullable, and the UI drops empty facts
+  rather than rendering blank rows.
+- Alt text comes from the `seen` field of the classification — a real
+  description of what is visible, which makes it honest alt text rather than a
+  generic placeholder.
+
+Curation: images below 1440px are skipped, and where a session has more than
+eight the gallery is sampled **evenly across the session** rather than taking
+the first eight — the photographer walks through a space, so an even spread
+samples different rooms while consecutive frames are the same corner. The two
+frames containing identifiable people (`IMG_20241021_173259.jpg`,
+`IMG_20260728_175204.jpg`) are excluded by name; the run log shows 16 of 17 and
+26 of 27 usable for those two sessions, which is that exclusion working.
+
+### The hero is now the company's own work, not stock
+
+Session 29 turned out to be exactly what spec §15 asks the client for: one flat,
+one session, room to room. Five landscape frames were staged into
+`seed-data/placeholders/` and ingested — **Entrance → Living Room → Bedroom →
+Kitchen → Dining**, with Bangla labels (প্রবেশপথ, বসার ঘর, শোবার ঘর, রান্নাঘর,
+খাবার ঘর) set afterwards, since room names are labels rather than claims.
+
+No stock imagery was used anywhere. Wikimedia Commons was tested and does return
+CC-licensed interiors with usable licence metadata — but six photographs of six
+different properties cannot read as one continuous interior, which is the whole
+premise of §7. The client's own sequence does. If the hero is ever restaged from
+stock, that trade-off is the thing to weigh.
+
+Note the archive is all 4160×3120 (4:3 phone photos) — there is not a single
+16:9 frame. That is fine: `object-fit: cover` plus `focalX` crops them, and the
+first filter written for this was too strict at `aspect ≥ 1.5`.
+
+### Published locally, deliberately
+
+All 25 are `published: true` **in the local database only** so the work can be
+looked at, and four are `featured` for the home page. The provisional titles are
+not fit for a public deploy. Before this goes anywhere real, either rename them
+or set them back:
+
+```bash
+psql "$DATABASE_URL" -c 'UPDATE "Project" SET published = false;'
+```
+
+### Two fixes this uncovered
+
+1. **`ProjectCard` rendered a leading separator.** It concatenated
+   location/year/area, so an imported project with no location showed " · 2024".
+   Now joins the non-empty parts.
+2. **Next's fetch cache served an empty hero.** `.next/cache` persists across
+   builds, so a build that ran while `HeroSegment` was empty kept returning `[]`
+   for five minutes of `revalidate`. After seeding content, `rm -rf
+   apps/web/.next/cache` before rebuilding — otherwise the page silently renders
+   the zero-segment fallback and looks like a bug in the hero.
+
+### Verification
+
+- API: 5 hero segments with Bangla labels, 25 projects, 6 under `factory-works`,
+  blurhash and AVIF/WebP srcsets present on every image.
+- Web: 83 static pages (was 33), `/en/projects` 25 cards, 10 filter chips,
+  `?area=factory-works` 6 cards, `/bn` shows all five Bangla room labels.
+- `pnpm test` 252 passed · `pnpm typecheck` clean · `pnpm lint` clean.
+
+### Still to do on the archive
+
+- **Rename the 25 projects.** Provisional titles are the biggest gap.
+- **Session 17** is still low confidence — pharmacy, library or retail?
+- **Client names** legible on signage in sessions 3, 6 and 8 need confirming
+  before they go near `clientName`.
+- **The 10 videos are untouched** — the hero-video question is still open.
+- **Locations and years for real** — year is set from filenames, which is only
+  the date the photo was taken, not necessarily the completion year.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with

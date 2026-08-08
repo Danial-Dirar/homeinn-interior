@@ -14,6 +14,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
     "seed:hero": "tsx prisma/seed-hero.ts",
+    "seed:projects": "tsx prisma/seed-projects.ts",
     "media:inventory": "tsx scripts/media-inventory.ts"
   },
   "prisma": {

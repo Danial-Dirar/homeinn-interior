@@ -5,6 +5,7 @@
     "moduleResolution": "Node",
     "rootDir": "./",
     "outDir": "./dist",
+    "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false

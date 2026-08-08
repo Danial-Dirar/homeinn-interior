@@ -28,10 +28,16 @@ export function ProjectCard({ locale, project }: { locale: Locale; project: Proj
           ) : null}
         </div>
         <h3 className="heading mt-4">{text(project, "title", locale)}</h3>
+        {/* Joined rather than concatenated: an imported project may have no
+            location yet, and a leading " · " would show for every one. */}
         <p className="mt-1 text-sm text-current/60">
-          {text(project, "location", locale)}
-          {project.year ? ` · ${project.year}` : ""}
-          {project.areaSqft ? ` · ${project.areaSqft} ${t("areaUnit")}` : ""}
+          {[
+            text(project, "location", locale),
+            project.year ? String(project.year) : "",
+            project.areaSqft ? `${project.areaSqft} ${t("areaUnit")}` : "",
+          ]
+            .filter((part) => part.trim())
+            .join(" · ")}
         </p>
       </Link>
     </article>
