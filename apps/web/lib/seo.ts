@@ -79,6 +79,12 @@ export function pageMetadata({
   };
 }
 
+/** schema.org accepts a list, and both lines are genuinely answered. */
+function telephones(settings: SiteSettingsView): string | string[] {
+  const second = settings.phoneSecondary?.trim();
+  return second ? [settings.phone, second] : settings.phone;
+}
+
 function socialProfiles(settings: SiteSettingsView): string[] {
   return [settings.facebookUrl, settings.instagramUrl, settings.youtubeUrl].filter(
     (url): url is string => Boolean(url),
@@ -94,7 +100,7 @@ export function localBusinessJsonLd(settings: SiteSettingsView, locale: Locale) 
     "@type": "LocalBusiness",
     name: "Home Inn Interior Solution",
     url: canonicalFor(locale, "/"),
-    telephone: settings.phone,
+    telephone: telephones(settings),
     email: settings.email,
     foundingDate: String(settings.establishedYear),
     address: {
@@ -115,7 +121,7 @@ export function organizationJsonLd(settings: SiteSettingsView, locale: Locale) {
     name: "Home Inn Interior Solution",
     url: canonicalFor(locale, "/"),
     email: settings.email,
-    telephone: settings.phone,
+    telephone: telephones(settings),
     foundingDate: String(settings.establishedYear),
     sameAs: socialProfiles(settings),
   };

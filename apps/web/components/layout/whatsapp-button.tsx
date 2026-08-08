@@ -1,6 +1,6 @@
-import { MessageCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { whatsappHref } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "./whatsapp-icon";
 
 export function WhatsAppButton({ number, className }: { number: string; className?: string }) {
   const t = useTranslations("common");
@@ -13,7 +13,7 @@ export function WhatsAppButton({ number, className }: { number: string; classNam
       aria-label={t("whatsapp")}
       className={className}
     >
-      <MessageCircle aria-hidden="true" className="size-5" />
+      <WhatsAppIcon className="size-5" />
       <span className="sr-only">{t("whatsapp")}</span>
     </a>
   );

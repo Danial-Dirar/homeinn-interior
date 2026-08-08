@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { SiteSettingsView } from "@/lib/api.types";
 import { text } from "@/lib/locale-text";
+import { PhoneLines } from "./phone-lines";
 
 const SOCIALS = [
   { key: "facebookUrl", label: "Facebook" },
@@ -26,10 +27,8 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
         <address className="text-sm not-italic">
           <p className="eyebrow">{t("address")}</p>
           <p className="mt-2 text-sand">{text(settings, "address", locale)}</p>
-          <p className="mt-4">
-            <a className="hover:text-brand" href={`tel:${settings.phone}`}>{settings.phone}</a>
-          </p>
-          <p>
+          <PhoneLines settings={settings} className="mt-4 space-y-1" />
+          <p className="mt-1">
             <a className="hover:text-brand" href={`mailto:${settings.email}`}>{settings.email}</a>
           </p>
           <p className="mt-4">{text(settings, "hours", locale)}</p>

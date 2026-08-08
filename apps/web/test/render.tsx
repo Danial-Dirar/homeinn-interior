@@ -25,6 +25,8 @@ export const settingsFixture: SiteSettingsView = {
   id: "singleton",
   phone: "01760775454",
   whatsapp: "+8801760775454",
+  phoneSecondary: "01818843999",
+  whatsappSecondary: "+8801818843999",
   email: "homeinnbd14@gmail.com",
   addressEn: "Plot# 18, Road# 03, Block# KHA, Section# 06, Mirpur-10, Dhaka-1216",
   addressBn: "প্লট# ১৮, রোড# ০৩, ব্লক# খ, সেকশন# ০৬, মিরপুর-১০, ঢাকা-১২১৬",

@@ -866,6 +866,70 @@ psql "$DATABASE_URL" -c 'UPDATE "Project" SET published = false;'
 - **Locations and years for real** — year is set from filenames, which is only
   the date the photo was taken, not necessarily the completion year.
 
+### Hero pan smoothing — 2026-08-09
+
+The pan was welded to the scrollbar: `usePinProgress` set React state from the
+section's rect on every scroll event, so the strip's position *equalled* the
+scroll position and every wheel notch was visible as a step. Two changes:
+
+1. **`approach()` in `hero-math.ts`** — exponential damping, so scroll sets a
+   *target* and the camera eases toward it. Frame-rate independent
+   (`target + (current - target) * e^(-lambda*dt)`), which a naive
+   `current += (target - current) * 0.1` is not — that runs ~2.4× faster on a
+   144Hz display. There is a test for exactly that property.
+2. **`useSmoothProgress` replaces `usePinProgress`** and calls back on each
+   animation frame instead of setting state. `PanoramaHero` writes the strip,
+   foreground, light pool, progress bar and label opacities straight to the DOM
+   through refs. Re-rendering five full-bleed images at 60fps was half the
+   stutter. The rAF loop parks itself once settled.
+
+**Tuning, and the mistake worth remembering.** The first attempt used
+`LAMBDA = 5` and left Lenis at `duration: 1.1`, which measured **1950 ms** to
+come to rest after one wheel flick — syrup, not momentum. The two eases
+compound: Lenis smooths the scroll position that this then smooths again.
+Settled on `LAMBDA = 9` and Lenis `0.9`:
+
+| | |
+|---|---|
+| 50% of the travel | 215 ms |
+| 90% | 480 ms |
+| 99% | 801 ms |
+
+Measure before changing either number — a Playwright script reading
+`DOMMatrixReadOnly(getComputedStyle(strip).transform).m41` after
+`mouse.wheel()` is how these came out.
+
+### A second phone line — 2026-08-09
+
+`01818843999` now appears everywhere the original number does, each with its own
+WhatsApp control.
+
+It went in as **two nullable `SiteSettings` columns** (`phoneSecondary`,
+`whatsappSecondary`, migration `20260808234815_add_secondary_phone`) rather than
+being hardcoded — it is a business fact the admin will need to edit, and a
+company with one number is still a valid configuration.
+
+- `components/layout/phone-lines.tsx` owns the decision. `phoneLines(settings)`
+  is the single place that knows whether a second line exists, so no component
+  null-checks it. A blank or whitespace-only value is treated as absent, and
+  `whatsappSecondary` falls back to the number itself.
+- `whatsapp-icon.tsx` is WhatsApp's own glyph, inline, inheriting
+  `currentColor`. It replaced lucide's generic `MessageCircle` in the header
+  too. Used the way their brand guidelines allow — on a control whose only job
+  is opening a chat with us — and it is documented as not being a general
+  messaging icon.
+- Each WhatsApp link is named per number (`Chat on WhatsApp — 01818843999`), so
+  a screen reader does not hear two identical links.
+- JSON-LD `telephone` becomes an array when a second line exists and stays a
+  bare string when it does not; both are valid schema.org and both are tested.
+
+`seed.ts`'s settings upsert previously had `update: {}`, which meant an
+already-seeded database would never pick up new fields. It now pushes the second
+number on re-seed.
+
+Watch out: `prisma migrate dev --skip-generate` leaves the client stale, and the
+seed then fails with an opaque Prisma error. Run `prisma generate` after.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with

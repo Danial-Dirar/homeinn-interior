@@ -13,6 +13,8 @@ const SINGLETON_ID = "singleton";
 const BLANK = {
   phone: "",
   whatsapp: "",
+  phoneSecondary: null,
+  whatsappSecondary: null,
   email: "",
   addressEn: "",
   addressBn: "",

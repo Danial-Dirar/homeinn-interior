@@ -7,6 +7,7 @@ import {
 
 const settings: SiteSettingsView = {
   id: "singleton", phone: "01760775454", whatsapp: "+8801760775454",
+  phoneSecondary: "01818843999", whatsappSecondary: "+8801818843999",
   email: "homeinnbd14@gmail.com",
   addressEn: "Plot# 18, Road# 03, Block# KHA, Section# 06, Mirpur-10, Dhaka-1216",
   addressBn: "প্লট# ১৮, মিরপুর-১০, ঢাকা-১২১৬",
@@ -72,7 +73,7 @@ describe("localBusinessJsonLd", () => {
   it("carries the real NAP", () => {
     const json = localBusinessJsonLd(settings, "en");
     expect(json["@type"]).toBe("LocalBusiness");
-    expect(json.telephone).toBe("01760775454");
+    expect(json.telephone).toEqual(["01760775454", "01818843999"]);
     expect(json.email).toBe("homeinnbd14@gmail.com");
     expect(json.address.streetAddress).toContain("Mirpur-10");
   });
@@ -86,6 +87,18 @@ describe("localBusinessJsonLd", () => {
 
   it("uses the Bangla address for bn", () => {
     expect(localBusinessJsonLd(settings, "bn").address.streetAddress).toContain("মিরপুর");
+  });
+});
+
+describe("telephone in JSON-LD", () => {
+  it("is a bare string when there is only one line", () => {
+    const one = { ...settings, phoneSecondary: null, whatsappSecondary: null };
+    expect(localBusinessJsonLd(one, "en").telephone).toBe("01760775454");
+  });
+
+  it("ignores a whitespace-only second line", () => {
+    const blank = { ...settings, phoneSecondary: "   " };
+    expect(localBusinessJsonLd(blank, "en").telephone).toBe("01760775454");
   });
 });
 

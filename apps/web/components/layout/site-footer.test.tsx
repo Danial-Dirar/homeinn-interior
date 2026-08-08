@@ -7,10 +7,18 @@ describe("SiteFooter", () => {
   it("shows the real NAP from settings", () => {
     renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
     expect(screen.getByText(/Mirpur-10, Dhaka-1216/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /01760775454/ }))
+    // Exact, not a substring: the WhatsApp control beside each number carries
+    // the number in its own accessible name.
+    expect(screen.getByRole("link", { name: "01760775454" }))
       .toHaveAttribute("href", "tel:01760775454");
     expect(screen.getByRole("link", { name: /homeinnbd14@gmail.com/ }))
       .toHaveAttribute("href", "mailto:homeinnbd14@gmail.com");
+  });
+
+  it("shows both numbers", () => {
+    renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
+    expect(screen.getByRole("link", { name: "01818843999" }))
+      .toHaveAttribute("href", "tel:01818843999");
   });
 
   it("uses the Bangla address for bn", () => {

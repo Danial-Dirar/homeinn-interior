@@ -127,6 +127,8 @@ export interface SiteSettingsView {
   id: string;
   phone: string;
   whatsapp: string;
+  phoneSecondary: string | null;
+  whatsappSecondary: string | null;
   email: string;
   addressEn: string; addressBn: string;
   hoursEn: string; hoursBn: string;

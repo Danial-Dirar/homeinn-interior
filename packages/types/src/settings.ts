@@ -13,6 +13,10 @@ export const updateSettingsSchema = bilingualText("address", 500)
     z.object({
       phone: z.string().trim().min(1).max(40),
       whatsapp: z.string().trim().min(1).max(40),
+      // A second line, optional. `""` clears it rather than leaving a stale
+      // number on the site, so the admin can remove one without a null.
+      phoneSecondary: z.string().trim().max(40).optional(),
+      whatsappSecondary: z.string().trim().max(40).optional(),
       email: z.string().trim().toLowerCase().email(),
       facebookUrl: url.optional(),
       instagramUrl: url.optional(),

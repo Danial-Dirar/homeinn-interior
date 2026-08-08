@@ -236,10 +236,14 @@ model Lead {
 // ---------- Settings and auth ----------
 
 model SiteSettings {
-  id              String  @id @default("singleton")
-  phone           String
-  whatsapp        String
-  email           String
+  id       String @id @default("singleton")
+  phone    String
+  whatsapp String
+  // A second line the company also answers. Nullable because one number is a
+  // valid configuration — every surface hides the row when it is absent.
+  phoneSecondary    String?
+  whatsappSecondary String?
+  email             String
   addressEn       String
   addressBn       String
   hoursEn         String

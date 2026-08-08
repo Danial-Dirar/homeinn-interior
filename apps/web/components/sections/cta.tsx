@@ -1,6 +1,7 @@
 import type { Locale } from "@homeinn/types";
 import { useTranslations } from "next-intl";
 import { LeadForm } from "@/components/forms/lead-form";
+import { PhoneLines } from "@/components/layout/phone-lines";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import type { ServiceView, SiteSettingsView } from "@/lib/api.types";
 import { Section } from "./section";
@@ -27,9 +28,10 @@ export function Cta({
               number={settings.whatsapp}
               className="inline-flex items-center gap-2 border border-sand px-5 py-3 text-sand hover:border-brand hover:text-brand"
             />
-            <a href={`tel:${settings.phone}`} className="text-sand-dim hover:text-brand">
-              {common("callUs")} — {settings.phone}
-            </a>
+            <div className="text-sand-dim">
+              <p className="eyebrow">{common("callUs")}</p>
+              <PhoneLines settings={settings} className="mt-1 space-y-1" />
+            </div>
           </div>
         </div>
         <div className="text-sand">
