@@ -22,10 +22,18 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "বাংলা" })).toHaveAttribute("hreflang", "bn");
   });
 
-  it("exposes a persistent WhatsApp affordance", () => {
+  it("links to the social profiles that exist, and no others", () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
-    expect(screen.getByRole("link", { name: "Chat on WhatsApp" }))
-      .toHaveAttribute("href", "https://wa.me/8801760775454");
+    expect(screen.getByRole("link", { name: "Facebook" }))
+      .toHaveAttribute("href", "https://www.facebook.com/homeinnbd14");
+    expect(screen.getByRole("link", { name: "Instagram" })).toBeInTheDocument();
+    // The fixture has no YouTube URL; a dead link is worse than no link.
+    expect(screen.queryByRole("link", { name: "YouTube" })).not.toBeInTheDocument();
+  });
+
+  it("leaves WhatsApp to the floating button rather than the bar", () => {
+    renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(screen.queryByRole("link", { name: /Chat on WhatsApp/ })).not.toBeInTheDocument();
   });
 
   it("opens the mobile menu on request", async () => {

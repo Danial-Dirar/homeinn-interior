@@ -8,7 +8,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import type { SiteSettingsView } from "@/lib/api.types";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { LocaleSwitcher } from "./locale-switcher";
-import { WhatsAppButton } from "./whatsapp-button";
+import { SocialLinks } from "./social-links";
 
 const ROUTES = [
   { href: "/", key: "home" },
@@ -57,7 +57,10 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
 
         <div className="flex items-center gap-4">
           <LocaleSwitcher locale={locale} />
-          <WhatsAppButton number={settings.whatsapp} className="hover:text-brand" />
+          <SocialLinks
+            settings={settings}
+            className="hidden items-center gap-3 sm:flex"
+          />
 
           <Sheet>
             <SheetTrigger asChild>

@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SkipLink } from "@/components/layout/skip-link";
+import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { JsonLd } from "@/components/seo/json-ld";
 import { routing } from "@/i18n/routing";
@@ -65,6 +66,7 @@ export default async function LocaleLayout({
           <SiteHeader locale={locale} settings={settings} />
           {children}
           <SiteFooter locale={locale} settings={settings} />
+          <WhatsAppFloat settings={settings} />
         </NextIntlClientProvider>
       </body>
     </html>

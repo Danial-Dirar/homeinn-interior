@@ -968,6 +968,29 @@ number on re-seed.
 Watch out: `prisma migrate dev --skip-generate` leaves the client stale, and the
 seed then fails with an opaque Prisma error. Run `prisma generate` after.
 
+### Social icons moved up, WhatsApp moved out — 2026-08-09
+
+Facebook and Instagram were only ever in the footer as text links. They are now
+icons in the header's top right, and WhatsApp left the header for a floating
+button.
+
+- `social-links.tsx` renders Facebook / Instagram / YouTube from settings,
+  **only the ones configured** — the fixture has no YouTube URL and no link
+  appears, because a dead social link is worse than none.
+- `whatsapp-float.tsx` is fixed bottom-right, on every page, hidden only at the
+  top of the home page so it never lands on the hero's first frame. It reuses
+  the same `usePathname() === "/" && !scrolled` rule the header uses, so the two
+  cannot disagree. Verified: opacity 0 at home top, 1 after scrolling, 1 on
+  `/contact`.
+- `whatsapp-button.tsx` is deleted. The CTA section lost its separate WhatsApp
+  button too — `PhoneLines` already puts one beside each number there, and the
+  float is on the page regardless.
+
+**White on WhatsApp green is 1.98:1** and fails AA outright — this is WhatsApp's
+own brand pairing and axe caught it immediately. The button keeps `#25D366`,
+which is what makes it recognisable, but uses `ink` for the label and glyph:
+9.7:1. Do not "fix" it back to white.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with
