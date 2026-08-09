@@ -105,6 +105,14 @@ export interface CertificationView {
   sortOrder: number;
 }
 
+export interface ClientLogoView {
+  id: string;
+  name: string;
+  website: string | null;
+  sortOrder: number;
+  logo: MediaView;
+}
+
 export interface CorporateClientView {
   id: string;
   serial: number;

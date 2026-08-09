@@ -13,3 +13,4 @@ uploads/
 .pgdata/
 *.tsbuildinfo
 media_dump/
+client_logos/_source/

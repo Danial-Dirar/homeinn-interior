@@ -1,9 +1,12 @@
 import type { Locale } from "@homeinn/types";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ClientLogoWall } from "@/components/clients/client-logo-wall";
 import { CorporateTable } from "@/components/clients/corporate-table";
 import { ResidentialSummary } from "@/components/clients/residential-summary";
-import { getCorporateClients, getResidentialSummary, getSettings } from "@/lib/content";
+import {
+  getClientLogos, getCorporateClients, getResidentialSummary, getSettings,
+} from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -25,10 +28,11 @@ export default async function ClientsPage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [clients, summary, settings] = await Promise.all([
+  const [clients, summary, settings, logos] = await Promise.all([
     getCorporateClients(),
     getResidentialSummary(),
     getSettings(),
+    getClientLogos(),
   ]);
   const t = await getTranslations("clients");
 
@@ -37,6 +41,10 @@ export default async function ClientsPage({ params }: { params: Promise<{ locale
       <div className="mx-auto max-w-7xl px-5 py-28">
         <h1 className="display-1">{t("title")}</h1>
         <p className="mt-6 max-w-2xl text-lg text-ink/70">{t("intro")}</p>
+
+        <div className="mt-20">
+          <ClientLogoWall locale={locale} clients={logos} />
+        </div>
 
         <section className="mt-24">
           <h2 className="display-2">{t("residentialTitle")}</h2>

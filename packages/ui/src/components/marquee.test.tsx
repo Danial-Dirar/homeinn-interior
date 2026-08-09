@@ -27,6 +27,15 @@ describe("Marquee", () => {
     expect(tracks[1]).toHaveAttribute("aria-hidden", "true");
   });
 
+  it("keeps the keyboard out of the duplicated track", () => {
+    // aria-hidden alone still lets Tab reach links inside the copy, which is
+    // the `aria-hidden-focus` violation. `inert` is what actually removes them.
+    const { container } = render(
+      <Marquee><a href="https://example.com">BFIDC</a></Marquee>);
+    const copy = container.querySelectorAll("[data-marquee-track]")[1]!;
+    expect(copy).toHaveAttribute("inert");
+  });
+
   it("takes its duration from the speed prop", () => {
     const { container } = render(<Marquee speedSeconds={40}><span>x</span></Marquee>);
     expect(container.firstElementChild).toHaveStyle({ "--marquee-duration": "40s" });

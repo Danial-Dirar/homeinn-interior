@@ -991,6 +991,61 @@ own brand pairing and axe caught it immediately. The button keeps `#25D366`,
 which is what makes it recognisable, but uses `ink` for the label and glyph:
 9.7:1. Do not "fix" it back to white.
 
+### Client logo wall — 2026-08-09
+
+Five marks on `/clients`, scrolling right to left. `client_logos/` at the repo
+root holds the prepared WebP files plus a `_source/` of the originals.
+
+**Where each came from**, because a logo is someone else's trademark and the
+provenance matters:
+
+| Client | Source | Note |
+|---|---|---|
+| foodpanda | Wikimedia Commons, `Foodpanda logo since 2017`, **public domain** | their own site returns 403 to any non-browser request |
+| HATIL | `hatil.com/images/logo.svg` | |
+| OTOBI | `otobi.com/images/OTOBI-LOGO.png` | |
+| HNC Outsourcing | `hncoutsourcing.com/logo.svg` | matches the reception sign in media-dump session 3 |
+| LEC Abroad | `lecabroad.com/storage/uploads/setting-images/…` | matches the sign in session 8 |
+
+The first LEC file scraped was an app-promo banner, not the logo — worth
+opening what you download rather than trusting the filename.
+
+Prepared with `magick -density 600 … -resize x400 -trim +repage -border 8`,
+then WebP at height 200. Trimming matters: each logo is then measured by its own
+ink, so a wide wordmark and a square mark sit at a comparable visual weight.
+5–9 KB each.
+
+**`ClientLogo` is a new model, deliberately separate from `CorporateClient`.**
+That table is the profile PDF's 73-row project ledger keyed by its own serials;
+this is a short curated wall with a different lifecycle. Keeping them apart
+means the blocked PDF import cannot collide with this. Seeded by
+`pnpm --filter @homeinn/api seed:logos`, idempotent on name, served from
+`GET /api/client-logos`.
+
+`ClientLogoWall` marquees at four or more logos and lays out a plain centred row
+below that — a three-item loop reads as the same marks going round rather than
+as a client list. Speed scales with the count so the pace stays even as the list
+grows.
+
+### Two bugs this surfaced
+
+1. **`Picture` painted a background behind transparent logos.** It sets the
+   blurhash average colour on every `<img>`, which is right for a photograph and
+   turned OTOBI's black wordmark into a black rectangle and HNC's mark into a
+   blue block. The wall passes `style={{ backgroundColor: "transparent" }}`,
+   which wins because caller styles are spread last.
+2. **`Marquee`'s duplicated track was keyboard-reachable.** It was `aria-hidden`
+   but its links were still tabbable — axe's `aria-hidden-focus`, a real trap.
+   The copy is now `inert` too. Fixed in `packages/ui`, so every future marquee
+   gets it.
+
+### Adding a client later
+
+Drop the file in `client_logos/`, add a row to `CLIENTS` in
+`prisma/seed-client-logos.ts`, run `seed:logos`. The comment there says it
+plainly: only add a mark the company has confirmed as a client — publishing a
+logo asserts a working relationship.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with

@@ -34,6 +34,7 @@ model Media {
   testimonialAvatars Testimonial[]   @relation("TestimonialAvatar")
   teamPhotos         TeamMember[]    @relation("TeamPhoto")
   seoOgImages        Seo[]           @relation("SeoOgImage")
+  clientLogos        ClientLogo[]    @relation("ClientLogoImage")
 }
 
 model Seo {
@@ -124,6 +125,24 @@ model ResidentialClient {
   needsVerification Boolean @default(false)
   // displayed only with consent; see spec §11 privacy note
   publiclyListed    Boolean @default(false)
+}
+
+/**
+ * A client whose logo the company is permitted to show.
+ *
+ * Deliberately separate from `CorporateClient`, which is the profile PDF's
+ * 73-row project ledger keyed by its own serial numbers. This is a short,
+ * curated wall of marks — a different thing with a different lifecycle, and
+ * keeping them apart means neither import can collide with the other.
+ */
+model ClientLogo {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  website   String?
+  logoId    String
+  logo      Media   @relation("ClientLogoImage", fields: [logoId], references: [id])
+  sortOrder Int     @default(0)
+  published Boolean @default(true)
 }
 
 model Certification {

@@ -104,7 +104,9 @@
     "residentialBody": "We publish residential work in aggregate. Individual homeowners are named only where they have asked us to.",
     "residentialCount": "{count} completed residential projects",
     "districtsTitle": "Districts we have worked in",
-    "flagship": "Selected references"
+    "flagship": "Selected references",
+    "logosTitle": "Clients we have worked with",
+    "logosIntro": "A selection of the companies whose spaces we have built."
   },
   "blog": {
     "title": "Journal",

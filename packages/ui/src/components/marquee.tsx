@@ -10,9 +10,11 @@ interface MarqueeProps {
 
 /**
  * A CSS-only horizontal loop. The track is rendered twice so the seam falls
- * outside the viewport; the copy is aria-hidden so a screen reader hears the
- * list once. Animation stops entirely under prefers-reduced-motion, leaving a
- * static, horizontally scrollable row.
+ * outside the viewport; the copy is aria-hidden **and inert** so a screen reader
+ * hears the list once and the keyboard cannot tab into the hidden duplicate —
+ * `aria-hidden` alone leaves focusable children reachable, which axe flags as
+ * `aria-hidden-focus`. Animation stops entirely under prefers-reduced-motion,
+ * leaving a static, horizontally scrollable row.
  */
 export function Marquee({ children, speedSeconds = 45, className }: MarqueeProps) {
   const track =
@@ -26,7 +28,12 @@ export function Marquee({ children, speedSeconds = 45, className }: MarqueeProps
       <div data-marquee-track className={track}>
         {children}
       </div>
-      <div data-marquee-track aria-hidden="true" className={cn(track, "hidden motion-safe:flex")}>
+      <div
+        data-marquee-track
+        aria-hidden="true"
+        inert
+        className={cn(track, "hidden motion-safe:flex")}
+      >
         {children}
       </div>
     </div>
