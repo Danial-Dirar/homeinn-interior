@@ -1046,6 +1046,49 @@ Drop the file in `client_logos/`, add a row to `CLIENTS` in
 plainly: only add a mark the company has confirmed as a client — publishing a
 logo asserts a working relationship.
 
+### Mobile — 2026-08-09
+
+Two real defects, found by driving a phone viewport rather than by looking.
+
+1. **Navigation was unreachable on a phone.** Every page scrolled 219px
+   sideways, pushing the hamburger, the language toggle and the socials off
+   screen. The header looked like the culprit — it measured 612px on a 393px
+   viewport — but that was the symptom: `inset-x-0` stretches a fixed element to
+   the *scroll* width. The cause was the lead form's `<select>`, which sizes
+   itself to its longest option, and "Home Furniture & Office Furniture Supply
+   (Customized Design)" is 592px wide. A flex or grid item defaults to
+   `min-width: auto` and will not shrink below its content, so it dragged the
+   whole page with it. Fixed with `w-full min-w-0` on the selects and `min-w-0`
+   down the form's grid, plus `min-w-0 truncate` on the header brand as a
+   second line of defence. Verified 0 overflow at 320/360/375/393/412/430px.
+2. **`getHero("desktop")` was hardcoded**, so a phone got all five rooms at
+   desktop pacing instead of the curated `showOnMobile` subset spec §7 calls
+   for. The page now fetches both strips and `PanoramaHero` picks by viewport
+   via `useIsMobile`. Rendering two heroes side by side was tried first and
+   rejected — it duplicates the DOM, the images and the `#after-hero` anchor.
+
+### Why nothing loaded on the real phone
+
+`PUBLIC_MEDIA_BASE_URL` was `http://localhost:4000/media`, so every image URL
+the API hands out points at **the phone itself**. Nothing could ever load. Page
+HTML was fine because those fetches are server-side.
+
+For LAN testing, `.env` now uses this machine's address (192.168.0.167):
+
+```
+PUBLIC_MEDIA_BASE_URL="http://192.168.0.167:4000/media"
+NEXT_PUBLIC_API_URL="http://192.168.0.167:4000/api"
+NEXT_PUBLIC_SITE_URL="http://192.168.0.167:3100"
+WEB_ORIGIN="http://localhost:3000,http://localhost:3100,http://192.168.0.167:3100"
+```
+
+Both servers already bind `*` rather than loopback. `NEXT_PUBLIC_*` is inlined
+at build time, so the web app must be **rebuilt** after changing it; the API
+only needs a restart. If the IP changes, all four values change with it.
+
+This is exactly the class of problem the Vercel move removes — there is one real
+origin and no localhost anywhere.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with
