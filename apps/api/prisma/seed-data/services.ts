@@ -1,5 +1,6 @@
 /**
- * The seven services, verbatim from the company profile (spec §2). Titles are the
+ * The company profile's services (spec §2). Six rows, not the profile's
+ * seven: its 2D and 3D entries are merged into one — see the note below. Titles are the
  * profile's own wording; Bangla is a translation.
  *
  * The summaries and bodies restate the service name and nothing more — the profile
@@ -45,28 +46,20 @@ export const services = [
     sortOrder: 2,
     published: true,
   },
+  // The profile lists "2D Plan & Solution" and "3D Model & Visualization" as
+  // two separate products. Merged here at Muhammad's request — one drawing
+  // service, two outputs — so the wording is ours rather than the profile's.
+  // Splitting them again means restoring both entries and the sortOrder below.
   {
-    slug: "2d-plan-solution",
-    titleEn: "2D Plan & Solution",
-    titleBn: "২ডি প্ল্যান ও সমাধান",
-    summaryEn: "Two-dimensional plans and layout solutions.",
-    summaryBn: "দ্বিমাত্রিক প্ল্যান ও লেআউট সমাধান।",
-    bodyEn: "<p>Home Inn Interior Solution prepares 2D plans and layout solutions.</p>",
-    bodyBn: "<p>হোম ইন ইন্টেরিয়র সলিউশন ২ডি প্ল্যান ও লেআউট সমাধান তৈরি করে।</p>",
+    slug: "2d-3d-plan-model-visualization",
+    titleEn: "2D & 3D Plan, Model & Visualization",
+    titleBn: "২ডি ও ৩ডি প্ল্যান, মডেল ও ভিজ্যুয়ালাইজেশন",
+    summaryEn: "Two-dimensional layout plans and three-dimensional models of the proposed space.",
+    summaryBn: "প্রস্তাবিত স্পেসের দ্বিমাত্রিক লেআউট প্ল্যান ও ত্রিমাত্রিক মডেল।",
+    bodyEn: "<p>Home Inn Interior Solution prepares 2D plans and layout solutions, and produces 3D models and visualisations of the proposed space.</p>",
+    bodyBn: "<p>হোম ইন ইন্টেরিয়র সলিউশন ২ডি প্ল্যান ও লেআউট সমাধান তৈরি করে, এবং প্রস্তাবিত স্পেসের ৩ডি মডেল ও ভিজ্যুয়ালাইজেশন করে।</p>",
     icon: "ruler",
     sortOrder: 3,
-    published: true,
-  },
-  {
-    slug: "3d-model-visualization",
-    titleEn: "3D Model & Visualization",
-    titleBn: "৩ডি মডেল ও ভিজ্যুয়ালাইজেশন",
-    summaryEn: "Three-dimensional models and visualisations of the proposed space.",
-    summaryBn: "প্রস্তাবিত স্পেসের ত্রিমাত্রিক মডেল ও ভিজ্যুয়ালাইজেশন।",
-    bodyEn: "<p>Home Inn Interior Solution produces 3D models and visualisations.</p>",
-    bodyBn: "<p>হোম ইন ইন্টেরিয়র সলিউশন ৩ডি মডেল ও ভিজ্যুয়ালাইজেশন তৈরি করে।</p>",
-    icon: "box",
-    sortOrder: 4,
     published: true,
   },
   {
@@ -78,7 +71,7 @@ export const services = [
     bodyEn: "<p>Home Inn Interior Solution implements all Thai work.</p>",
     bodyBn: "<p>হোম ইন ইন্টেরিয়র সলিউশন সকল থাই ওয়ার্ক বাস্তবায়ন করে।</p>",
     icon: "blinds",
-    sortOrder: 5,
+    sortOrder: 4,
     published: true,
   },
   {
@@ -90,7 +83,7 @@ export const services = [
     bodyEn: "<p>Home Inn Interior Solution supplies kitchen accessories, bathroom accessories, and other home appliance items.</p>",
     bodyBn: "<p>হোম ইন ইন্টেরিয়র সলিউশন কিচেন আনুষাঙ্গিক, বাথরুম আনুষাঙ্গিক ও অন্যান্য হোম অ্যাপ্লায়েন্স সামগ্রী সরবরাহ করে।</p>",
     icon: "cooking-pot",
-    sortOrder: 6,
+    sortOrder: 5,
     published: true,
   },
 ];

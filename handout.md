@@ -1089,6 +1089,36 @@ only needs a restart. If the IP changes, all four values change with it.
 This is exactly the class of problem the Vercel move removes — there is one real
 origin and no localhost anywhere.
 
+### Nav order and the merged 2D/3D service — 2026-08-10
+
+**Nav is now Home · Services · Projects · Clients · Blog · About · Contact** —
+About moved from second to sixth. Work before company. The footer follows the
+same order minus Home, and a test pins the sequence so it cannot drift back by
+accident.
+
+**The profile's "2D Plan & Solution" and "3D Model & Visualization" are merged**
+into one row, `2d-3d-plan-model-visualization`. Worth being clear about what
+that means: those were two of the seven services taken verbatim from the company
+profile (spec §2), so the service list is no longer the profile's list. This was
+Muhammad's call, and the seed file says so at the merge site along with how to
+split them again.
+
+Knock-ons that had to move with it:
+
+- `sortOrder` was left with a gap; the two later services were pulled up to
+  0–5.
+- Both catalogues said "Seven ways…" and "Seven services…" — now six, in English
+  and Bangla. A stale count is a false claim like any other.
+- Seeding creates the merged row but cannot know the old two should go, so they
+  were deleted explicitly:
+  `DELETE FROM "Service" WHERE slug IN ('2d-plan-solution','3d-model-visualization');`
+  Checked first that no `Lead` referenced either (`serviceId` count was 0) —
+  that FK would have blocked the delete and, worse, orphaned a real enquiry.
+- Static pages dropped 83 → 81: two service detail routes fewer.
+
+Six services also happen to fill a three-column grid exactly, so the empty-cell
+problem fixed earlier no longer has anything to show.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with

@@ -5,6 +5,16 @@ import { renderWithIntl, settingsFixture } from "@/test/render";
 import { SiteHeader } from "./site-header";
 
 describe("SiteHeader", () => {
+  it("orders the nav work-first, with About late", () => {
+    // Pinned deliberately: a visitor wants what we do and what we have built
+    // before who we are. Changing this order should be a decision, not a drift.
+    renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    const desktopNav = screen.getAllByRole("navigation")[0]!;
+    expect([...desktopNav.querySelectorAll("a")].map((a) => a.textContent)).toEqual([
+      "Home", "Services", "Projects", "Clients", "Blog", "About", "Contact",
+    ]);
+  });
+
   it("links to all seven routes from spec §6", () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
     for (const label of ["Home", "About", "Services", "Projects", "Clients", "Blog", "Contact"]) {

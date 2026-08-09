@@ -37,7 +37,8 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
         <nav aria-label={nav("menu")} className="text-sm">
           <p className="eyebrow">{nav("menu")}</p>
           <ul className="mt-2 space-y-2">
-            {(["about", "services", "projects", "clients", "blog", "contact"] as const).map((key) => (
+            {/* Same order as the header, minus Home. */}
+            {(["services", "projects", "clients", "blog", "about", "contact"] as const).map((key) => (
               <li key={key}>
                 <Link href={`/${key}`} className="hover:text-brand">{nav(key)}</Link>
               </li>

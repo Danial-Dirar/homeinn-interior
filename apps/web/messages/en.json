@@ -40,7 +40,7 @@
     "statResidential": "residential projects",
     "statDistricts": "districts",
     "servicesEyebrow": "What we do",
-    "servicesTitle": "Seven ways we take a space from drawing to handover.",
+    "servicesTitle": "Six ways we take a space from drawing to handover.",
     "areasEyebrow": "Where we work",
     "areasTitle": "Nine kinds of project, one standard of finish.",
     "projectsEyebrow": "Selected projects",
@@ -78,7 +78,7 @@
   },
   "services": {
     "title": "Services",
-    "intro": "Seven services, offered end to end.",
+    "intro": "Six services, offered end to end.",
     "empty": "Services are being published. Please check back shortly.",
     "enquire": "Enquire about this service",
     "gallery": "Gallery"

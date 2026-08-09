@@ -10,13 +10,18 @@ import { useScrolled } from "@/hooks/use-scrolled";
 import { LocaleSwitcher } from "./locale-switcher";
 import { SocialLinks } from "./social-links";
 
+/**
+ * Nav order, and it is deliberate: the work comes before the company. A visitor
+ * lands wanting to know what we do and what we have built, so About sits late,
+ * just before Contact.
+ */
 const ROUTES = [
   { href: "/", key: "home" },
-  { href: "/about", key: "about" },
   { href: "/services", key: "services" },
   { href: "/projects", key: "projects" },
   { href: "/clients", key: "clients" },
   { href: "/blog", key: "blog" },
+  { href: "/about", key: "about" },
   { href: "/contact", key: "contact" },
 ] as const;
 
