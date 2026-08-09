@@ -10,8 +10,7 @@ import { useSmoothProgress } from "@/hooks/use-smooth-progress";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { HeroStack } from "./hero-stack";
 import {
-  foregroundTranslateX, labelOpacity, lightPoolX, objectPosition, scrollDistanceVh,
-  stripTranslateX,
+  driftX, lightPoolX, objectPosition, scrollDistanceVh, segmentOpacity,
 } from "./hero-math";
 
 interface PanoramaHeroProps {
@@ -20,21 +19,19 @@ interface PanoramaHeroProps {
   target: "desktop" | "mobile";
 }
 
-/** Spec §7's first seam treatment: adjacent segment edges fade out. */
-const SEAM_MASK = "linear-gradient(to right, transparent, black 12%, black 88%, transparent)";
-
 /**
- * Spec §7. Vertical scroll drives a horizontal camera dolly through what reads
- * as one continuous interior. Sticky does the pinning; the strip translates;
- * a faster foreground and a masked edge hide each joint; a warm light pool
- * tracks the camera so the stitched images do not read as a filmstrip.
+ * The scroll hero. One room fills the screen; scrolling crossfades to the next.
+ *
+ * Spec §7 asks for a horizontal pan through one continuous interior, and that
+ * is the right treatment for a stitched panorama. These are photographs of
+ * separate rooms, and panning them showed half a kitchen beside half a dining
+ * room — the seam masks had nothing to hide because the seam was real. Scroll
+ * now snaps to whole segments (see `snappedProgress`), so the hero always comes
+ * to rest on one complete photograph.
  *
  * Every per-frame style is written straight to the DOM through refs. React
- * renders this once; the pan is then pure DOM writes, because re-rendering five
- * full-bleed images sixty times a second is exactly what makes a pan stutter.
- *
- * Knows nothing about the CMS. One segment is a static hero, zero segments is
- * a text hero, and a single wide panorama later pans through the same code.
+ * renders this once; re-rendering five full-bleed images sixty times a second
+ * is what makes a scroll animation stutter.
  */
 export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
   const t = useTranslations("home");
@@ -42,10 +39,9 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
   const reduced = usePrefersReducedMotion();
 
   const sectionRef = useRef<HTMLElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const foregroundRef = useRef<HTMLDivElement>(null);
   const lightPoolRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const framesRef = useRef<(HTMLDivElement | null)[]>([]);
   const labelsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const count = segments.length;
@@ -53,13 +49,19 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
 
   const draw = useCallback(
     (p: number) => {
-      if (stripRef.current) {
-        stripRef.current.style.transform =
-          `translate3d(${stripTranslateX(p, count, 100)}vw, 0, 0)`;
-      }
-      if (foregroundRef.current) {
-        foregroundRef.current.style.transform =
-          `translate3d(${foregroundTranslateX(p, count, 100)}vw, 0, 0)`;
+      for (const [index, frame] of framesRef.current.entries()) {
+        const opacity = segmentOpacity(p, index, count);
+        if (frame) {
+          frame.style.opacity = String(opacity);
+          frame.style.transform = `translate3d(${driftX(p, index, count)}vw, 0, 0)`;
+          // A fully faded frame must not swallow clicks meant for what is under it.
+          frame.style.visibility = opacity === 0 ? "hidden" : "visible";
+        }
+        const label = labelsRef.current[index];
+        if (label) {
+          label.style.opacity = String(opacity);
+          label.style.transform = `translateY(${(1 - opacity) * 12}px)`;
+        }
       }
       if (lightPoolRef.current) {
         lightPoolRef.current.style.background =
@@ -69,17 +71,12 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
       if (progressRef.current) {
         progressRef.current.style.width = `${p * 100}%`;
       }
-      for (const [index, label] of labelsRef.current.entries()) {
-        if (!label) continue;
-        const opacity = labelOpacity(p, index, count);
-        label.style.opacity = String(opacity);
-        label.style.transform = `translateY(${(1 - opacity) * 12}px)`;
-      }
     },
     [count],
   );
 
-  useSmoothProgress(sectionRef, animated, draw);
+  // `count` as the snap target: the hero rests on whole rooms only.
+  useSmoothProgress(sectionRef, animated, draw, count);
 
   if (count === 0) {
     return (
@@ -114,56 +111,45 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
         style={{ height: `${scrollDistanceVh(count, target)}vh` }}
       >
         <div className="sticky top-0 h-dvh overflow-hidden bg-ink">
-          <div
-            ref={stripRef}
-            data-hero-strip
-            className="flex h-full will-change-transform"
-            style={{ width: `${count * 100}vw` }}
-          >
-            {segments.map((segment, index) => (
-              <div
-                key={segment.id}
-                className="relative h-full w-screen shrink-0"
-                style={{ maskImage: SEAM_MASK, WebkitMaskImage: SEAM_MASK }}
-              >
-                <Picture
-                  media={segment.image}
-                  locale={locale}
-                  sizes="100vw"
-                  priority={index === 0}
-                  className="h-full w-full object-cover"
-                  style={{ objectPosition: objectPosition(segment.focalX) }}
-                />
-              </div>
-            ))}
-          </div>
+          {segments.map((segment, index) => (
+            <div
+              key={segment.id}
+              ref={(node) => {
+                framesRef.current[index] = node;
+              }}
+              data-hero-frame
+              className="absolute inset-0 will-change-[opacity,transform]"
+              // Slightly wider than the screen so the drift has somewhere to go
+              // without ever exposing an edge.
+              style={{
+                width: "108vw",
+                left: "-4vw",
+                opacity: index === 0 ? 1 : 0,
+                visibility: index === 0 ? "visible" : "hidden",
+              }}
+            >
+              <Picture
+                media={segment.image}
+                locale={locale}
+                sizes="110vw"
+                priority={index === 0}
+                className="h-full w-full object-cover"
+                style={{ objectPosition: objectPosition(segment.focalX) }}
+              />
+            </div>
+          ))}
 
-          {/* Second seam treatment: near-field objects crossing each joint. */}
-          <div
-            ref={foregroundRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 flex will-change-transform"
-            style={{ width: `${count * 100}vw` }}
-          >
-            {segments.map((segment) => (
-              <div key={segment.id} className="relative h-full w-screen shrink-0">
-                {segment.foreground ? (
-                  <Picture
-                    media={segment.foreground}
-                    locale={locale}
-                    sizes="100vw"
-                    className="h-full w-full object-cover"
-                  />
-                ) : null}
-              </div>
-            ))}
-          </div>
-
-          {/* The light pool. Without it, stitched images read as flat. */}
+          {/* The light pool. Without it the photographs read flat. */}
           <div
             ref={lightPoolRef}
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 mix-blend-screen"
+          />
+
+          {/* A floor of ink under the caption, so a bright room stays readable. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-ink to-transparent"
           />
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 md:p-12">
@@ -177,8 +163,6 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
                       labelsRef.current[index] = node;
                     }}
                     className="absolute bottom-0 left-0"
-                    // Only the first label is visible before the first frame
-                    // runs, which is also where the pan starts.
                     style={{ opacity: index === 0 ? 1 : 0 }}
                   >
                     <p className="display-2 text-sand">{text(segment, "label", locale)}</p>

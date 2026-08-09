@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
-import { approach, pinProgress } from "@/components/hero/hero-math";
+import { approach, pinProgress, snappedProgress } from "@/components/hero/hero-math";
 
 /**
  * How fast the camera chases the scrollbar. Higher is tighter, lower glides
@@ -37,6 +37,12 @@ export function useSmoothProgress(
   ref: RefObject<HTMLElement | null>,
   enabled: boolean,
   onFrame: (progress: number) => void,
+  /**
+   * When set, scroll chooses the nearest of this many whole steps rather than
+   * any position between them. The hero passes its segment count, which is what
+   * stops it resting on half of one photograph and half of the next.
+   */
+  snapTo?: number,
 ): void {
   // Kept in a ref so changing the callback never restarts the loop.
   const callback = useRef(onFrame);
@@ -58,7 +64,8 @@ export function useSmoothProgress(
 
     const readTarget = () => {
       const rect = element.getBoundingClientRect();
-      target = pinProgress(rect.top, rect.height, window.innerHeight);
+      const raw = pinProgress(rect.top, rect.height, window.innerHeight);
+      target = snapTo && snapTo > 1 ? snappedProgress(raw, snapTo) : raw;
     };
 
     const tick = (time: number) => {
@@ -95,5 +102,5 @@ export function useSmoothProgress(
       window.removeEventListener("resize", start);
       if (frame !== null) cancelAnimationFrame(frame);
     };
-  }, [ref, enabled]);
+  }, [ref, enabled, snapTo]);
 }

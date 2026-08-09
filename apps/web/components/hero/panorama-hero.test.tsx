@@ -64,11 +64,31 @@ describe("PanoramaHero", () => {
   });
 
   it("marks the first image as the LCP element and lazies the rest", () => {
-    renderWithIntl(
+    // Queried from the DOM rather than by role: every room but the active one
+    // is `visibility: hidden`, which correctly keeps it out of the
+    // accessibility tree.
+    const { container } = renderWithIntl(
       <PanoramaHero segments={[segment(0), segment(1), segment(2)]} locale="en" target="desktop" />);
-    const images = screen.getAllByRole("img");
+    const images = container.querySelectorAll("img");
     expect(images[0]).toHaveAttribute("fetchpriority", "high");
     expect(images[2]).toHaveAttribute("loading", "lazy");
+  });
+
+  it("shows exactly one room to assistive technology at a time", () => {
+    renderWithIntl(
+      <PanoramaHero segments={[segment(0), segment(1), segment(2)]} locale="en" target="desktop" />);
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+  });
+
+  it("stacks the rooms rather than laying them out side by side", () => {
+    // The old strip put two half-rooms on screen at once, which is the whole
+    // reason this became a crossfade.
+    const { container } = renderWithIntl(
+      <PanoramaHero segments={[segment(0), segment(1)]} locale="en" target="desktop" />);
+    const frames = container.querySelectorAll("[data-hero-frame]");
+    expect(frames).toHaveLength(2);
+    expect(frames[0]).toHaveStyle({ opacity: "1" });
+    expect(frames[1]).toHaveStyle({ opacity: "0" });
   });
 
   it("renders a plain vertical stack under prefers-reduced-motion", () => {
@@ -76,7 +96,7 @@ describe("PanoramaHero", () => {
     setReducedMotion(true);
     const { container } = renderWithIntl(
       <PanoramaHero segments={[segment(0), segment(1)]} locale="en" target="desktop" />);
-    expect(container.querySelector("[data-hero-strip]")).toBeNull();
+    expect(container.querySelector("[data-hero-frame]")).toBeNull();
     expect(screen.getByText("Room 1")).toBeInTheDocument();
   });
 
@@ -89,7 +109,7 @@ describe("PanoramaHero", () => {
   it("renders a single segment as a static hero rather than a one-frame pan", () => {
     const { container } = renderWithIntl(
       <PanoramaHero segments={[segment(0)]} locale="en" target="desktop" />);
-    expect(container.querySelector("[data-hero-strip]")).toBeNull();
+    expect(container.querySelector("[data-hero-frame]")).toBeNull();
     expect(screen.getByRole("img")).toBeInTheDocument();
   });
 

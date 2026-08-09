@@ -1,11 +1,17 @@
 /**
- * The scroll panorama's arithmetic (spec §7), with no DOM in sight.
+ * The scroll hero's arithmetic (spec §7), with no DOM in sight.
  *
- * The model: N segments, each exactly one viewport wide, laid out in a strip.
- * Pin progress `p` runs 0 → 1 across the section's scroll distance, and the
- * strip translates left so that at p = 0 segment 0 fills the viewport and at
- * p = 1 segment N-1 does. Every other quantity — label crossfades, the light
- * pool, the parallax foreground — is a function of that one number.
+ * The model: N room photographs, each filling the screen. Pin progress `p` runs
+ * 0 → 1 across the section's scroll distance and is mapped onto a segment
+ * index, so `p = 0` is the first room and `p = 1` is the last.
+ *
+ * Spec §7 describes a horizontal strip that pans through one continuous
+ * interior. That only works when the photographs genuinely stitch — adjacent
+ * frames of a single space. The client's archive is discrete rooms, so panning
+ * put half a kitchen beside half a dining room and the seam treatments had
+ * nothing to hide. One room at a time, crossfaded, is the honest presentation
+ * for discrete photographs. If a true stitched panorama ever arrives, the pan
+ * belongs back here.
  */
 
 export function clamp01(value: number): number {
@@ -14,53 +20,53 @@ export function clamp01(value: number): number {
   return value;
 }
 
-export function stripWidth(count: number, viewportWidth: number): number {
-  return count * viewportWidth;
+/** Where `p` sits on the 0…N-1 scale of segments. */
+function position(p: number, count: number): number {
+  if (count <= 1) return 0;
+  return clamp01(p) * (count - 1);
 }
 
-/** How far the strip can travel before its last segment is flush with the right edge. */
-function travel(count: number, viewportWidth: number): number {
-  return Math.max(0, stripWidth(count, viewportWidth) - viewportWidth);
-}
-
-export function stripTranslateX(p: number, count: number, viewportWidth: number): number {
-  const distance = clamp01(p) * travel(count, viewportWidth);
-  // Negating zero yields -0, which would reach CSS as `translate3d(-0vw, …)`.
-  return distance === 0 ? 0 : -distance;
+/** The room the camera is closest to. */
+export function snapIndex(p: number, count: number): number {
+  if (count <= 1) return 0;
+  return Math.min(count - 1, Math.max(0, Math.round(position(p, count))));
 }
 
 /**
- * Spec §7: a column, curtain or plant straddling each joint moves at ~1.35× the
- * strip's rate. The eye reads the faster object as near-field and stops looking
- * for the seam behind it.
+ * The progress the hero actually rests at: the nearest whole segment.
+ *
+ * This is what guarantees a full room rather than two halves. Raw scroll picks
+ * which room; the damping eases to this quantised value, so every resting state
+ * is exactly one photograph at full opacity.
  */
-export const FOREGROUND_RATE = 1.35;
-
-export function foregroundTranslateX(p: number, count: number, viewportWidth: number): number {
-  return stripTranslateX(p, count, viewportWidth) * FOREGROUND_RATE;
+export function snappedProgress(p: number, count: number): number {
+  if (count <= 1) return 0;
+  return snapIndex(p, count) / (count - 1);
 }
 
-/** The span of `p` over which segment `index` is the one on screen. */
-export function segmentWindow(index: number, count: number): { start: number; end: number } {
-  if (count <= 1) return { start: 0, end: 1 };
-  const step = 1 / (count - 1);
-  const centre = index * step;
-  return { start: centre - step / 2, end: centre + step / 2 };
-}
-
-/** Full opacity within this much of a step from the centre. */
-const LABEL_PLATEAU = 0.35;
-/** Fully faded by this much of a step from the centre. */
-const LABEL_FADE_END = 0.9;
-
-export function labelOpacity(p: number, index: number, count: number): number {
+/**
+ * How visible segment `index` is. Exactly 1 at its own position, 0 at its
+ * neighbour's, linear in between — so the pair always sums to 1 during a
+ * crossfade and no frame is ever a wash of three images.
+ */
+export function segmentOpacity(p: number, index: number, count: number): number {
   if (count <= 1) return 1;
-  const step = 1 / (count - 1);
-  const distance = Math.abs(clamp01(p) - index * step) / step;
+  return clamp01(1 - Math.abs(position(p, count) - index));
+}
 
-  if (distance <= LABEL_PLATEAU) return 1;
-  if (distance >= LABEL_FADE_END) return 0;
-  return 1 - (distance - LABEL_PLATEAU) / (LABEL_FADE_END - LABEL_PLATEAU);
+/** How far a segment drifts, in vw. Small enough never to reveal its neighbour. */
+const DRIFT_VW = 4;
+
+/**
+ * A slow sideways drift on each photograph, so a still frame is not completely
+ * static. Zero when the segment is centred, which keeps the resting state
+ * exactly as composed.
+ */
+export function driftX(p: number, index: number, count: number): number {
+  if (count <= 1) return 0;
+  const distance = Math.max(-1, Math.min(1, position(p, count) - index));
+  // Negating zero yields -0, which would reach CSS as `translate3d(-0vw, …)`.
+  return distance === 0 ? 0 : -distance * DRIFT_VW;
 }
 
 /** Half-width of the light pool's sweep, in viewport percent. */
@@ -68,20 +74,18 @@ const LIGHT_POOL_SWING = 22;
 
 /**
  * Where the warm radial gradient sits, as a percentage of the viewport width.
- * One oscillation per segment, so the pool passes across each room as the
- * camera does. Without it, stitched images read as a flat filmstrip (spec §7).
+ * One oscillation per room, so the pool crosses each space as the camera
+ * arrives. Without it the photographs read flat (spec §7).
  */
 export function lightPoolX(p: number, count: number): number {
   if (count <= 1) return 50;
-  const travelled = clamp01(p) * (count - 1);
-  return 50 + LIGHT_POOL_SWING * Math.sin(travelled * Math.PI * 2);
+  return 50 + LIGHT_POOL_SWING * Math.sin(position(p, count) * Math.PI * 2);
 }
 
 /**
- * Scroll distance for the pinned section, in vh. A phone screen is narrow, so
- * the same pan feels twice as fast there and needs more scroll per segment.
- * These constants reproduce spec §7's stated 500vh for six desktop segments and
- * 300vh for three mobile ones.
+ * Scroll distance for the pinned section, in vh — one screenful of scroll per
+ * room, so a normal gesture advances exactly one room. Mobile gets more,
+ * because a phone screen makes the same change of view feel abrupt.
  */
 const VH_PER_SEGMENT = { desktop: 100, mobile: 150 } as const;
 
@@ -114,11 +118,6 @@ const SETTLED = 0.0001;
 
 /**
  * Moves `current` a fraction of the way toward `target`, exponentially.
- *
- * This is what stops the strip being welded to the scrollbar. Raw scroll
- * position drives the *target*; the strip chases it, so a flick of the wheel
- * sets a destination and the camera glides there instead of stepping with each
- * wheel notch.
  *
  * `lambda` is a rate, not a per-frame fraction, and `dt` is in seconds — so the
  * motion is identical on a 60Hz and a 144Hz display. A naive

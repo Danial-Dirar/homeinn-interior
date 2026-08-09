@@ -899,6 +899,44 @@ Measure before changing either number — a Playwright script reading
 `DOMMatrixReadOnly(getComputedStyle(strip).transform).m41` after
 `mouse.wheel()` is how these came out.
 
+### The hero is a crossfade now, not a pan — 2026-08-09
+
+Muhammad sent a screenshot of the hero resting mid-pan: half a kitchen beside
+half a dining room, with both room labels overlapping into unreadable text.
+
+**The pan was the wrong treatment, and the reason is worth keeping.** Spec §7's
+horizontal strip works when the photographs genuinely stitch — adjacent frames
+of one continuous space, where the seam masks and the 1.35× parallax foreground
+have a real joint to hide. The archive is discrete room photographs. Panning
+them does not hide a seam; it puts two unrelated rooms on screen at once, and no
+amount of masking fixes that because the discontinuity is the content.
+
+So: one room fills the screen, scroll crossfades to the next, and it **always
+comes to rest on a whole photograph**.
+
+- `snappedProgress(p, count)` quantises scroll to the nearest whole segment;
+  `useSmoothProgress` takes an optional `snapTo` and eases to that. Resting
+  state is therefore always exactly one image at opacity 1.
+- `segmentOpacity` replaces `labelOpacity` and drives both the image and its
+  label from one number, so a label can never outlive its room. Adjacent
+  opacities sum to 1 during the fade and a third room is never lit — both tested.
+- `driftX` gives each frame a 4vw sideways drift so a still frame is not dead,
+  zero at rest, and never wide enough to expose a neighbour. Frames are 108vw
+  wide and offset -4vw to give it somewhere to go.
+- Faded frames get `visibility: hidden`, which keeps them out of the
+  accessibility tree — a screen reader hears one room, not five. That is why the
+  LCP test now queries `container.querySelectorAll("img")` instead of by role.
+- `stripTranslateX`, `foregroundTranslateX`, `stripWidth` and `segmentWindow`
+  are gone rather than left as dead code with passing tests. `HeroSegment.
+  foreground` is unused by this treatment but stays in the schema — it is what a
+  real stitched panorama would need.
+
+Verified by scripting the browser: after each wheel step, exactly one frame is
+at opacity 1 and zero frames are partial.
+
+**If a true stitched panorama ever arrives**, the pan is the better treatment
+and belongs back — the note at the top of `hero-math.ts` says so.
+
 ### A second phone line — 2026-08-09
 
 `01818843999` now appears everywhere the original number does, each with its own

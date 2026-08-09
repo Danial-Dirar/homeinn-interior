@@ -7,7 +7,7 @@ test.describe("the scroll panorama", () => {
     await page.goto("/en");
 
     // Spec §7: no pin, no transform — the same content on ordinary scroll.
-    await expect(page.locator("[data-hero-strip]")).toHaveCount(0);
+    await expect(page.locator("[data-hero-frame]")).toHaveCount(0);
     await context.close();
   });
 
