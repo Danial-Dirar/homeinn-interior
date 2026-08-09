@@ -17,8 +17,11 @@ interface LeadFormProps {
   defaultType?: "CONTACT" | "CONSULTATION" | "QUOTE";
 }
 
+// `w-full min-w-0` is not cosmetic: a <select> sizes itself to its longest
+// option, and "Home Furniture & Office Furniture Supply (Customized Design)"
+// is wide enough to push a phone page 200px into horizontal scroll.
 const SELECT_CLASS =
-  "h-11 border border-current/20 bg-transparent px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+  "h-11 w-full min-w-0 truncate border border-current/20 bg-transparent px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
 
 export function LeadForm({
   locale,
@@ -65,8 +68,8 @@ export function LeadForm({
   }[status];
 
   return (
-    <form key={formKey} onSubmit={onSubmit} noValidate className="grid gap-5">
-      <div className="grid gap-2">
+    <form key={formKey} onSubmit={onSubmit} noValidate className="grid min-w-0 gap-5">
+      <div className="grid min-w-0 gap-2">
         <Label htmlFor="lead-type">{t("type")}</Label>
         <select id="lead-type" name="type" defaultValue={defaultType} className={SELECT_CLASS}>
           <option value="CONTACT">{t("typeContact")}</option>
@@ -75,12 +78,12 @@ export function LeadForm({
         </select>
       </div>
 
-      <div className="grid gap-2">
+      <div className="grid min-w-0 gap-2">
         <Label htmlFor="lead-name">{t("name")}</Label>
         <Input id="lead-name" name="name" required autoComplete="name" />
       </div>
 
-      <div className="grid gap-2">
+      <div className="grid min-w-0 gap-2">
         <Label htmlFor="lead-phone">{t("phone")}</Label>
         <Input
           id="lead-phone"
@@ -93,13 +96,13 @@ export function LeadForm({
         <p id="lead-phone-hint" className="text-xs text-current/60">{t("phoneHint")}</p>
       </div>
 
-      <div className="grid gap-2">
+      <div className="grid min-w-0 gap-2">
         <Label htmlFor="lead-email">{t("email")}</Label>
         <Input id="lead-email" name="email" type="email" autoComplete="email" />
       </div>
 
       {services.length > 0 ? (
-        <div className="grid gap-2">
+        <div className="grid min-w-0 gap-2">
           <Label htmlFor="lead-service">{t("service")}</Label>
           <select id="lead-service" name="serviceId" defaultValue="" className={SELECT_CLASS}>
             <option value="">{t("servicePlaceholder")}</option>
@@ -112,7 +115,7 @@ export function LeadForm({
         </div>
       ) : null}
 
-      <div className="grid gap-2">
+      <div className="grid min-w-0 gap-2">
         <Label htmlFor="lead-message">{t("message")}</Label>
         <Textarea id="lead-message" name="message" rows={4} />
       </div>

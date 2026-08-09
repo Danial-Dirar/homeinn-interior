@@ -19,9 +19,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [hero, settings, services, areas, projects, clients, testimonials, certifications] =
+  const [hero, heroMobile, settings, services, areas, projects, clients, testimonials, certifications] =
     await Promise.all([
+      // Both strips: spec §7 curates a narrower mobile subset (`showOnMobile`)
+      // and gives it more scroll per room. Which one renders is a CSS decision,
+      // so the page has to hold both.
       getHero("desktop"),
+      getHero("mobile"),
       getSettings(),
       getServices(),
       getWorkingAreas(),
@@ -33,7 +37,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
 
   return (
     <main>
-      <PanoramaHero segments={hero} locale={locale} target="desktop" />
+      <PanoramaHero segments={hero} mobileSegments={heroMobile} locale={locale} />
       <Statement locale={locale} settings={settings} />
       <ServicesGrid locale={locale} services={services} />
       <WorkingAreas locale={locale} areas={areas} />

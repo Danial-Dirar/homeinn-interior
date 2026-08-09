@@ -8,6 +8,7 @@ import type { HeroSegmentView } from "@/lib/api.types";
 import { text, textOrNull } from "@/lib/locale-text";
 import { useSmoothProgress } from "@/hooks/use-smooth-progress";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { HeroStack } from "./hero-stack";
 import {
   driftX, lightPoolX, objectPosition, scrollDistanceVh, segmentOpacity,
@@ -15,8 +16,12 @@ import {
 
 interface PanoramaHeroProps {
   segments: HeroSegmentView[];
+  /**
+   * The curated phone strip (spec §7): fewer rooms, more scroll each. Falls
+   * back to the full set when the CMS has flagged none for mobile.
+   */
+  mobileSegments?: HeroSegmentView[];
   locale: Locale;
-  target: "desktop" | "mobile";
 }
 
 /**
@@ -33,10 +38,13 @@ interface PanoramaHeroProps {
  * renders this once; re-rendering five full-bleed images sixty times a second
  * is what makes a scroll animation stutter.
  */
-export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
+export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroProps) {
   const t = useTranslations("home");
   const common = useTranslations("common");
   const reduced = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
+  const target = isMobile ? "mobile" : "desktop";
+  const shown = isMobile && mobileSegments?.length ? mobileSegments : segments;
 
   const sectionRef = useRef<HTMLElement>(null);
   const lightPoolRef = useRef<HTMLDivElement>(null);
@@ -44,7 +52,7 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
   const framesRef = useRef<(HTMLDivElement | null)[]>([]);
   const labelsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  const count = segments.length;
+  const count = shown.length;
   const animated = !reduced && count > 1;
 
   const draw = useCallback(
@@ -96,7 +104,7 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
     return (
       <>
         <section aria-label={t("heroFallbackTitle")}>
-          <HeroStack segments={segments} locale={locale} />
+          <HeroStack segments={shown} locale={locale} />
         </section>
         <div id="after-hero" />
       </>
@@ -111,7 +119,7 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
         style={{ height: `${scrollDistanceVh(count, target)}vh` }}
       >
         <div className="sticky top-0 h-dvh overflow-hidden bg-ink">
-          {segments.map((segment, index) => (
+          {shown.map((segment, index) => (
             <div
               key={segment.id}
               ref={(node) => {
@@ -154,7 +162,7 @@ export function PanoramaHero({ segments, locale, target }: PanoramaHeroProps) {
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 md:p-12">
             <div className="relative h-24">
-              {segments.map((segment, index) => {
+              {shown.map((segment, index) => {
                 const caption = textOrNull(segment, "caption", locale);
                 return (
                   <div

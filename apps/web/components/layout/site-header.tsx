@@ -42,8 +42,14 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
         overHero ? "bg-ink/80 backdrop-blur-sm" : "bg-ink/95 backdrop-blur-sm",
       ].join(" ")}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5">
-        <Link href="/" className="font-display text-lg tracking-tight">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 sm:gap-6">
+        {/* `min-w-0` is load-bearing: a flex item defaults to `min-width: auto`,
+            so without it this long name refuses to shrink and pushes the menu
+            button off a phone screen entirely. */}
+        <Link
+          href="/"
+          className="min-w-0 truncate font-display text-base tracking-tight sm:text-lg"
+        >
           {common("brand")}
         </Link>
 
@@ -55,7 +61,7 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center gap-4">
           <LocaleSwitcher locale={locale} />
           <SocialLinks
             settings={settings}
