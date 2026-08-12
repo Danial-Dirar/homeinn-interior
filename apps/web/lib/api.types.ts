@@ -105,6 +105,22 @@ export interface CertificationView {
   sortOrder: number;
 }
 
+export interface ProductView {
+  id: string;
+  slug: string;
+  nameEn: string; nameBn: string;
+  summaryEn: string; summaryBn: string;
+  descriptionEn: string; descriptionBn: string;
+  /** Poisha. Null means the piece is quoted rather than priced. */
+  priceBdt: number | null;
+  madeToOrder: boolean;
+  leadTimeDays: number | null;
+  sortOrder: number;
+  featured: boolean;
+  cover: MediaView | null;
+}
+export type ProductDetailView = ProductView & { gallery: MediaView[] };
+
 export interface ClientLogoView {
   id: string;
   name: string;

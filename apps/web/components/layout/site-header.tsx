@@ -8,6 +8,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import type { SiteSettingsView } from "@/lib/api.types";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { LocaleSwitcher } from "./locale-switcher";
+import { NewFlag } from "./new-flag";
 import { SocialLinks } from "./social-links";
 
 /**
@@ -17,6 +18,7 @@ import { SocialLinks } from "./social-links";
  */
 const ROUTES = [
   { href: "/", key: "home" },
+  { href: "/furniture", key: "furniture", flag: "new" },
   { href: "/services", key: "services" },
   { href: "/projects", key: "projects" },
   { href: "/clients", key: "clients" },
@@ -60,8 +62,13 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
 
         <nav aria-label={t("menu")} className="hidden items-center gap-7 lg:flex">
           {ROUTES.map((route) => (
-            <Link key={route.href} href={route.href} className="text-sm hover:text-brand">
+            <Link
+              key={route.href}
+              href={route.href}
+              className="relative text-sm hover:text-brand"
+            >
               {t(route.key)}
+              {"flag" in route ? <NewFlag /> : null}
             </Link>
           ))}
         </nav>
@@ -84,8 +91,9 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
               <nav className="mt-8 flex flex-col gap-5">
                 {ROUTES.map((route) => (
                   <SheetClose asChild key={route.href}>
-                    <Link href={route.href} className="text-lg">
+                    <Link href={route.href} className="relative w-fit text-lg">
                       {t(route.key)}
+                      {"flag" in route ? <NewFlag /> : null}
                     </Link>
                   </SheetClose>
                 ))}

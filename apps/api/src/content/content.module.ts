@@ -6,6 +6,8 @@ import { BlogService } from "./blog.service";
 import { CertificationsController } from "./certifications.controller";
 import { ClientLogosController } from "./client-logos.controller";
 import { ClientLogosService } from "./client-logos.service";
+import { ProductsController } from "./products.controller";
+import { ProductsService } from "./products.service";
 import { CertificationsService } from "./certifications.service";
 import { ClientsController } from "./clients.controller";
 import { ClientsService } from "./clients.service";
@@ -25,7 +27,7 @@ import { WorkingAreasService } from "./working-areas.service";
 const services = [
   ServicesService, WorkingAreasService, ProjectsService, ClientsService,
   HeroService, BlogService, TestimonialsService, TeamService, CertificationsService,
-  ClientLogosService,
+  ClientLogosService, ProductsService,
 ];
 
 @Module({
@@ -33,7 +35,7 @@ const services = [
   controllers: [
     ServicesController, WorkingAreasController, ProjectsController, ClientsController,
     HeroController, BlogController, TestimonialsController, TeamController,
-    CertificationsController, ClientLogosController,
+    CertificationsController, ClientLogosController, ProductsController,
   ],
   providers: services,
   exports: services,

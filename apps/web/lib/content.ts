@@ -1,7 +1,7 @@
 import { apiGet, apiGetOr, apiGetOrNull } from "./api";
 import type {
   BlogPostDetailView, BlogPostView, CertificationView, ClientLogoView, CorporateClientView,
-  HeroSegmentView,
+  HeroSegmentView, ProductDetailView, ProductView,
   ProjectDetailView, ProjectView, ResidentialSummaryView, ServiceDetailView, ServiceView,
   SiteSettingsView, TeamMemberView, TestimonialView, WorkingAreaView,
 } from "./api.types";
@@ -36,6 +36,10 @@ export const getTestimonials = () =>
 export const getTeam = () => apiGetOr<TeamMemberView[]>("/team", [], { tags: ["team"] });
 export const getCertifications = () =>
   apiGetOr<CertificationView[]>("/certifications", [], { tags: ["certifications"] });
+export const getProducts = () => apiGet<ProductView[]>("/products", { tags: ["products"] });
+export const getProduct = (slug: string) =>
+  apiGetOrNull<ProductDetailView>(`/products/${slug}`, { tags: ["products"] });
+
 export const getClientLogos = () =>
   apiGetOr<ClientLogoView[]>("/client-logos", [], { tags: ["client-logos"] });
 export const getCorporateClients = () =>

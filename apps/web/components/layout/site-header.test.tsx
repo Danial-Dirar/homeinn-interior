@@ -10,12 +10,20 @@ describe("SiteHeader", () => {
     // before who we are. Changing this order should be a decision, not a drift.
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
     const desktopNav = screen.getAllByRole("navigation")[0]!;
+    // `textContent` picks up the NEW flag, which is a child of the link.
     expect([...desktopNav.querySelectorAll("a")].map((a) => a.textContent)).toEqual([
-      "Home", "Services", "Projects", "Clients", "Blog", "About", "Contact",
+      "Home", "FurnitureNew", "Services", "Projects", "Clients", "Blog", "About", "Contact",
     ]);
   });
 
-  it("links to all seven routes from spec §6", () => {
+  it("flags Furniture as new, without saying it twice to a screen reader", () => {
+    renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    // The link is named "Furniture", not "Furniture New" — the flag is decorative.
+    expect(screen.getAllByRole("link", { name: "Furniture" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("New")[0]!.closest("[aria-hidden='true']")).not.toBeNull();
+  });
+
+  it("links to every route from spec §6", () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
     for (const label of ["Home", "About", "Services", "Projects", "Clients", "Blog", "Contact"]) {
       expect(screen.getAllByRole("link", { name: label }).length).toBeGreaterThan(0);

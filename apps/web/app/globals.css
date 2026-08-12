@@ -26,6 +26,15 @@
     from { transform: translateX(0); }
     to { transform: translateX(-100%); }
   }
+
+  /* The NEW flag. Fades rather than hard-blinks — a hard on/off next to
+     Fraunces reads as a broken image, and a slow pulse still catches the eye. */
+  --animate-flag-pulse: flag-pulse 1.6s ease-in-out infinite;
+
+  @keyframes flag-pulse {
+    0% { opacity: 0.55; transform: scale(1); }
+    70%, 100% { opacity: 0; transform: scale(1.9); }
+  }
 }
 
 @layer base {

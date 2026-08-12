@@ -35,6 +35,8 @@ model Media {
   teamPhotos         TeamMember[]    @relation("TeamPhoto")
   seoOgImages        Seo[]           @relation("SeoOgImage")
   clientLogos        ClientLogo[]    @relation("ClientLogoImage")
+  shopProductCovers  ShopProduct[]   @relation("ShopProductCover")
+  shopProductGallery ShopProduct[]   @relation("ShopProductGallery")
 }
 
 model Seo {
@@ -72,7 +74,44 @@ model Service {
   seoId     String? @unique
   seo       Seo?    @relation("ServiceSeo", fields: [seoId], references: [id])
   leads     Lead[]
-  // Phase 2 hangs ShopProduct[] off this row; the row itself does not change.
+  // Phase 2, as planned in spec §3 — and the Service row itself did not change.
+  products  ShopProduct[]
+}
+
+/**
+ * A furniture piece that can be ordered.
+ *
+ * Spec §3 planned this exactly: a shoppable item is not the same thing as a
+ * service. Service #7 "Home Appliance" is a *category*; the individual items
+ * that sell at a price are its children. So this hangs off `Service` and no
+ * Phase 1 table changes.
+ *
+ * `priceBdt` is stored in **poisha** (integer), never as a float — money in a
+ * float is a rounding bug waiting for a customer to find it. Null means
+ * "quote only", which is the honest state for a piece that is made to order.
+ */
+model ShopProduct {
+  id            String  @id @default(cuid())
+  slug          String  @unique
+  nameEn        String
+  nameBn        String
+  summaryEn     String
+  summaryBn     String
+  descriptionEn String  @db.Text
+  descriptionBn String  @db.Text
+  /// Poisha. 1250000 = ৳12,500.00
+  priceBdt      Int?
+  /// Made to order rather than stocked; the site says so instead of a count.
+  madeToOrder   Boolean @default(true)
+  leadTimeDays  Int?
+  serviceId     String?
+  service       Service? @relation(fields: [serviceId], references: [id])
+  coverId       String?
+  cover         Media?   @relation("ShopProductCover", fields: [coverId], references: [id])
+  gallery       Media[]  @relation("ShopProductGallery")
+  sortOrder     Int      @default(0)
+  featured      Boolean  @default(false)
+  published     Boolean  @default(false)
 }
 
 model WorkingArea {

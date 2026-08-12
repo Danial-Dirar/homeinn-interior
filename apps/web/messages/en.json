@@ -28,7 +28,9 @@
     "close": "Close",
     "language": "Language",
     "english": "English",
-    "bangla": "বাংলা"
+    "bangla": "বাংলা",
+    "furniture": "Furniture",
+    "new": "New"
   },
   "home": {
     "heroCue": "Scroll to walk through",
@@ -153,5 +155,22 @@
     "errorTitle": "Something broke on our side",
     "errorBody": "Please try again. If it keeps happening, message us on WhatsApp.",
     "retry": "Try again"
+  },
+  "furniture": {
+    "title": "Furniture",
+    "intro": "Pieces we design and build in our own workshop, for homes, offices and showrooms.",
+    "empty": "The first pieces are being photographed.",
+    "madeToOrder": "Made to order",
+    "onRequest": "Price on request",
+    "customEyebrow": "Every piece",
+    "customWord1": "Custom",
+    "customWord2": "Designed",
+    "customWord3": "Furniture",
+    "customBody": "Nothing here is off the shelf. Each piece is drawn for the room it will stand in, then built in our workshop to the millimetre.",
+    "customCta": "Talk to us about a piece",
+    "leadTime": "Ready in about {days} days",
+    "order": "Order this piece",
+    "orderNote": "Ordering online is coming. For now this opens an enquiry and we will call you back.",
+    "backToFurniture": "All furniture"
   }
 }
