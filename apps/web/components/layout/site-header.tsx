@@ -18,9 +18,9 @@ import { SocialLinks } from "./social-links";
  */
 const ROUTES = [
   { href: "/", key: "home" },
-  { href: "/furniture", key: "furniture", flag: "new" },
   { href: "/services", key: "services" },
   { href: "/projects", key: "projects" },
+  { href: "/furniture", key: "furniture", flag: "new" },
   { href: "/clients", key: "clients" },
   { href: "/blog", key: "blog" },
   { href: "/about", key: "about" },

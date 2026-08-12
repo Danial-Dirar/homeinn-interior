@@ -2,7 +2,7 @@ import type { Locale } from "@homeinn/types";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CustomBuiltPanel } from "@/components/furniture/custom-built-panel";
-import { ProductCard } from "@/components/furniture/product-card";
+import { ProductCatalogue } from "@/components/furniture/product-catalogue";
 import { getProducts } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 
@@ -45,16 +45,7 @@ export default async function FurniturePage({
         {products.length === 0 ? (
           <p className="text-ink/60">{t("empty")}</p>
         ) : (
-          <ul className="grid gap-10 sm:grid-cols-2">
-            {products.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                locale={locale}
-                index={index}
-              />
-            ))}
-          </ul>
+          <ProductCatalogue products={products} locale={locale} />
         )}
 
         <CustomBuiltPanel />

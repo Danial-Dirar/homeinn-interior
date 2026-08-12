@@ -12,7 +12,7 @@ describe("SiteHeader", () => {
     const desktopNav = screen.getAllByRole("navigation")[0]!;
     // `textContent` picks up the NEW flag, which is a child of the link.
     expect([...desktopNav.querySelectorAll("a")].map((a) => a.textContent)).toEqual([
-      "Home", "FurnitureNew", "Services", "Projects", "Clients", "Blog", "About", "Contact",
+      "Home", "Services", "Projects", "FurnitureNew", "Clients", "Blog", "About", "Contact",
     ]);
   });
 

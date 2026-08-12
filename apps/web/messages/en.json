@@ -171,6 +171,15 @@
     "leadTime": "Ready in about {days} days",
     "order": "Order this piece",
     "orderNote": "Ordering online is coming. For now this opens an enquiry and we will call you back.",
-    "backToFurniture": "All furniture"
+    "backToFurniture": "All furniture",
+    "searchLabel": "Search furniture",
+    "searchPlaceholder": "Wardrobe, desk, shelving…",
+    "priceLabel": "Price",
+    "band_any": "Any price",
+    "band_under50k": "Under ৳50,000",
+    "band_50kTo1lakh": "৳50,000 – ৳1,00,000",
+    "band_over1lakh": "Above ৳1,00,000",
+    "resultCount": "{count, plural, =0 {No pieces} one {# piece} other {# pieces}}",
+    "noResults": "Nothing matches that. Try a broader price range, or tell us what you are looking for and we will build it."
   }
 }

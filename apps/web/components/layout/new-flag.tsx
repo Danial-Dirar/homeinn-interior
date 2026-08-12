@@ -19,7 +19,7 @@ export function NewFlag() {
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute -right-2 -top-3 translate-x-full"
+      className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2"
     >
       <span className="relative flex">
         <span className="absolute inset-0 rounded-full bg-brand motion-safe:animate-[flag-pulse_1.6s_ease-in-out_infinite]" />
