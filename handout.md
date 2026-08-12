@@ -1119,6 +1119,24 @@ Knock-ons that had to move with it:
 Six services also happen to fill a three-column grid exactly, so the empty-cell
 problem fixed earlier no longer has anything to show.
 
+### The domain is owned — 2026-08-12
+
+Spec §16 listed this as an open question: "`homeinnbd.com` does not currently
+resolve. Confirm the registrar and whether it is owned." **Answered: it is
+owned**, and the DNS is live — both `homeinnbd.com` and `www.homeinnbd.com`
+answer, currently with a parked `A` record pointing at `127.0.0.1`. Nothing is
+served (`curl` gets no response), which is exactly what a registered but
+unconfigured domain looks like.
+
+The registrar panel is a LogicBoxes/ResellerClub reseller
+(`webmartcp.myorderbox.com`). **Its login is deliberately not recorded in this
+repo** — it arrived over chat, and a domain-panel password in a git history is a
+password you can never take back. It belongs in a password manager, and that one
+should be rotated because it has been in a chat log.
+
+Practical consequence: the nameservers already work, so pointing the domain at a
+deploy is an A/CNAME change rather than a nameserver migration.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with
