@@ -34,21 +34,23 @@ export default async function FurniturePage({
 
   return (
     <main id="main" className="bg-bone">
-      <div className="mx-auto max-w-7xl px-5 pt-28">
-        <h1 className="display-1">{t("title")}</h1>
-        <p className="mt-6 max-w-2xl text-lg text-ink/70">{t("intro")}</p>
-      </div>
-
-      {/* Catalogue left, the custom-built panel right and sticky — it holds
-          while the pieces scroll past, which is the point it is making. */}
-      <div className="mx-auto grid max-w-7xl gap-14 px-5 py-20 lg:grid-cols-[1.6fr_1fr] lg:gap-20">
+      <div className="mx-auto max-w-7xl px-5 pb-24 pt-28">
         {products.length === 0 ? (
-          <p className="text-ink/60">{t("empty")}</p>
+          <>
+            <h1 className="display-1">{t("title")}</h1>
+            <p className="mt-6 max-w-2xl text-lg text-ink/70">{t("empty")}</p>
+          </>
         ) : (
-          <ProductCatalogue products={products} locale={locale} />
+          // The catalogue owns both rows so the filter state can sit with the
+          // controls while they live up beside the title.
+          <ProductCatalogue
+            products={products}
+            locale={locale}
+            title={t("title")}
+            intro={t("intro")}
+            aside={<CustomBuiltPanel />}
+          />
         )}
-
-        <CustomBuiltPanel />
       </div>
     </main>
   );
