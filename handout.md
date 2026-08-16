@@ -1135,7 +1135,51 @@ password you can never take back. It belongs in a password manager, and that one
 should be rotated because it has been in a chat log.
 
 Practical consequence: the nameservers already work, so pointing the domain at a
-deploy is an A/CNAME change rather than a nameserver migration.
+deploy is an A/CNAME change rather than a nameserver migration. (Superseded
+below — the chosen path does need a nameserver change after all.)
+
+### The home connection is behind CGNAT — port forwarding is off the table — 2026-08-12
+
+The decision is to self-host rather than use Vercel, from Muhammad's own PC for
+now and a VPS later, on `homeinnbd.com`. Spec §14 recommended exactly this
+shape, so this is not a departure from the plan.
+
+The naive version of it does not work here. `tracepath` to `1.1.1.1` leaves the
+LAN and then stays in private address space for four more hops:
+
+    2:  172.16.100.53
+    3:  172.16.16.201
+    4:  10.60.80.1
+    5:  10.60.80.134
+
+That is carrier-grade NAT. The public address the internet reports
+(`103.72.212.128`) is the ISP's shared egress, not this router's. **The router
+has no public WAN address, so there is no port to forward** — an `A` record
+aimed at the house would resolve to an address that belongs to the ISP and is
+shared with hundreds of other subscribers. Standard for Bangladeshi residential
+broadband; worth writing down so it is not rediscovered later.
+
+**Chosen answer: Cloudflare Tunnel.** `cloudflared` on the host dials *out* and
+holds the connection open, and Cloudflare routes inbound requests down it. CGNAT
+is irrelevant because nothing has to reach in. It also terminates TLS, which
+removes the Caddy/Let's Encrypt half of the §14 recommendation, and it keeps the
+home IP off the public record.
+
+The cost is a real one: the free tunnel requires the domain's **nameservers** to
+move to Cloudflare, which is why the note above is superseded. That is a change
+in the myorderbox panel and it is reversible.
+
+Two things to keep in view:
+
+- **Uptime is the PC's uptime.** Fine for showing the client, not fine as the
+  permanent home of a business's public site.
+- A free-tier Oracle VM (`haifa-oracle`) is already in the tailnet, offline for
+  11 days. If it is still live it is a public-IP VPS at no cost, and the "buy a
+  VPS later" step may already be done.
+
+Nothing in the app changes between the two. Moving from the tunnel to a VPS is a
+DNS change, because `StorageService` already abstracts the media directory and
+the compose file is the same either way.
 
 ### Still to build when the folder arrives
 
