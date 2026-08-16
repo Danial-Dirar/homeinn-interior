@@ -1181,6 +1181,54 @@ Nothing in the app changes between the two. Moving from the tunnel to a VPS is a
 DNS change, because `StorageService` already abstracts the media directory and
 the compose file is the same either way.
 
+### A suspend mid-write corrupted git and the web build — 2026-08-17
+
+`next start` failed with "Could not find a production build in the '.next'
+directory", and every git command printed `object file .git/objects/86/144f7… is
+empty`. Two symptoms, one cause.
+
+The clock is the tell. The zero-length object and `handout.md` both carry an
+mtime of **Aug 12 17:52**, while the machine now reports **Aug 17 02:34**. The
+commit was made, the machine suspended seconds later, and it never came back
+cleanly — so the directory entries survived and the contents did not. Three
+objects were lost, and they are exactly one commit's worth:
+
+    b208041  blob    the new handout.md
+    5f3ea5b  tree    the new root tree
+    86144f7  commit  which refs/heads/main pointed at
+
+`.next` was truncated the same way: manifests present, `BUILD_ID` absent, which
+is precisely the file `next start` looks for. The disk was never full — 78G free
+on a 92%-used btrfs volume — so this is not a space problem and not a failing
+drive.
+
+**Recovery, in case it happens again.** The working tree is not part of the
+object database, so the actual writing was never at risk; only the commit was.
+
+1. Back the edited file up outside the repo first.
+2. Delete the zero-length objects — `find .git/objects -type f -empty`. Git
+   treats an existing object file as proof the object is stored, so an empty one
+   makes every later write silently no-op. They have to go.
+3. `git symbolic-ref HEAD refs/heads/main` and `git update-ref refs/heads/main
+   <last good commit>`.
+4. `rm .git/index && git reset` — the index cached the dead tree too.
+5. `git fsck`. Reflog entries for the dead commit still error; they are
+   cosmetic, and `git reflog expire --expire-unreachable=now --all` clears them.
+6. Re-commit. Verify with `git cat-file -s HEAD` — a non-zero size is the point.
+
+Rebuilt with `rm -rf apps/web/.next` then a full `next build`, carrying the LAN
+values so phone testing keeps working:
+
+    env NEXT_PUBLIC_API_URL=http://192.168.0.167:4000/api \
+        NEXT_PUBLIC_SITE_URL=http://192.168.0.167:3100 \
+        pnpm --filter @homeinn/web build
+
+95 pages. `/en`, `/bn`, `/en/furniture`, `/bn/furniture`, `/en/clients` and
+`/en/projects` all answer 200. Re-committed as `530d1e2`.
+
+**Checking a build properly:** `test -d .next` is not the test — a half-written
+build leaves the directory behind. `test -f .next/BUILD_ID` is.
+
 ### Still to build when the folder arrives
 
 1. A category mapper — folder name → one of the nine `WorkingArea` slugs, with
