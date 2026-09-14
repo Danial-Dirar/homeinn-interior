@@ -1284,3 +1284,35 @@ clients breaks whenever permission changes, which is exactly what happened here.
 The wall therefore stops scrolling and renders a plain centred row. That is the
 existing deliberate behaviour, not a regression — a three-item loop reads as the
 same marks going round rather than as a client list.
+
+### Admin shell and enquiries — design agreed — 2026-09-14
+
+Phase 1C-1 designed and specced:
+`docs/superpowers/specs/2026-09-14-admin-shell-and-enquiries-design.md`.
+
+Full content management was the scope asked for. It decomposes into three
+phases, because the API turns out to be most of the way there already — eleven
+content areas have guarded write routes, and only furniture and client logos
+lack them:
+
+1. **shell + enquiries** (this spec) — login, session, route protection, inbox,
+   email on a new lead
+2. **content editing** — projects, services, blog, hero, testimonials, team,
+   certifications, settings, media and alt text, all on existing routes
+3. **furniture and client logos** — needs API write routes first
+
+Decisions: per-person accounts (email + password, as the API already does);
+admin at `/admin`, outside the locale tree, English-only chrome with bilingual
+content fields; browser talks to the API directly, matching the reasoning
+already recorded in `main.ts` about per-IP throttling.
+
+**Two security findings, both blocking a public deploy:**
+
+1. `POST /api/auth/login` has no rate limit. `ThrottlerModule` is registered but
+   never installed as `APP_GUARD`, so it only guards routes that name it — the
+   public lead form alone. Login can be attempted as fast as the network allows.
+2. The seeded admin defaults to `admin@homeinnbd.com` / `ChangeMeNow!2026`,
+   written in `seed.ts` and pushed to GitHub. Deploying without setting
+   `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` publishes the admin password.
+   The upsert is `update: {}`, so setting them after the account exists does
+   nothing silently — changing it needs a deliberate script.
