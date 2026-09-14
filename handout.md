@@ -993,7 +993,7 @@ which is what makes it recognisable, but uses `ink` for the label and glyph:
 
 ### Client logo wall — 2026-08-09
 
-Five marks on `/clients`, scrolling right to left. `client_logos/` at the repo
+Marks on `/clients`, scrolling right to left. `client_logos/` at the repo
 root holds the prepared WebP files plus a `_source/` of the originals.
 
 **Where each came from**, because a logo is someone else's trademark and the
@@ -1002,8 +1002,6 @@ provenance matters:
 | Client | Source | Note |
 |---|---|---|
 | foodpanda | Wikimedia Commons, `Foodpanda logo since 2017`, **public domain** | their own site returns 403 to any non-browser request |
-| HATIL | `hatil.com/images/logo.svg` | |
-| OTOBI | `otobi.com/images/OTOBI-LOGO.png` | |
 | HNC Outsourcing | `hncoutsourcing.com/logo.svg` | matches the reception sign in media-dump session 3 |
 | LEC Abroad | `lecabroad.com/storage/uploads/setting-images/…` | matches the sign in session 8 |
 
@@ -1031,7 +1029,7 @@ grows.
 
 1. **`Picture` painted a background behind transparent logos.** It sets the
    blurhash average colour on every `<img>`, which is right for a photograph and
-   turned OTOBI's black wordmark into a black rectangle and HNC's mark into a
+   turned a black wordmark into a black rectangle and HNC's mark into a
    blue block. The wall passes `style={{ backgroundColor: "transparent" }}`,
    which wins because caller styles are spread last.
 2. **`Marquee`'s duplicated track was keyboard-reachable.** It was `aria-hidden`
@@ -1240,3 +1238,49 @@ build leaves the directory behind. `test -f .next/BUILD_ID` is.
 4. Alt text. `Media.altEn`/`altBn` are **required** and cannot be auto-written
    truthfully; the importer will need to stage placeholders that the admin
    (Plan 1C) forces someone to fill.
+
+### WhatsApp moved to the second line, and two marks withdrawn — 2026-09-14
+
+**WhatsApp is now one number, `01818843999`.** Both phone numbers stay; only the
+WhatsApp account changed. That broke an assumption baked into the code: the
+float read `settings.whatsapp`, which is the *first* line's account, so simply
+clearing it would have removed the button altogether, and simply moving the new
+number into that field would have hung a WhatsApp icon beside a number that does
+not answer there.
+
+So WhatsApp is no longer "the first line's account" but "whichever line runs
+it". `companyWhatsapp(settings)` in `phone-lines.tsx` returns the first line
+that has one, and `whatsapp-float.tsx` asks it. Moving WhatsApp to a different
+number is now a data change, not a code change.
+
+- `apps/web/components/layout/phone-lines.tsx` — added `companyWhatsapp`
+- `apps/web/components/layout/whatsapp-float.tsx` — uses it instead of `settings.whatsapp`
+- `apps/api/prisma/seed.ts` — `whatsapp: ""`, pushed through `update` so an
+  already-seeded database is corrected rather than left on the old number
+- `apps/web/test/render.tsx` — fixture follows the seed
+- `phone-lines.test.tsx`, `whatsapp-float.test.tsx` — the first line now carries
+  no icon; the float opens `wa.me/8801818843999`
+
+The schema has `whatsapp String` (not null), hence `""` rather than `NULL`.
+Live row updated with `UPDATE "SiteSettings" SET whatsapp = ''`.
+
+**Two client marks were withdrawn** at the client's instruction, with no trace
+to remain. Removing the row alone is not enough — the ingested derivatives stay
+served at their own URLs — so all four places were cleared:
+
+1. `ClientLogo` rows, then the `Media` rows they pointed at
+2. `apps/api/uploads/<storageKey>/` for each, the AVIF and WebP derivatives
+3. `client_logos/*.webp` and their originals under `client_logos/_source/`
+4. `seed-client-logos.ts`, so a re-seed does not bring them back
+
+`sortOrder` was left with gaps by the delete (0, 3, 4) and renumbered to 0, 1, 2
+so the database matches what a fresh seed would produce.
+
+`client-logo-wall.test.tsx` had used real client names as fixtures. They are
+invented now — `Alpha Ltd`, `Beta Group`, … — because a test that names real
+clients breaks whenever permission changes, which is exactly what happened here.
+
+**Consequence worth knowing:** three logos remain, and `MIN_FOR_MARQUEE` is 4.
+The wall therefore stops scrolling and renders a plain centred row. That is the
+existing deliberate behaviour, not a regression — a three-item loop reads as the
+same marks going round rather than as a client list.

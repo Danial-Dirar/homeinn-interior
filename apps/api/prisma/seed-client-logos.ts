@@ -13,11 +13,13 @@ const DIR = join(__dirname, "..", "..", "..", "client_logos");
  * A logo is someone else's trademark, and showing it asserts a working
  * relationship. Every entry here is one the company has confirmed — do not add
  * a mark just because the file exists in the folder.
+ *
+ * Consent also runs the other way. When a mark is withdrawn it has to leave the
+ * database, the ingested derivatives and `client_logos/` as well as this list,
+ * because dropping the row alone leaves the image served at its own URL.
  */
 const CLIENTS = [
   { name: "foodpanda", file: "foodpanda.webp", website: "https://www.foodpanda.com.bd/" },
-  { name: "HATIL", file: "hatil.webp", website: "https://hatil.com/" },
-  { name: "OTOBI", file: "otobi.webp", website: "https://otobi.com/" },
   { name: "HNC Outsourcing Ltd.", file: "hnc-outsourcing.webp", website: "https://hncoutsourcing.com/" },
   { name: "LEC Abroad", file: "lec-abroad.webp", website: "https://lecabroad.com/" },
 ];

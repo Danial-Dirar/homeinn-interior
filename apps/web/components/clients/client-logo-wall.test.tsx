@@ -15,7 +15,10 @@ function logo(name: string, website: string | null = "https://example.com"): Cli
   return { id: name, name, website, sortOrder: 0, logo: media };
 }
 
-const five = ["foodpanda", "HATIL", "OTOBI", "HNC", "LEC"].map((n) => logo(n));
+// Invented names on purpose. Real client marks are shown by permission, and a
+// fixture that names them breaks the moment that permission changes.
+const five = ["Alpha Ltd", "Beta Group", "Gamma Co", "Delta Works", "Epsilon BD"]
+  .map((n) => logo(n));
 
 describe("ClientLogoWall", () => {
   it("renders nothing when there are no logos", () => {
@@ -26,12 +29,12 @@ describe("ClientLogoWall", () => {
   it("names each logo, so the mark is not the only cue", () => {
     renderWithIntl(<ClientLogoWall locale="en" clients={five} />);
     // Duplicated by the marquee track, hence getAllByLabelText.
-    expect(screen.getAllByLabelText("HATIL").length).toBeGreaterThan(0);
+    expect(screen.getAllByLabelText("Beta Group").length).toBeGreaterThan(0);
   });
 
   it("links a logo to the client's site, opened safely", () => {
     renderWithIntl(<ClientLogoWall locale="en" clients={five} />);
-    const link = screen.getAllByLabelText("OTOBI")[0]!;
+    const link = screen.getAllByLabelText("Gamma Co")[0]!;
     expect(link).toHaveAttribute("href", "https://example.com");
     expect(link).toHaveAttribute("rel", "noreferrer noopener");
   });
