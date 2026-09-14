@@ -4,10 +4,10 @@ import { renderWithIntl, settingsFixture } from "@/test/render";
 import { WhatsAppFloat } from "./whatsapp-float";
 
 describe("WhatsAppFloat", () => {
-  it("opens a chat on the primary number", () => {
+  it("opens a chat on the number that answers, not merely the first line", () => {
     renderWithIntl(<WhatsAppFloat settings={settingsFixture} />);
     expect(screen.getByRole("link", { name: "Chat on WhatsApp" }))
-      .toHaveAttribute("href", "https://wa.me/8801760775454");
+      .toHaveAttribute("href", "https://wa.me/8801818843999");
   });
 
   it("is hidden at the top of the home page so it never covers the hero", () => {
@@ -18,9 +18,15 @@ describe("WhatsAppFloat", () => {
     expect(link.className).toContain("pointer-events-none");
   });
 
-  it("renders nothing when no WhatsApp number is configured", () => {
-    const { container } = renderWithIntl(
-      <WhatsAppFloat settings={{ ...settingsFixture, whatsapp: "" }} />);
+  it("renders nothing when no line answers on WhatsApp", () => {
+    // Both lines have to go: the second falls back to its own number.
+    const none = {
+      ...settingsFixture,
+      whatsapp: "",
+      phoneSecondary: null,
+      whatsappSecondary: null,
+    };
+    const { container } = renderWithIntl(<WhatsAppFloat settings={none} />);
     expect(container).toBeEmptyDOMElement();
   });
 

@@ -24,7 +24,8 @@ export function renderWithIntl(
 export const settingsFixture: SiteSettingsView = {
   id: "singleton",
   phone: "01760775454",
-  whatsapp: "+8801760775454",
+  // WhatsApp is on the second line only, matching the seeded settings.
+  whatsapp: "",
   phoneSecondary: "01818843999",
   whatsappSecondary: "+8801818843999",
   email: "homeinnbd14@gmail.com",

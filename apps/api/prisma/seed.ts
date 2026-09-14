@@ -20,13 +20,20 @@ const certifications = [
 export async function seed(prisma: PrismaClient): Promise<void> {
   await prisma.siteSettings.upsert({
     where: { id: "singleton" },
-    // The second line is pushed on re-seed too; `update: {}` would leave an
-    // already-seeded database without it forever.
-    update: { phoneSecondary: "01818843999", whatsappSecondary: "+8801818843999" },
+    // Pushed on re-seed too; `update: {}` would leave an already-seeded
+    // database on the old numbers forever.
+    update: {
+      whatsapp: "",
+      phoneSecondary: "01818843999",
+      whatsappSecondary: "+8801818843999",
+    },
     create: {
       id: "singleton",
       phone: "01760775454",
-      whatsapp: "+8801760775454",
+      // The company answers WhatsApp on the second line only. Empty rather
+      // than repeating the first number, so no icon appears beside a number
+      // that would not answer there. Required by the schema, hence "".
+      whatsapp: "",
       phoneSecondary: "01818843999",
       whatsappSecondary: "+8801818843999",
       email: "homeinnbd14@gmail.com",

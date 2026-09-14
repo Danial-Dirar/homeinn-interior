@@ -5,6 +5,7 @@ import { usePathname } from "@/i18n/navigation";
 import { useScrolled } from "@/hooks/use-scrolled";
 import type { SiteSettingsView } from "@/lib/api.types";
 import { whatsappHref } from "@/lib/whatsapp";
+import { companyWhatsapp } from "./phone-lines";
 import { WhatsAppIcon } from "./whatsapp-icon";
 
 /**
@@ -20,11 +21,13 @@ export function WhatsAppFloat({ settings }: { settings: SiteSettingsView }) {
   const scrolled = useScrolled(300);
   const overHero = usePathname() === "/" && !scrolled;
 
-  if (!settings.whatsapp) return null;
+  // Whichever line carries WhatsApp, not simply the first one.
+  const number = companyWhatsapp(settings);
+  if (!number) return null;
 
   return (
     <a
-      href={whatsappHref(settings.whatsapp)}
+      href={whatsappHref(number)}
       target="_blank"
       rel="noreferrer noopener"
       aria-label={t("whatsapp")}

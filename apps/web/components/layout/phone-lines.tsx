@@ -29,6 +29,18 @@ export function phoneLines(settings: SiteSettingsView): PhoneLine[] {
 }
 
 /**
+ * The single number the company answers on WhatsApp, or `null` if none does.
+ *
+ * Not the same thing as `settings.whatsapp`: WhatsApp sits on whichever line
+ * the company actually runs it on, which is not necessarily the first. Asking
+ * the lines keeps that in one place, so moving WhatsApp to another number is a
+ * data change rather than a code change.
+ */
+export function companyWhatsapp(settings: SiteSettingsView): string | null {
+  return phoneLines(settings).find((line) => line.whatsapp)?.whatsapp ?? null;
+}
+
+/**
  * Renders the numbers as `tel:` links, each with a WhatsApp control beside it.
  * `tone` picks the hover colour so it sits on either ground.
  */

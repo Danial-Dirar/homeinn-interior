@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { renderWithIntl, settingsFixture } from "@/test/render";
-import { PhoneLines, phoneLines } from "./phone-lines";
+import { PhoneLines, companyWhatsapp, phoneLines } from "./phone-lines";
 
 describe("phoneLines", () => {
   it("returns both numbers when a second one is configured", () => {
@@ -22,6 +22,26 @@ describe("phoneLines", () => {
     const noWa = { ...settingsFixture, whatsappSecondary: null };
     expect(phoneLines(noWa)[1]?.whatsapp).toBe("01818843999");
   });
+
+  it("leaves a line without WhatsApp when none is configured for it", () => {
+    expect(phoneLines(settingsFixture)[0]?.whatsapp).toBeNull();
+  });
+});
+
+describe("companyWhatsapp", () => {
+  it("finds the line that answers, even when it is not the first", () => {
+    expect(companyWhatsapp(settingsFixture)).toBe("+8801818843999");
+  });
+
+  it("is null when no line answers on WhatsApp", () => {
+    const none = {
+      ...settingsFixture,
+      whatsapp: "",
+      phoneSecondary: null,
+      whatsappSecondary: null,
+    };
+    expect(companyWhatsapp(none)).toBeNull();
+  });
 });
 
 describe("PhoneLines", () => {
@@ -33,16 +53,19 @@ describe("PhoneLines", () => {
       .toHaveAttribute("href", "tel:01818843999");
   });
 
-  it("gives each number its own WhatsApp link", () => {
+  it("shows WhatsApp beside the number that answers there, and not the other", () => {
     renderWithIntl(<PhoneLines settings={settingsFixture} />);
-    expect(screen.getByRole("link", { name: /Chat on WhatsApp — 01760775454/ }))
-      .toHaveAttribute("href", "https://wa.me/8801760775454");
     expect(screen.getByRole("link", { name: /Chat on WhatsApp — 01818843999/ }))
       .toHaveAttribute("href", "https://wa.me/8801818843999");
+    // An icon beside a number that does not answer on WhatsApp would send
+    // people to a dead chat, so the first line carries none.
+    expect(screen.queryByRole("link", { name: /Chat on WhatsApp — 01760775454/ }))
+      .toBeNull();
   });
 
-  it("names the WhatsApp links per number so they are not two identical links", () => {
-    renderWithIntl(<PhoneLines settings={settingsFixture} />);
+  it("names the links per number when more than one answers", () => {
+    const both = { ...settingsFixture, whatsapp: "+8801760775454" };
+    renderWithIntl(<PhoneLines settings={both} />);
     const names = screen
       .getAllByRole("link", { name: /Chat on WhatsApp/ })
       .map((link) => link.getAttribute("aria-label"));
@@ -51,6 +74,6 @@ describe("PhoneLines", () => {
 
   it("labels them in Bangla for bn", () => {
     renderWithIntl(<PhoneLines settings={settingsFixture} />, { locale: "bn" });
-    expect(screen.getAllByRole("link", { name: /হোয়াটসঅ্যাপে বার্তা দিন/ })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: /হোয়াটসঅ্যাপে বার্তা দিন/ })).toHaveLength(1);
   });
 });
