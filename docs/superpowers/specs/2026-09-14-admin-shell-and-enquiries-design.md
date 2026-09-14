@@ -86,11 +86,15 @@ it to lock the real staff out. Talking directly keeps per-IP limits meaningful.
 CORS is already configured for this: `credentials: true` with an origin
 allowlist read from `WEB_ORIGIN`.
 
-**This requires the site and the API to be same-site in production** — for
-example `homeinnbd.com` and `api.homeinnbd.com` — so that `sameSite: lax`
+**This requires the site and the API to be same-site in production** —
+`homeinn-interior.com` and `api.homeinn-interior.com` — so that `sameSite: lax`
 cookies are sent. One domain, self-hosted, satisfies this naturally. It is a
 genuine constraint on hosting and is recorded here so it is not discovered
 later.
+
+The domain is not bought yet. Nothing in this phase depends on owning it —
+development runs on `localhost`, where the same-site rule also holds — but the
+production cookie settings and `WEB_ORIGIN` cannot be finalised until it is.
 
 ### The consequence: a first-paint flash
 
@@ -197,7 +201,9 @@ enquiry in the admin.
   password must be changed deliberately, and the plan needs a way to do it: a
   small `pnpm admin:password` script, since this phase has no password-change
   screen.
-- The domain, once bought, so `WEB_ORIGIN` and the cookie settings can be set.
+- The domain. It will be `homeinn-interior.com`, not yet registered. Needed
+  before `WEB_ORIGIN` and the cookie settings can be finalised, not before the
+  work starts.
 
 ## Open question
 

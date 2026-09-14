@@ -7,13 +7,13 @@ describe("apiBaseUrl", () => {
   });
 
   it("reads NEXT_PUBLIC_API_URL", () => {
-    expect(apiBaseUrl({ NEXT_PUBLIC_API_URL: "https://api.homeinnbd.com/api" }))
-      .toBe("https://api.homeinnbd.com/api");
+    expect(apiBaseUrl({ NEXT_PUBLIC_API_URL: "https://api.homeinn-interior.com/api" }))
+      .toBe("https://api.homeinn-interior.com/api");
   });
 
   it("strips trailing slashes so path joins never double up", () => {
-    expect(apiBaseUrl({ NEXT_PUBLIC_API_URL: "https://api.homeinnbd.com/api//" }))
-      .toBe("https://api.homeinnbd.com/api");
+    expect(apiBaseUrl({ NEXT_PUBLIC_API_URL: "https://api.homeinn-interior.com/api//" }))
+      .toBe("https://api.homeinn-interior.com/api");
   });
 });
 
@@ -23,7 +23,7 @@ describe("siteUrl", () => {
   });
 
   it("strips a trailing slash", () => {
-    expect(siteUrl({ NEXT_PUBLIC_SITE_URL: "https://homeinnbd.com/" }))
-      .toBe("https://homeinnbd.com");
+    expect(siteUrl({ NEXT_PUBLIC_SITE_URL: "https://homeinn-interior.com/" }))
+      .toBe("https://homeinn-interior.com");
   });
 });

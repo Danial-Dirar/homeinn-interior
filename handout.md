@@ -1316,3 +1316,38 @@ already recorded in `main.ts` about per-IP throttling.
    `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` publishes the admin password.
    The upsert is `update: {}`, so setting them after the account exists does
    nothing silently — changing it needs a deliberate script.
+
+### The domain changed — `homeinn-interior.com` — 2026-09-14
+
+Supersedes the two entries above about `homeinnbd.com`. The site will be at
+**`homeinn-interior.com`**, which is **not registered yet** — checked by RDAP,
+`404` from Verisign, so it is free to buy.
+
+`homeinnbd.com` is still owned and still parked at `127.0.0.1`. It is not being
+abandoned as a registration, but it is no longer the address the site will
+answer on.
+
+Worth knowing before the purchase: **`homeinninterior.com`, the same name
+without the hyphen, is already registered** and parked on GoDaddy nameservers.
+Spoken aloud the two are identical, so a caller told the address will more often
+than not type the unhyphenated one and land on a stranger's parked page. The
+client's call; recorded so the trade-off was at least seen.
+
+Consequences for work already done:
+
+- `apps/web/lib/env.test.ts` used the old domain in its fixtures, updated. The
+  assertions are about stripping trailing slashes, so the host is incidental.
+- The admin design spec's same-site requirement now reads
+  `homeinn-interior.com` + `api.homeinn-interior.com`.
+- **The Google OAuth client** created in August has the old domain in its
+  authorised origins and redirect URIs. Those entries are dead and will need
+  replacing once the new domain is live. Google allows editing them at any time.
+  Only the `localhost:3100` entries work in the meantime, which is all that
+  local development needs.
+- `seed.ts` still defaults the admin email to `admin@homeinnbd.com`. Left alone
+  deliberately — it is a placeholder that must be overridden with a real address
+  before deploying either way, and changing one dead default for another buys
+  nothing.
+
+Earlier plans and the Phase 1 design still name `homeinnbd.com`. They are a
+record of what was decided when, and were not rewritten.
