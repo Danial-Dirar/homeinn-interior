@@ -80,9 +80,12 @@ export function ResourceForm({ resource, id, justCreated = false }: {
     setBusy(true);
     setMessage(null);
     try {
-      const payload = toPayload(resource.fields, values);
+      const payload = toPayload(resource.fields, values, row);
       if (safeId) {
-        await adminSend("PATCH", `${resource.writePath}/${safeId}`, payload);
+        const saved = await adminSend<AdminRow>("PATCH", `${resource.writePath}/${safeId}`, payload);
+        // The reply is the bare row; keep the loaded relations (images) and take
+        // the rest, so the Published badge and the site link are current.
+        setRow((current) => (current && saved ? { ...current, ...saved } : current));
         setMessage({ tone: "success", text: "Saved. The site shows the change within moments." });
       } else {
         const created = await adminSend<{ id: string }>("POST", resource.writePath, payload);

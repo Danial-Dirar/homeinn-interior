@@ -27,14 +27,28 @@ export class AdminApiError extends Error {
 
 let refreshing: Promise<boolean> | null = null;
 
-function refreshOnce(): Promise<boolean> {
-  refreshing ??= fetch(`${apiBaseUrl()}/auth/refresh`, { method: "POST", credentials: "include" })
+const sendRefresh = () =>
+  fetch(`${apiBaseUrl()}/auth/refresh`, { method: "POST", credentials: "include" })
     .then((res) => res.ok)
-    .catch(() => false)
+    .catch(() => false);
+
+/**
+ * One refresh at a time, in this tab and across tabs. Two tabs refreshing at
+ * once would both send the same refresh token; the second reads as a stolen,
+ * replayed token and the API ends every session. The Web Locks API queues
+ * them, and the cookie the first one rotates is the one the second sends.
+ */
+function refreshOnce(): Promise<boolean> {
+  if (refreshing) return refreshing;
+  const locks = typeof navigator === "undefined" ? undefined : navigator.locks;
+  const pending = (locks
+    ? (locks.request("homeinn-admin-refresh", sendRefresh) as Promise<unknown>).then((ok) => ok === true)
+    : sendRefresh())
     .finally(() => {
       refreshing = null;
     });
-  return refreshing;
+  refreshing = pending;
+  return pending;
 }
 
 /** Where to go after signing in: a path inside the panel, never anywhere else. */
@@ -67,7 +81,8 @@ async function errorFrom(res: Response): Promise<AdminApiError> {
     | null;
   const fieldErrors: Record<string, string> = {};
   for (const issue of body?.issues ?? []) {
-    const key = issue.path?.join(".") || "_";
+    // A problem inside a list (`tags.3`, `galleryIds.0`) belongs to the list's field.
+    const key = issue.path?.[0] !== undefined ? String(issue.path[0]) : "_";
     fieldErrors[key] ??= issue.message;
   }
   const message = Array.isArray(body?.message) ? body.message.join(" ") : body?.message;

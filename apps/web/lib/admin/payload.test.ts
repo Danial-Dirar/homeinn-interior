@@ -96,4 +96,23 @@ describe("validate", () => {
   it("asks for a required choice", () => {
     expect(validate(fields, { ...initialValues(fields), titleEn: "a", titleBn: "b" }).workingAreaId).toBe("Required");
   });
+
+describe("dates", () => {
+  const dated: Field[] = [{ name: "publishedAt", label: "Date", kind: "date", nullable: true }];
+
+  it("shows the day as it was in Dhaka, not in UTC", () => {
+    // 02:00 in Dhaka on the 13th is still the 12th in UTC.
+    expect(initialValues(dated, { id: "b", publishedAt: "2026-10-12T20:00:00.000Z" }).publishedAt).toBe("2026-10-13");
+  });
+
+  it("keeps the saved moment when the day was not changed, so saving never moves a post", () => {
+    const row = { id: "b", publishedAt: "2026-10-12T20:00:00.000Z" };
+    expect(toPayload(dated, initialValues(dated, row), row).publishedAt).toBe("2026-10-12T20:00:00.000Z");
+  });
+
+  it("starts a changed day at midnight in Dhaka, so a post dated today is out at once", () => {
+    const row = { id: "b", publishedAt: "2026-10-12T20:00:00.000Z" };
+    expect(toPayload(dated, { publishedAt: "2026-10-20" }, row).publishedAt).toBe("2026-10-20T00:00:00+06:00");
+  });
+});
 });

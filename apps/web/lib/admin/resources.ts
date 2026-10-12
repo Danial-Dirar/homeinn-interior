@@ -67,7 +67,10 @@ export const RESOURCES: ResourceDef[] = [
       },
       { name: "areaSqft", label: "Area (sq ft)", kind: "number", nullable: true, min: 1 },
       { name: "year", label: "Year", kind: "number", nullable: true, min: 1990, max: 2100 },
-      { name: "description", label: "Description", kind: "richtext", bilingual: true, required: true, wide: true },
+      {
+        name: "description", label: "Description", kind: "richtext", bilingual: true, wide: true,
+        help: "Can wait until it is written; the page simply shows none.",
+      },
       { name: "cover", key: "coverId", label: "Cover image", kind: "media", nullable: true },
       gallery,
       featured,
@@ -131,7 +134,10 @@ export const RESOURCES: ResourceDef[] = [
     fields: [
       { name: "name", label: "Name", kind: "text", bilingual: true, required: true, max: 200 },
       { name: "summary", label: "Summary", kind: "textarea", bilingual: true, required: true, max: 500 },
-      { name: "description", label: "Description", kind: "richtext", bilingual: true, required: true, wide: true },
+      {
+        name: "description", label: "Long description", kind: "richtext", bilingual: true, wide: true,
+        help: "Optional: the furniture page shows the summary.",
+      },
       { name: "priceBdt", label: "Price (taka)", kind: "money", help: "Leave empty for “price on request”." },
       { name: "madeToOrder", label: "Made to order", kind: "boolean", defaultValue: true },
       { name: "leadTimeDays", label: "Lead time (days)", kind: "number", nullable: true, min: 0 },
@@ -323,7 +329,10 @@ export function resourceNamed(name: string): ResourceDef | undefined {
 /** The settings row: one record, always edited, never created or deleted. */
 export const SETTINGS_FIELDS: Field[] = [
   { name: "phone", label: "Phone", kind: "text", required: true, max: 40 },
-  { name: "whatsapp", label: "WhatsApp", kind: "text", required: true, max: 40 },
+  {
+    name: "whatsapp", label: "WhatsApp", kind: "text", max: 40,
+    help: "Leave empty if this number does not answer on WhatsApp.",
+  },
   { name: "phoneSecondary", label: "Second phone", kind: "text", nullable: true, max: 40 },
   { name: "whatsappSecondary", label: "Second WhatsApp", kind: "text", nullable: true, max: 40 },
   { name: "email", label: "Email", kind: "text", required: true, max: 200 },

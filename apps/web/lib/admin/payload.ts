@@ -2,6 +2,16 @@ import { isText, keysOf, type AdminRow, type Field, type FormValues, type MediaV
 
 const text = (value: unknown) => (typeof value === "string" ? value : value == null ? "" : String(value));
 
+/** The company works in Dhaka time, so a date is the day as it was there. */
+const DHAKA_DAY = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Dhaka", year: "numeric", month: "2-digit", day: "2-digit",
+});
+
+function dhakaDay(iso: unknown): string {
+  const date = new Date(text(iso));
+  return Number.isNaN(date.getTime()) ? "" : DHAKA_DAY.format(date);
+}
+
 /** A saved row (or nothing, for a new one) as form state. */
 export function initialValues(fields: Field[], row?: AdminRow | Record<string, unknown> | null): FormValues {
   const values: FormValues = {};
@@ -36,15 +46,23 @@ export function initialValues(fields: Field[], row?: AdminRow | Record<string, u
         values[field.name] = Array.isArray(saved) ? saved.join(", ") : "";
         break;
       case "date":
-        values[field.name] = saved ? text(saved).slice(0, 10) : "";
+        values[field.name] = saved ? dhakaDay(saved) : "";
         break;
     }
   }
   return values;
 }
 
-/** Form state as the API's write schemas expect it. */
-export function toPayload(fields: Field[], values: FormValues): Record<string, unknown> {
+/**
+ * Form state as the API's write schemas expect it. `original` is the saved
+ * row, when editing: a date whose day was not changed is sent back exactly as
+ * saved, so saving a post never moves it.
+ */
+export function toPayload(
+  fields: Field[],
+  values: FormValues,
+  original?: Record<string, unknown> | null,
+): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const field of fields) {
     const raw = values[field.name];
@@ -84,7 +102,12 @@ export function toPayload(fields: Field[], values: FormValues): Record<string, u
         break;
       case "date": {
         const value = text(raw).trim();
-        out[field.name] = value === "" ? null : value;
+        const saved = original?.[field.name];
+        if (value === "") out[field.name] = null;
+        else if (saved && dhakaDay(saved) === value) out[field.name] = text(saved);
+        // A new day starts at midnight in Dhaka, so a post dated today is out
+        // at once rather than at 6 a.m., when midnight UTC arrives.
+        else out[field.name] = `${value}T00:00:00+06:00`;
         break;
       }
     }

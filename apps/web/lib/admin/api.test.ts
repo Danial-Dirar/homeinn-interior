@@ -98,4 +98,24 @@ describe("loginPathFor", () => {
     expect(loginPathFor("//evil.example/admins")).toBe("/admins");
     expect(loginPathFor(null)).toBe("/admins");
   });
+
+describe("field errors inside a list", () => {
+  it("are shown on the list's own field", async () => {
+    fakeApi({ "/blog": [{ status: 400, body: { message: "Validation failed", issues: [{ path: ["tags", 3], message: "Too long" }] } }] });
+    const error = (await adminSend("POST", "/blog", {}).catch((e: unknown) => e)) as AdminApiError;
+    expect(error.fieldErrors).toEqual({ tags: "Too long" });
+  });
+});
+
+describe("refreshing across tabs", () => {
+  it("takes the browser-wide lock, so two tabs never send the same refresh token", async () => {
+    // A second refresh with a just-rotated token reads as theft and ends
+    // every session.
+    const request = vi.fn(async (_name: string, run: () => Promise<unknown>) => run());
+    vi.stubGlobal("navigator", { locks: { request } });
+    fakeApi({ "/leads": [{ status: 401 }, { status: 200 }], "/auth/refresh": [{ status: 200 }] });
+    await adminFetch("/leads");
+    expect(request).toHaveBeenCalledWith("homeinn-admin-refresh", expect.any(Function));
+  });
+});
 });

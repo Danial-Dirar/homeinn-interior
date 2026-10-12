@@ -1,14 +1,14 @@
 "use client";
 
 import type { AuthUser } from "@homeinn/types";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@homeinn/ui";
+import { Button, Sheet, SheetContent, SheetTitle, SheetTrigger } from "@homeinn/ui";
 import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { adminGet, adminSend } from "@/lib/admin/api";
 import { AdminContext } from "./admin-context";
 import { AdminNav } from "./admin-nav";
-import { Loading } from "./ui";
+import { Loading, Notice } from "./ui";
 
 /**
  * The panel's frame. Nothing inside renders until `GET /auth/me` confirms the
@@ -22,18 +22,23 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [newCount, setNewCount] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unreachable, setUnreachable] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let live = true;
+    setUnreachable(false);
     adminGet<{ user: AuthUser }>("/auth/me")
       .then((res) => live && setUser(res.user))
-      .catch(() => {
-        // adminFetch has already sent the visitor to the login screen.
+      .catch((error: { status?: number }) => {
+        // A 401 has already gone to the login screen. Anything else — no
+        // network, a server error — would otherwise leave the spinner forever.
+        if (live && error.status !== 401) setUnreachable(true);
       });
     return () => {
       live = false;
     };
-  }, []);
+  }, [attempt]);
 
   // Refreshed on every page change, so answering an enquiry updates the count.
   useEffect(() => {
@@ -54,8 +59,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   if (!user) {
     return (
-      <div className="grid min-h-dvh place-items-center">
-        <Loading label="Checking your session" />
+      <div className="grid min-h-dvh place-items-center px-5">
+        {unreachable ? (
+          <div className="flex max-w-sm flex-col items-start gap-4">
+            <Notice tone="error">The admin panel can&apos;t reach the server. Check the connection, or try again in a minute.</Notice>
+            <Button type="button" variant="outline" onClick={() => setAttempt((n) => n + 1)}>Try again</Button>
+          </div>
+        ) : (
+          <Loading label="Checking your session" />
+        )}
       </div>
     );
   }

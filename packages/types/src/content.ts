@@ -12,8 +12,26 @@ const galleryIds = z.array(idSchema).max(60).optional();
  */
 const clearableId = idSchema.nullable().optional();
 const clearableText = (max: number) => z.string().trim().max(max).nullable().optional();
+/** A web address: http or https only — `.url()` alone would accept javascript:. */
+export const webUrl = z
+  .string()
+  .trim()
+  .url()
+  .max(300)
+  .refine((value) => /^https?:\/\//i.test(value), { message: "Must start with http:// or https://" });
+
+/**
+ * Long text that may stay empty until someone writes it: imported projects
+ * and furniture have none, and saving them to rename or publish must not
+ * demand invented copy.
+ */
+const optionalRichText = z.string().trim().max(RICH_TEXT_MAX).default("");
+
+/** Poisha in a Postgres INT4: anything larger would fail as a 500, not a 400. */
+const MAX_POISHA = 2_147_483_647;
+
 const clearableUrl = z
-  .union([z.string().trim().url().max(300), z.literal("")])
+  .union([webUrl, z.literal("")])
   .nullable()
   .optional()
   .transform((value) => (value === "" ? null : value));
@@ -50,9 +68,10 @@ export type UpdateWorkingAreaInput = z.infer<typeof updateWorkingAreaSchema>;
 // ---------- Project ----------
 
 export const createProjectSchema = bilingualText("title", 200)
-  .merge(bilingualText("description", RICH_TEXT_MAX))
   .merge(
     z.object({
+      descriptionEn: optionalRichText,
+      descriptionBn: optionalRichText,
       // Empty until known: a design-stage project has no site yet, and the
       // page hides an empty facts row rather than inventing one.
       locationEn: z.string().trim().max(200).default(""),
@@ -179,11 +198,12 @@ export type UpdateHeroSegmentInput = z.infer<typeof updateHeroSegmentSchema>;
 
 export const createProductSchema = bilingualText("name", 200)
   .merge(bilingualText("summary", 500))
-  .merge(bilingualText("description", RICH_TEXT_MAX))
   .merge(
     z.object({
+      descriptionEn: optionalRichText,
+      descriptionBn: optionalRichText,
       /** Poisha. `null` means "price on request". */
-      priceBdt: z.number().int().min(0).max(100_000_000_00).nullable().optional(),
+      priceBdt: z.number().int().min(0).max(MAX_POISHA).nullable().optional(),
       madeToOrder: z.boolean().default(true),
       leadTimeDays: z.number().int().min(0).max(3650).nullable().optional(),
       serviceId: clearableId,

@@ -28,9 +28,20 @@ const TYPE_LABEL: Record<string, string> = {
   CONTACT: "Contact", CONSULTATION: "Consultation", QUOTE: "Quote",
 };
 
+/** One line of a visitor's own words: no line breaks to add lines of their own. */
+const oneLine = (value: string) => value.replace(/\s+/g, " ").trim();
+
+/**
+ * The visitor wrote the name and the message, so neither may pass for our
+ * own text: the name is kept to one line, the real admin link comes before
+ * the message, and every line of the message is quoted with "> ".
+ */
 export function emailForLead(lead: NotifiableLead, siteUrl: string) {
+  const name = oneLine(lead.name);
+  const message = (lead.message ?? "").trim();
   const lines = [
-    `${lead.name} sent an enquiry through the website.`,
+    `${name} sent an enquiry through the website.`,
+    `Open it in the admin panel: ${siteUrl.replace(/\/+$/, "")}/admins/enquiries/${lead.id}`,
     "",
     `Phone:    ${lead.phone}`,
     lead.email ? `Email:    ${lead.email}` : null,
@@ -39,12 +50,11 @@ export function emailForLead(lead: NotifiableLead, siteUrl: string) {
     `Language: ${lead.locale === "bn" ? "Bangla" : "English"}`,
     lead.sourcePath ? `Page:     ${lead.sourcePath}` : null,
     "",
-    lead.message ?? "(No message.)",
-    "",
-    `Open it in the admin panel: ${siteUrl.replace(/\/+$/, "")}/admins/enquiries/${lead.id}`,
+    "Their message:",
+    ...(message ? message.split(/\r?\n/).map((line) => `> ${line}`) : ["> (No message.)"]),
   ];
   return {
-    subject: `New enquiry: ${lead.name} (${TYPE_LABEL[lead.type] ?? lead.type})`,
+    subject: `New enquiry: ${name} (${TYPE_LABEL[lead.type] ?? lead.type})`,
     text: lines.filter((line) => line !== null).join("\n"),
   };
 }

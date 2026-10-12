@@ -149,6 +149,31 @@ describe("clearing optional fields", () => {
       .expect(201);
   });
 
+  it("saves an imported project that has no description yet, with the whole form the panel sends", async () => {
+    // seed-projects.ts stores "" descriptions on purpose; renaming or
+    // publishing one must not demand invented copy.
+    const area = await seedArea();
+    const project = await prisma.project.create({
+      data: {
+        slug: "factory-works", titleEn: "Factory Works", titleBn: "ফ্যাক্টরির কাজ", locationEn: "", locationBn: "",
+        descriptionEn: "", descriptionBn: "", workingAreaId: area.id,
+      },
+    });
+    await request(server()).patch(`/api/projects/${project.id}`).set("Cookie", editor)
+      .send({
+        titleEn: "Factory fit-out, Gazipur", titleBn: "ফ্যাক্টরি ফিট-আউট, গাজীপুর", locationEn: "", locationBn: "",
+        descriptionEn: "", descriptionBn: "", clientName: null, areaSqft: null, year: null,
+        workingAreaId: area.id, coverId: null, galleryIds: [], featured: false, published: true, sortOrder: 0,
+      })
+      .expect(200);
+  });
+
+  it("saves settings with no WhatsApp on the first line, as seeded", async () => {
+    await request(server()).patch("/api/settings").set("Cookie", admin)
+      .send({ phone: "01760775454", whatsapp: "", phoneSecondary: "01818843999", whatsappSecondary: null })
+      .expect(200);
+  });
+
   it("clears a social link in settings with an empty string", async () => {
     await request(server()).patch("/api/settings").set("Cookie", admin)
       .send({ facebookUrl: "https://facebook.com/homeinn" }).expect(200);

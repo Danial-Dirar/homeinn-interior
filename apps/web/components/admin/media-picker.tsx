@@ -54,8 +54,13 @@ export function MediaPicker({
     };
   }, [open, query, page]);
 
+  // Each opening starts afresh from the first page: carrying on from where
+  // "Load more" left off would append that page again.
   useEffect(() => {
-    if (!open) setSelected([]);
+    if (open) return;
+    setSelected([]);
+    setPage(1);
+    setItems(null);
   }, [open]);
 
   function pick(media: MediaView) {

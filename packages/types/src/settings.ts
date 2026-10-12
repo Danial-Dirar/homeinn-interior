@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { bilingualText } from "./common.js";
+import { webUrl } from "./content.js";
 
 /** A link, or `""` to remove it from the site. */
 const url = z
-  .union([z.string().trim().url().max(300), z.literal("")])
+  .union([webUrl, z.literal("")])
   .transform((value) => (value === "" ? null : value));
 
 /**
@@ -15,7 +16,8 @@ export const updateSettingsSchema = bilingualText("address", 500)
   .merge(
     z.object({
       phone: z.string().trim().min(1).max(40),
-      whatsapp: z.string().trim().min(1).max(40),
+      // May be empty: the company answers WhatsApp on its second line only.
+      whatsapp: z.string().trim().max(40),
       // A second line, optional. `""` clears it rather than leaving a stale
       // number on the site, so the admin can remove one without a null.
       phoneSecondary: z.string().trim().max(40).nullable().optional(),

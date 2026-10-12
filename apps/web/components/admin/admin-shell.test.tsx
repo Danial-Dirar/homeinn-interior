@@ -63,4 +63,17 @@ describe("AdminShell", () => {
     await screen.findByText("Panel");
     expect((await screen.findAllByText("3 new"))[0]).toBeInTheDocument();
   });
+
+  it("says so, and offers to try again, when the API cannot be reached", async () => {
+    adminGet.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    render(<AdminShell><p>Panel</p></AdminShell>);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/can't reach the server/i);
+
+    adminGet.mockImplementation(async (path: string) => {
+      if (path === "/auth/me") return { user: { id: "u1", name: "M", email: "m@x.test", role: "ADMIN" } };
+      return { items: [], total: 0 };
+    });
+    screen.getByRole("button", { name: "Try again" }).click();
+    expect(await screen.findByText("Panel")).toBeInTheDocument();
+  });
 });

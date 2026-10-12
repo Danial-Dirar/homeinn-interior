@@ -92,4 +92,14 @@ describe("ResourceForm", () => {
     await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
     expect(adminSend).toHaveBeenCalledWith("PATCH", "/working-areas/..%2F..%2Fusers%2Fx", expect.anything());
   });
+
+  it("updates the Published badge after a save, without a reload", async () => {
+    const projects = resourceNamed("working-areas")!;
+    adminGet.mockResolvedValue({ id: "w1", nameEn: "Homes", nameBn: "বাড়ি", sortOrder: 0, published: false });
+    adminSend.mockResolvedValue({ id: "w1", nameEn: "Homes", nameBn: "বাড়ি", sortOrder: 0, published: true });
+    render(<ResourceForm resource={projects} id="w1" />);
+    expect(await screen.findByText("Draft")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(await screen.findByText("Published")).toBeInTheDocument();
+  });
 });

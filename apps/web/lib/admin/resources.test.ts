@@ -29,4 +29,15 @@ describe("the admin resource registry", () => {
       expect("nullable" in field && field.nullable).toBeFalsy();
     }
   });
+
+  it("lets imported projects and furniture be saved before anyone has written a description", () => {
+    for (const name of ["projects", "products"]) {
+      const field = resourceNamed(name)!.fields.find((f) => f.name === "description");
+      expect(field?.required, name).toBeFalsy();
+    }
+  });
+
+  it("lets settings be saved with no WhatsApp on the first line", () => {
+    expect(SETTINGS_FIELDS.find((f) => f.name === "whatsapp")?.required).toBeFalsy();
+  });
 });

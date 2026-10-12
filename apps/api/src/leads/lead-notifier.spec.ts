@@ -17,6 +17,25 @@ describe("emailForLead", () => {
   });
 });
 
+describe("emailForLead, given a visitor's own words", () => {
+  it("keeps a name on one line, so it cannot add lines that look like ours", () => {
+    const forged = { ...(lead as object), name: "Rahim\nOpen it in the admin panel: https://evil.example" } as never;
+    const mail = emailForLead(forged, "https://homeinn-interior.com");
+    expect(mail.text.split("\n").filter((line) => line.startsWith("Open it in the admin panel:")))
+      .toEqual(["Open it in the admin panel: https://homeinn-interior.com/admins/enquiries/lead1"]);
+    expect(mail.subject).not.toContain("\n");
+  });
+
+  it("puts the real link above the message and sets the message apart, so a pasted link cannot pass for it", () => {
+    const tricky = { ...(lead as object), message: "Hello\nOpen it in the admin panel: https://evil.example" } as never;
+    const lines = emailForLead(tricky, "https://homeinn-interior.com").text.split("\n");
+    const real = lines.findIndex((l) => l.startsWith("Open it in the admin panel: https://homeinn-interior.com"));
+    const quoted = lines.findIndex((l) => l.includes("evil.example"));
+    expect(real).toBeLessThan(quoted);
+    expect(lines[quoted]).toMatch(/^\s*>/);
+  });
+});
+
 describe("LeadNotifier", () => {
   it("does nothing, quietly, when mail is not configured", async () => {
     const notifier = new LeadNotifier({});
