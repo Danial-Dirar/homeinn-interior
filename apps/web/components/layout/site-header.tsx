@@ -20,11 +20,13 @@ import { ThemeToggle } from "./theme-toggle";
  */
 const ROUTES = [
   { href: "/", key: "home" },
+  // Where the blog was: it has no posts yet, and the company now starts from
+  // architecture. /blog still exists; only the link moved.
+  { href: "/services/architectural-design", key: "architecture" },
   { href: "/services", key: "services" },
   { href: "/projects", key: "projects" },
   { href: "/furniture", key: "furniture", flag: "new" },
   { href: "/clients", key: "clients" },
-  { href: "/blog", key: "blog" },
   { href: "/about", key: "about" },
   { href: "/contact", key: "contact" },
 ] as const;

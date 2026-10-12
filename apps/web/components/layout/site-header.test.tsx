@@ -12,7 +12,7 @@ describe("SiteHeader", () => {
     const desktopNav = screen.getAllByRole("navigation")[0]!;
     // `textContent` picks up the NEW flag, which is a child of the link.
     expect([...desktopNav.querySelectorAll("a")].map((a) => a.textContent)).toEqual([
-      "Home", "Services", "Projects", "FurnitureNew", "Clients", "Blog", "About", "Contact",
+      "Home", "Architecture", "Services", "Projects", "FurnitureNew", "Clients", "About", "Contact",
     ]);
   });
 
@@ -25,7 +25,7 @@ describe("SiteHeader", () => {
 
   it("links to every route from spec §6", () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
-    for (const label of ["Home", "About", "Services", "Projects", "Clients", "Blog", "Contact"]) {
+    for (const label of ["Home", "About", "Services", "Projects", "Clients", "Architecture", "Contact"]) {
       expect(screen.getAllByRole("link", { name: label }).length).toBeGreaterThan(0);
     }
   });
@@ -52,6 +52,13 @@ describe("SiteHeader", () => {
   it("leaves WhatsApp to the floating button rather than the bar", () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
     expect(screen.queryByRole("link", { name: /Chat on WhatsApp/ })).not.toBeInTheDocument();
+  });
+
+  it("leads to architecture where the blog used to be", () => {
+    renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(screen.getAllByRole("link", { name: "Architecture" })[0])
+      .toHaveAttribute("href", "/en/services/architectural-design");
+    expect(screen.queryByRole("link", { name: "Blog" })).not.toBeInTheDocument();
   });
 
   it("carries the Home inn wordmark as the link home", () => {

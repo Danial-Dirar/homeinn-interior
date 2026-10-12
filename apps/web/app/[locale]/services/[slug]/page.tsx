@@ -7,7 +7,8 @@ import { Picture } from "@/components/media/picture";
 import { Blueprint } from "@/components/blueprint/blueprint";
 import { JsonLd } from "@/components/seo/json-ld";
 import { RichText } from "@/components/rich-text";
-import { getService, getServices } from "@/lib/content";
+import { ProjectCard } from "@/components/project-card";
+import { getProjects, getService, getServices } from "@/lib/content";
 import { text } from "@/lib/locale-text";
 import { largestSrc } from "@/lib/media";
 import { breadcrumbJsonLd, metadataFromSeo, pageMetadata } from "@/lib/seo";
@@ -59,6 +60,7 @@ export default async function ServiceDetailPage({
   if (!service) notFound();
 
   const services = await getServices();
+  const designs = DRAWN.has(slug) ? await getProjects("architectural-design") : [];
   const t = await getTranslations("services");
 
   return (
@@ -106,6 +108,19 @@ export default async function ServiceDetailPage({
             </div>
           </aside>
         </div>
+
+        {designs.length > 0 ? (
+          <section className="mt-24">
+            <h2 className="heading">{t("designs")}</h2>
+            <ul className="mt-6 grid gap-10 sm:grid-cols-2">
+              {designs.map((project) => (
+                <li key={project.id}>
+                  <ProjectCard locale={locale} project={project} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         {service.gallery.length > 0 ? (
           <section className="mt-24">

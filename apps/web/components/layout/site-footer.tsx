@@ -6,6 +6,17 @@ import { text } from "@/lib/locale-text";
 import { Wordmark } from "@/components/brand/wordmark";
 import { PhoneLines } from "./phone-lines";
 
+/** Same order as the header, minus Home. */
+const MENU = [
+  { href: "/services/architectural-design", key: "architecture" },
+  { href: "/services", key: "services" },
+  { href: "/projects", key: "projects" },
+  { href: "/furniture", key: "furniture" },
+  { href: "/clients", key: "clients" },
+  { href: "/about", key: "about" },
+  { href: "/contact", key: "contact" },
+] as const;
+
 const SOCIALS = [
   { key: "facebookUrl", label: "Facebook" },
   { key: "instagramUrl", label: "Instagram" },
@@ -38,10 +49,9 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
         <nav aria-label={nav("menu")} className="text-sm">
           <p className="eyebrow">{nav("menu")}</p>
           <ul className="mt-2 space-y-2">
-            {/* Same order as the header, minus Home. */}
-            {(["services", "projects", "furniture", "clients", "blog", "about", "contact"] as const).map((key) => (
-              <li key={key}>
-                <Link href={`/${key}`} className="hover:text-accent">{nav(key)}</Link>
+            {MENU.map((item) => (
+              <li key={item.key}>
+                <Link href={item.href} className="hover:text-accent">{nav(item.key)}</Link>
               </li>
             ))}
           </ul>

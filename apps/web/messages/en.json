@@ -29,6 +29,7 @@
     "language": "Language",
     "english": "English",
     "bangla": "বাংলা",
+    "architecture": "Architecture",
     "furniture": "Furniture",
     "new": "New",
     "lightsOn": "Lights on",
@@ -92,7 +93,8 @@
     "intro": "From the first drawing to the finished room, offered end to end.",
     "empty": "Services are being published. Please check back shortly.",
     "enquire": "Enquire about this service",
-    "gallery": "Gallery"
+    "gallery": "Gallery",
+    "designs": "Designs"
   },
   "projects": {
     "title": "Projects",

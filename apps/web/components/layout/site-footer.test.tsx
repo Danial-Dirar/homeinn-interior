@@ -42,6 +42,13 @@ describe("SiteFooter", () => {
     expect(container.querySelector("footer")).toHaveClass("ground-ink");
   });
 
+  it("lists architecture, not the blog, in its menu", () => {
+    renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
+    expect(screen.getByRole("link", { name: "Architecture" }))
+      .toHaveAttribute("href", "/en/services/architectural-design");
+    expect(screen.queryByRole("link", { name: "Blog" })).not.toBeInTheDocument();
+  });
+
   it("credits the established year", () => {
     renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
     expect(screen.getByText(/2015/)).toBeInTheDocument();
