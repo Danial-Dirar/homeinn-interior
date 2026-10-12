@@ -1777,3 +1777,34 @@ ingested.
 Verified: the hero-sync spec passes (10), the API typecheck is clean, the dev
 database has the 6 new segments, the web rebuild serves `data-theme="light"`,
 and the screenshots were checked by eye.
+
+### Committed and pushed — 2026-10-12
+
+| Commit | What |
+| --- | --- |
+| `2c7b473` | feat(api): drive the hero from a manifest of licensed stand-ins |
+| `61e9db2` | test(api): bring the seed e2e counts up to date |
+| `4dccfb4` | feat(web): rebrand as Home Inn with the new wordmark, palette and lights switch |
+| `ba88b0c` | docs: record the brand refresh, the themes and the second hero set |
+
+There are no co-author trailers; Muhammad is the only collaborator (checked
+with `git log | grep -ci co-authored` → 0).
+
+Two first attempts went wrong and were fixed before anything was pushed:
+
+- **A mis-staged commit.** A failed `git add` left the hero files staged, and
+  they landed inside the e2e commit. It was undone with `git reset --soft
+  HEAD~1` and redone as the two commits above.
+- **The push itself.** HTTPS has no credentials on this machine, `gh` is not
+  installed, and SSH (`~/.ssh/github-haifa`, which authenticates as
+  Danial-Dirar) works. The push therefore went to
+  `git@github.com:Danial-Dirar/homeinn-interior.git` directly, without changing
+  the `origin` URL, and `origin/main` was refreshed with a fetch.
+
+**GitHub was 13 commits behind before this.** Its main stopped at `a6041c0`
+(2026-08-09, the lead-form fix). Everything from the client logo wall through
+the admin design docs had never been pushed. The push was a fast-forward
+(`a6041c0..ba88b0c`, 17 commits), checked with `merge-base --is-ancestor`
+first. To make plain `git push` work next time, either set the remote to SSH
+(`git remote set-url origin git@github.com:Danial-Dirar/homeinn-interior.git`)
+or install `gh` — his call, not done here.
