@@ -13,6 +13,13 @@ const config: NextConfig = {
   images: { unoptimized: true },
   // @homeinn/ui ships TypeScript source rather than a build step.
   transpilePackages: ["@homeinn/ui"],
+  // The panel's address is /admins; the earlier design said /admin.
+  async redirects() {
+    return [
+      { source: "/admin", destination: "/admins", permanent: true },
+      { source: "/admin/:path*", destination: "/admins/:path*", permanent: true },
+    ];
+  },
 };
 
 export default withNextIntl(config);

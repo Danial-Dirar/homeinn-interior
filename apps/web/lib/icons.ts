@@ -18,6 +18,9 @@ const ICONS: Record<string, LucideIcon> = {
   "drafting-compass": DraftingCompass,
 };
 
+/** The names an editor can choose from for a service's icon. */
+export const ICON_NAMES = Object.keys(ICONS);
+
 export function iconFor(name: string): LucideIcon {
   return ICONS[name] ?? Sparkles;
 }
