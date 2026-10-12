@@ -2132,3 +2132,19 @@ panel build kora start korbo". The admin design was agreed on 2026-09-14
   current.
 - Two answers are still owed from Part 2: whether to merge the two
   overlapping services, and whether `/blog` should be removed entirely.
+
+---
+
+## Admin panel at `/admins` — 2026-10-13 — IN PROGRESS (built overnight)
+
+Muhammad, before going offline: build an admin panel where the Contact Us
+messages can be read, "and not only that, everything else too". It goes at
+`domain/admins`. The site stays as it is, with a few animations where they
+help, and anything left over gets polished. **Don't ask anything.**
+
+- **Spec:** `docs/superpowers/specs/2026-10-13-admin-panel-design.md`. It
+  builds all three phases of the 2026-09-14 admin spec together. Its rulings
+  are listed at the end of the spec.
+- **Branch:** `feat/admin-panel`.
+
+### Log
