@@ -43,13 +43,17 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
   // `bone`, and sand-on-bone is 1.18:1 — the nav would simply be invisible.
   // Even over the hero the bar keeps an ink scrim rather than going fully
   // transparent: legibility must not depend on what happens to be behind it.
+  // The cream scrim can be thinner than the ink one: charcoal on cream at 55%
+  // clears 4.5:1 over black, cream on ink needs 75% to clear it over white.
   const overHero = usePathname() === "/" && !scrolled;
 
   return (
     <header
       className={[
         "ground-ink ground-chrome fixed inset-x-0 top-0 z-50 text-sand transition-colors duration-300",
-        overHero ? "bg-ink/80 backdrop-blur-sm" : "bg-ink/95 backdrop-blur-sm",
+        overHero
+          ? "bg-ink/75 [[data-theme=light]_&]:bg-ink/55 backdrop-blur-md"
+          : "bg-ink/95 backdrop-blur-sm",
       ].join(" ")}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 sm:gap-6">

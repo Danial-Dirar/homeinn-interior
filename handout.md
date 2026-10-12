@@ -2092,3 +2092,43 @@ After the fixes:
 - **Web on :3100** was rebuilt with the LAN `.env` and restarted from this
   session.
 - **The second API on :4100**, used only for the browser checks, was stopped.
+
+---
+
+## A see-through header over the hero — 2026-10-13 — DONE
+
+Muhammad, pointing at the top bar on the home page: "eita transparent kore de
+ektu". The bar over the hero was an 80% scrim with a small blur. It is now:
+
+- **Light theme:** 55% cream with a 12px blur. Charcoal text on 55% cream
+  still clears 4.5:1 even over a black pixel of the photo.
+- **Dark theme:** 75% ink, also with a 12px blur. Cream text needs 75% to
+  clear 4.5:1 over a white pixel, so it can't go as thin as the light bar.
+- **Once scrolled**, or on any page other than home, the bar is unchanged:
+  95%.
+
+What changed:
+
+- `components/layout/site-header.tsx`: the light-theme value comes from the
+  variant `[[data-theme=light]_&]:bg-ink/55`, which outranks the 75% base.
+- `site-header.test.tsx`: new test "lets the hero show through, more on the
+  cream than on ink", which failed first and then passed.
+
+Checks:
+
+- Tests: web 301, typecheck and lint clean.
+- Rebuilt and restarted :3100. In the browser, the computed backgrounds were
+  `/ 0.55` in light and `/ 0.75` in dark, both `blur(12px)`.
+- Screenshots in both themes checked by eye.
+- axe on the home page found 0 violations in light and 0 in dark.
+
+### Next session
+
+**Build the admin panel.** Muhammad: "kalke shokale limit ashle amra admin
+panel build kora start korbo". The admin design was agreed on 2026-09-14
+(see "Admin shell and enquiries — design agreed" above). Before starting:
+
+- Restart the API on :4000 so the render tags appear. Its build is already
+  current.
+- Two answers are still owed from Part 2: whether to merge the two
+  overlapping services, and whether `/blog` should be removed entirely.

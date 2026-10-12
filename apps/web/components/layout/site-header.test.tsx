@@ -76,6 +76,15 @@ describe("SiteHeader", () => {
     expect(container.querySelector("header")).toHaveClass("ground-chrome");
   });
 
+  it("lets the hero show through, more on the cream than on ink", () => {
+    // Charcoal on cream at 55% still clears 4.5:1 over a black pixel of the
+    // photo; cream text on ink needs 75% to clear it over a white one.
+    const { container } = renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(container.querySelector("header")).toHaveClass(
+      "bg-ink/75", "[[data-theme=light]_&]:bg-ink/55", "backdrop-blur-md",
+    );
+  });
+
   it("offers the lights switch", () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
     expect(screen.getByRole("button", { name: "Lights off" })).toBeInTheDocument();
