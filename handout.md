@@ -2175,3 +2175,42 @@ help, and anything left over gets polished. **Don't ask anything.**
       when the email cannot be sent".
     - The e2e environment sets `LOGIN_THROTTLE_LIMIT=10000`, since every file
       logs in many times.
+- **Security review → fixed** (`fix(api): end sessions at once…`). A
+  background review of the accounts commit found two problems:
+  - When an admin reset someone's password or changed their role, that
+    person's sessions kept running.
+  - A deleted account's access token worked until it expired.
+
+  The fix:
+  - `AdminUser` gained `sessionsValidAfter`. Migration:
+    `20261012210916_admin_sessions_valid_after`, applied to the dev and test
+    databases.
+  - Resetting a password, changing a role or changing your own password sets
+    it and revokes the refresh tokens.
+  - `JwtGuard` now reads the account on every request. It refuses tokens
+    issued before the cut-off and accounts that no longer exist, and takes the
+    role from the database. To compare to the millisecond, access tokens carry
+    `iatMs`.
+  - Three tests were written first and seen to fail.
+- **API: content writes and the admin read surface**
+  (`feat(api): write routes for furniture…`):
+  - **Write routes:** `/products`, `/client-logos`, `/clients/corporate` and
+    `/clients/residential`.
+  - **Clearable fields:** optional values can be cleared with `null`.
+    Settings links take `""`.
+  - **Project location** may be empty.
+  - **Admin reads:** `GET /api/admin/summary`, `/api/admin/:resource` and
+    `/:resource/:id`. These live in `src/admin/` and are driven by one
+    registry of twelve resources.
+  - **Tests:** `test/content-admin.e2e-spec.ts`, 17 tests.
+- **Instant updates** (`feat: refresh the site the moment…`):
+  - **API:** `src/revalidate/revalidate.ts` is a global interceptor. It maps
+    each write route to cache tags and posts them to the web app.
+  - **Web:** `app/api/revalidate/route.ts` takes the request. It accepts only
+    known tags and compares the secret in constant time.
+  - **Configuration:** set `REVALIDATE_SECRET` on both apps and
+    `WEB_REVALIDATE_URL` on the API.
+- **`pnpm admin:password <email>`** (`apps/api/scripts/admin-password.ts`):
+  - Reads the new password from `ADMIN_NEW_PASSWORD`.
+  - `--create "Name"` makes a new admin.
+  - It ends that account's sessions.
