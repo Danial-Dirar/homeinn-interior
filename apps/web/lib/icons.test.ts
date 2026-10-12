@@ -6,7 +6,7 @@ describe("iconFor", () => {
   it("maps every icon name the seed uses", () => {
     // apps/api/prisma/seed-data/services.ts — these seven, exactly.
     // lucide icons are forwardRef components, so they are objects, not functions.
-    for (const name of ["sofa", "paintbrush", "building", "ruler", "box", "blinds", "cooking-pot"]) {
+    for (const name of ["sofa", "paintbrush", "building", "ruler", "box", "blinds", "cooking-pot", "drafting-compass"]) {
       expect(iconFor(name)).toBeDefined();
       expect(iconFor(name)).not.toBe(iconFor("not-a-real-icon"));
     }

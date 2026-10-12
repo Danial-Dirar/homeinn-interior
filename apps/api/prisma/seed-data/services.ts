@@ -1,7 +1,8 @@
 /**
- * The company profile's services (spec §2). Six rows, not the profile's
- * seven: its 2D and 3D entries are merged into one — see the note below. Titles are the
- * profile's own wording; Bangla is a translation.
+ * The company profile's services (spec §2). Seven rows: the profile's seven with
+ * its 2D and 3D entries merged (see the note below), plus Architectural Design,
+ * added 2026-10-12. Titles are the profile's own wording except those two;
+ * Bangla is a translation.
  *
  * The summaries and bodies restate the service name and nothing more — the profile
  * PDF's descriptive copy is not in this repository, so no capability, timeline, or
@@ -10,6 +11,21 @@
  * document is available.
  */
 export const services = [
+  // Added 2026-10-12 at Muhammad's instruction: Home Inn now "does everything
+  // starting from architecture design". Not from the 2026 profile. The copy
+  // claims only what the company's own drawings and renders show.
+  {
+    slug: "architectural-design",
+    titleEn: "Architectural Design",
+    titleBn: "স্থাপত্য নকশা",
+    summaryEn: "Buildings designed from the plot up: measured floor plans and 3D views before anything is built.",
+    summaryBn: "জমি থেকে শুরু করে ভবনের নকশা: নির্মাণের আগেই মাপসহ ফ্লোর প্ল্যান ও ৩ডি ভিউ।",
+    bodyEn: "<p>Home Inn designs buildings as well as the spaces inside them. A design is worked out in measured floor plans, then modelled and rendered in 3D, so the house can be seen and changed before construction starts.</p>",
+    bodyBn: "<p>হোম ইন ভবনের ভেতরের জায়গার পাশাপাশি ভবনেরও নকশা করে। মাপসহ ফ্লোর প্ল্যানে নকশা তৈরি হয়, তারপর ৩ডি-তে মডেল ও রেন্ডার করা হয়, যাতে নির্মাণ শুরুর আগেই বাড়িটি দেখা ও বদলানো যায়।</p>",
+    icon: "drafting-compass",
+    sortOrder: 0,
+    published: true,
+  },
   {
     slug: "home-furniture-office-furniture-supply-customized-design",
     titleEn: "Home Furniture & Office Furniture Supply (Customized Design)",
@@ -19,7 +35,7 @@ export const services = [
     bodyEn: "<p>Home Inn supplies home and office furniture to customised designs.</p>",
     bodyBn: "<p>হোম ইন কাস্টমাইজড ডিজাইনে বাসা ও অফিসের ফার্নিচার সরবরাহ করে।</p>",
     icon: "sofa",
-    sortOrder: 0,
+    sortOrder: 1,
     published: true,
   },
   {
@@ -31,7 +47,7 @@ export const services = [
     bodyEn: "<p>Home Inn designs interiors and implements them on site.</p>",
     bodyBn: "<p>হোম ইন ইন্টেরিয়র ডিজাইন করে এবং সাইটে তা বাস্তবায়ন করে।</p>",
     icon: "paintbrush",
-    sortOrder: 1,
+    sortOrder: 2,
     published: true,
   },
   {
@@ -43,7 +59,7 @@ export const services = [
     bodyEn: "<p>Home Inn designs exteriors and implements them on site.</p>",
     bodyBn: "<p>হোম ইন এক্সটেরিয়র ডিজাইন করে এবং সাইটে তা বাস্তবায়ন করে।</p>",
     icon: "building",
-    sortOrder: 2,
+    sortOrder: 3,
     published: true,
   },
   // The profile lists "2D Plan & Solution" and "3D Model & Visualization" as
@@ -59,7 +75,7 @@ export const services = [
     bodyEn: "<p>Home Inn prepares 2D plans and layout solutions, and produces 3D models and visualisations of the proposed space.</p>",
     bodyBn: "<p>হোম ইন ২ডি প্ল্যান ও লেআউট সমাধান তৈরি করে, এবং প্রস্তাবিত স্পেসের ৩ডি মডেল ও ভিজ্যুয়ালাইজেশন করে।</p>",
     icon: "ruler",
-    sortOrder: 3,
+    sortOrder: 4,
     published: true,
   },
   {
@@ -71,7 +87,7 @@ export const services = [
     bodyEn: "<p>Home Inn implements all Thai work.</p>",
     bodyBn: "<p>হোম ইন সকল থাই ওয়ার্ক বাস্তবায়ন করে।</p>",
     icon: "blinds",
-    sortOrder: 4,
+    sortOrder: 5,
     published: true,
   },
   {
@@ -83,7 +99,7 @@ export const services = [
     bodyEn: "<p>Home Inn supplies kitchen accessories, bathroom accessories, and other home appliance items.</p>",
     bodyBn: "<p>হোম ইন কিচেন আনুষাঙ্গিক, বাথরুম আনুষাঙ্গিক ও অন্যান্য হোম অ্যাপ্লায়েন্স সামগ্রী সরবরাহ করে।</p>",
     icon: "cooking-pot",
-    sortOrder: 5,
+    sortOrder: 6,
     published: true,
   },
 ];

@@ -17,15 +17,22 @@ afterAll(async () => {
 });
 
 describe("seed data", () => {
-  // The profile lists 7; its "2D Plan & Solution" and "3D Model & Visualization"
-  // were merged into one on 2026-08-10 (see seed-data/services.ts).
-  it("creates the 6 services: the profile's 7 with 2D and 3D merged", async () => {
-    expect(await prisma.service.count()).toBe(6);
+  // The profile lists 7; its 2D and 3D entries were merged (2026-08-10) and
+  // Architectural Design was added (2026-10-12).
+  it("creates 7 services: the profile's 7 with 2D and 3D merged, plus architectural design", async () => {
+    expect(await prisma.service.count()).toBe(7);
   });
 
-  // The profile's 9, plus `factory-works` added on 2026-08-09 for the archive.
-  it("creates the 10 working areas: the profile's 9 plus factory works", async () => {
-    expect(await prisma.workingArea.count()).toBe(10);
+  // The profile's 9, plus factory-works (2026-08-09) and architectural-design (2026-10-12).
+  it("creates 11 working areas", async () => {
+    expect(await prisma.workingArea.count()).toBe(11);
+  });
+
+  it("puts architectural design first in both lists", async () => {
+    const [service] = await prisma.service.findMany({ orderBy: { sortOrder: "asc" }, take: 1 });
+    const [area] = await prisma.workingArea.findMany({ orderBy: { sortOrder: "asc" }, take: 1 });
+    expect(service?.slug).toBe("architectural-design");
+    expect(area?.slug).toBe("architectural-design");
   });
 
   it("translates every working area rather than repeating the English", async () => {
@@ -34,7 +41,7 @@ describe("seed data", () => {
   });
 
   it("publishes the services so the public list is not empty", async () => {
-    expect(await prisma.service.count({ where: { published: true } })).toBe(6);
+    expect(await prisma.service.count({ where: { published: true } })).toBe(7);
   });
 
   it("creates the 3 credentials from the profile", async () => {
