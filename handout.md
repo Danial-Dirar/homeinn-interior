@@ -1808,3 +1808,30 @@ the admin design docs had never been pushed. The push was a fast-forward
 first. To make plain `git push` work next time, either set the remote to SSH
 (`git remote set-url origin git@github.com:Danial-Dirar/homeinn-interior.git`)
 or install `gh` — his call, not done here.
+
+---
+
+## Part 2 — Architecture remodel — 2026-10-12 — STARTED (design stage, nothing built)
+
+Home Inn now does "everything starting from architecture design". The site
+still introduces itself as interiors and furniture. Part 2 repositions it and
+shows the architecture work. It is following the brainstorming path:
+understand, ask, propose, spec, plan, build.
+
+### What the company's own material contains
+
+From `/mnt/shinrinyoku/Home Inn/PDF References/` (the `ignore/` folder was
+left alone):
+
+| Folder | What it is | Usable on the site? |
+| --- | --- | --- |
+| `Renders 2/` | one project: a modern two-storey villa with a brick jali facade. 20 renders at 1920×1080 — gate views ×4, aerials ×6, front elevation, interiors ×5 (stair, dining, living, bedroom), cutaway floor views ×4 | yes, if confirmed as Home Inn's work. 1920 wide clears both the hero and the project minimum |
+| `16.09/` | a second project: a classical two-storey villa with a rooftop pool. Exteriors ×8, cutaways ×7, interiors ×3 at 1920×1080. Also `output_0*` (AI-enhanced, sea backdrops, 1024px), `80eeb4…~mv2.jpeg` (a Wix-hosted file, probably downloaded), and `Reference/` (other people's villas from Facebook) | the 1920 renders, if confirmed; not the AI outputs, the Wix file or `Reference/` |
+| `Drawings/` | A3 PDFs — cover sheet, ground floor (A.02) and first floor (A.03) plans, 2,614 sq ft surface area, with garage, dining, living, beds and terraces | yes, as a floor-plan image. Which project it belongs to is unknown |
+| `Variations/` | PromeAI variations (watermarked) and SketchUp "try" studies of a third, modern duplex, at 600–1300px | no — AI output, and too small |
+| `Photo References/` | Pinterest-style inspiration (South Asian contemporary: terracotta, sage, jali, courtyards) | mood only; not ours to publish |
+
+### Open questions
+
+The first, asked on 2026-10-12: which of these folders are Home Inn's own
+work. Nothing about them can be published until that is answered.
