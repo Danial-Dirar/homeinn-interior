@@ -2148,3 +2148,30 @@ help, and anything left over gets polished. **Don't ask anything.**
 - **Branch:** `feat/admin-panel`.
 
 ### Log
+- **API: accounts, inbox, media** (`feat(api): throttle login…`):
+  - **Accounts:**
+    - **Login throttle:** 10 attempts per 15 minutes per IP, with
+      `LOGIN_THROTTLE_LIMIT` to override.
+    - **`trust proxy`** is set to `TRUST_PROXY ?? "loopback"` in `main.ts`.
+    - **Changing your own password:** `POST /auth/password`.
+    - **Account management:** `/users` lets an admin list, create, edit and
+      delete accounts. Deleting yourself, or deleting or demoting the last
+      admin, is refused.
+  - **Leads:**
+    - The list takes a `?status=` filter and includes the service.
+    - New routes: `GET /leads/:id`, and `DELETE /leads/:id` for admins only.
+    - **Email on a new lead** (`src/leads/lead-notifier.ts`, with nodemailer)
+      is off until `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` and
+      `LEAD_NOTIFY_TO` are set. It is never awaited.
+  - **Media:** `PATCH /media/:id` corrects alt text, and `GET /media?q=`
+    searches it.
+  - **Shared types:** `changePasswordSchema`, `createUserSchema`,
+    `updateUserSchema`, `leadListQuerySchema` and `mediaListQuerySchema`.
+  - **Tests:**
+    - `test/auth-throttle.e2e-spec.ts`: the eleventh login gets a 429.
+    - `test/accounts.e2e-spec.ts`: 12 tests.
+    - `test/inbox.e2e-spec.ts`: 10 tests.
+    - `src/leads/*.spec.ts`: 4 tests, including "still saves the enquiry
+      when the email cannot be sent".
+    - The e2e environment sets `LOGIN_THROTTLE_LIMIT=10000`, since every file
+      logs in many times.
