@@ -1835,3 +1835,59 @@ left alone):
 
 The first, asked on 2026-10-12: which of these folders are Home Inn's own
 work. Nothing about them can be published until that is answered.
+
+### Answers so far, and where Part 2 stands — 2026-10-12 (end of session)
+
+Muhammad's answers:
+
+- **Everything in `PDF References/` is Home Inn's own work and may be shown**,
+  wherever it fits — the Variations included. Removing the PromeAI watermark is
+  fine by him.
+  - Still to be excluded: `16.09/Reference/` (other people's villas from
+    Facebook, by the folder's own name).
+  - The PromeAI free tier may require the watermark; worth confirming his plan
+    before removing it.
+- **Hero: leave it as it is.** He likes the current six photos and is not sure
+  a render would look as good there. The renders go **elsewhere, probably
+  Projects**.
+- He would like **blueprints and design drawings scattered through the site**
+  ("eidik odik"), **perhaps animated**. Later.
+- Villa names, locations and years; which project the floor plan belongs to;
+  and whether to build a "Plan → Model → Render" process section on the home
+  page — all **deferred**: "save it all in the handout, ask me later".
+
+### To do next session, in order
+
+1. **Ask what was deferred**: the names, locations and years of the two
+   villas (or agree descriptive titles); which project the floor-plan PDF
+   (2,614 sq ft) belongs to; and the "Plan → Model → Render" section.
+2. **Propose the Part 2 design and get it approved** (brainstorming → spec →
+   plan):
+   - positioning copy in en/bn — "architecture to interiors"; and fix the
+     stale "Nine kinds of project", since there are now 10 working areas
+   - an Architectural Design service, first in the list
+   - an Architectural Design working area for design-stage projects
+   - the brick-jali villa (`Renders 2/`) and the rooftop-pool villa (`16.09/`)
+     as projects. Import them through a manifest seed, like the hero, with alt
+     text saying "3D render", so a design is never presented as a built
+     photograph
+   - the Variations duplex, if it fits — watermark removed, though most
+     Variations files are under 700px wide
+   - blueprints / drawings placed around the site, possibly animated (for
+     example a line-drawing reveal); PDF to image with `pdftoppm`
+3. Then the read-through list that is still open: findings 4 (Bangla-digit
+   phone input), 5 (`/furniture` missing from the sitemap), 9 (furniture
+   detail `<dl>`), 10 (bn alt text and digits), 11 (furniture prices are
+   placeholders), 12 (stale checklist rows), 14 (login throttle, seeded admin
+   password, provisional project titles). Findings 1–3 and 6–8 were fixed
+   today; 13 is answered by this file.
+
+### Running state when the session ended
+
+- The web server on :3100, started from this session, was **stopped**.
+  Restart it with the LAN values:
+  `set -a; . ./.env; set +a; PORT=3100 pnpm --filter @homeinn/web start`.
+  The build in `apps/web/.next` is current.
+- The API on :4000 and Postgres on 5433 were left as they were. Muhammad
+  started both earlier.
+- Everything is committed and pushed. GitHub `main` matches local.
