@@ -19,7 +19,14 @@ export const createLeadSchema = z.object({
   email: z.string().trim().toLowerCase().email().optional(),
   message: z.string().trim().max(4000).optional(),
   serviceId: z.string().cuid().optional(),
-  sourcePath: z.string().max(300).optional(),
+  // A path on this site ("/bn/contact"). The admin inbox shows it as a link, so
+  // anything else — a javascript: URL, another site, a protocol-relative
+  // "//host" or "/\\host" — is refused here rather than trusted there.
+  sourcePath: z
+    .string()
+    .max(300)
+    .refine((path) => /^\/(?![/\\])/.test(path), { message: "Must be a path on this site" })
+    .optional(),
   locale: localeSchema,
 });
 export type CreateLeadInput = z.infer<typeof createLeadSchema>;

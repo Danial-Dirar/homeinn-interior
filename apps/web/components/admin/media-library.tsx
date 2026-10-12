@@ -46,7 +46,7 @@ export function MediaLibrary() {
   async function remove(media: MediaView) {
     if (!window.confirm("Delete this image from the library? This cannot be undone.")) return;
     try {
-      await adminSend("DELETE", `/media/${media.id}`);
+      await adminSend("DELETE", `/media/${encodeURIComponent(media.id)}`);
       setItems((list) => (list ?? []).filter((m) => m.id !== media.id));
       setTotal((t) => t - 1);
       setEditing(null);
@@ -121,7 +121,7 @@ function AltEditor({ media, canDelete, onSaved, onDelete }: {
     event.preventDefault();
     setBusy(true);
     try {
-      const saved = await adminSend<MediaView>("PATCH", `/media/${media.id}`, { altEn: altEn.trim(), altBn: altBn.trim() });
+      const saved = await adminSend<MediaView>("PATCH", `/media/${encodeURIComponent(media.id)}`, { altEn: altEn.trim(), altBn: altBn.trim() });
       onSaved(saved);
       setMessage({ tone: "success", text: "Saved." });
     } catch (e) {

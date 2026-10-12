@@ -31,6 +31,15 @@ describe("createLeadSchema", () => {
     expect(() => createLeadSchema.parse({ ...base, email: "nope" })).toThrow();
   });
 
+  it("accepts only a path on this site as the page an enquiry came from", () => {
+    // It is shown as a link in the admin inbox; a javascript: or off-site URL
+    // there would run or open whatever a visitor typed.
+    expect(createLeadSchema.parse({ ...base, sourcePath: "/bn/contact" }).sourcePath).toBe("/bn/contact");
+    for (const bad of ["javascript:alert(1)", "https://evil.example/", "//evil.example/x", "contact"]) {
+      expect(() => createLeadSchema.parse({ ...base, sourcePath: bad }), bad).toThrow();
+    }
+  });
+
   it("rejects an unknown lead type", () => {
     expect(() => createLeadSchema.parse({ ...base, type: "SPAM" })).toThrow();
   });

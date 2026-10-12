@@ -61,7 +61,7 @@ export function UsersAdmin() {
   async function update(account: Account, change: Partial<Pick<Account, "role">> & { password?: string }) {
     setMessage(null);
     try {
-      const saved = await adminSend<Account>("PATCH", `/users/${account.id}`, change);
+      const saved = await adminSend<Account>("PATCH", `/users/${encodeURIComponent(account.id)}`, change);
       setAccounts((list) => (list ?? []).map((a) => (a.id === account.id ? saved : a)));
       setMessage({
         tone: "success",
@@ -85,7 +85,7 @@ export function UsersAdmin() {
   async function remove(account: Account) {
     if (!window.confirm(`Remove ${account.name}'s account? They will be signed out at once.`)) return;
     try {
-      await adminSend("DELETE", `/users/${account.id}`);
+      await adminSend("DELETE", `/users/${encodeURIComponent(account.id)}`);
       setAccounts((list) => (list ?? []).filter((a) => a.id !== account.id));
     } catch (e) {
       setMessage({ tone: "error", text: (e as Error).message });

@@ -11,7 +11,15 @@ import { whatsappHref } from "@/lib/whatsapp";
 import { useAdmin } from "./admin-context";
 import { Badge, controlClass, FieldShell, fullDate, Loading, Notice, PageHeader, Panel } from "./ui";
 
+/** Only a path on this site becomes a link; anything else is shown as text. */
+function isLocalPath(path: string): boolean {
+  return /^\/(?![/\\])/.test(path);
+}
+
 export function EnquiryDetail({ id }: { id: string }) {
+  // The id comes from the address bar; encoded, a crafted "../users/x" stays
+  // inside /leads/ instead of reaching another route.
+  const leadPath = `/leads/${encodeURIComponent(id)}`;
   const router = useRouter();
   const { user } = useAdmin();
   const [lead, setLead] = useState<AdminLead | null>(null);
@@ -22,7 +30,7 @@ export function EnquiryDetail({ id }: { id: string }) {
 
   useEffect(() => {
     let live = true;
-    adminGet<AdminLead>(`/leads/${id}`)
+    adminGet<AdminLead>(leadPath)
       .then((row) => {
         if (!live) return;
         setLead(row);
@@ -33,14 +41,14 @@ export function EnquiryDetail({ id }: { id: string }) {
     return () => {
       live = false;
     };
-  }, [id]);
+  }, [leadPath]);
 
   async function save(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setMessage(null);
     try {
-      const saved = await adminSend<AdminLead>("PATCH", `/leads/${id}`, { status, internalNotes: notes });
+      const saved = await adminSend<AdminLead>("PATCH", leadPath, { status, internalNotes: notes });
       setLead((current) => (current ? { ...current, ...saved } : saved));
       setMessage({ tone: "success", text: "Saved." });
     } catch (e) {
@@ -53,7 +61,7 @@ export function EnquiryDetail({ id }: { id: string }) {
   async function remove() {
     if (!window.confirm("Delete this enquiry for good? Use this for spam and test messages only.")) return;
     try {
-      await adminSend("DELETE", `/leads/${id}`);
+      await adminSend("DELETE", leadPath);
       router.push("/admins/enquiries");
     } catch (e) {
       setMessage({ tone: "error", text: (e as Error).message });
@@ -134,7 +142,9 @@ export function EnquiryDetail({ id }: { id: string }) {
               <dt className="text-ink/65">Language</dt><dd>{lead.locale === "bn" ? "Bangla" : "English"}</dd>
               <dt className="text-ink/65">Page</dt>
               <dd className="break-all">
-                {lead.sourcePath ? <a href={lead.sourcePath} target="_blank" rel="noreferrer" className="underline underline-offset-4">{lead.sourcePath}</a> : "Unknown"}
+                {!lead.sourcePath ? "Unknown" : isLocalPath(lead.sourcePath) ? (
+                  <a href={lead.sourcePath} target="_blank" rel="noreferrer" className="underline underline-offset-4">{lead.sourcePath}</a>
+                ) : <span>{lead.sourcePath}</span>}
               </dd>
             </dl>
           </Panel>

@@ -47,4 +47,23 @@ describe("EnquiryDetail", () => {
     });
     expect(await screen.findByRole("status")).toHaveTextContent("Saved");
   });
+
+  it("never turns a stored page address into a link unless it is a path on this site", async () => {
+    // sourcePath comes from an anonymous form; an older row could hold anything.
+    adminGet.mockResolvedValue({ ...lead, sourcePath: "javascript:alert(document.cookie)" });
+    render(<EnquiryDetail id="l1" />);
+    expect(await screen.findByText("javascript:alert(document.cookie)")).not.toHaveAttribute("href");
+    expect(screen.queryByRole("link", { name: /javascript:/ })).not.toBeInTheDocument();
+  });
+
+  it("keeps a crafted id inside the enquiry's own address", async () => {
+    // A link to /admins/enquiries/..%2Fusers%2Fx must not make "Delete enquiry"
+    // delete an account.
+    vi.stubGlobal("confirm", () => true);
+    render(<EnquiryDetail id="../users/x" />);
+    await screen.findByText(/Please call after 5pm\./);
+    expect(adminGet).toHaveBeenCalledWith("/leads/..%2Fusers%2Fx");
+    await userEvent.click(screen.getByRole("button", { name: "Delete enquiry" }));
+    expect(adminSend).toHaveBeenCalledWith("DELETE", "/leads/..%2Fusers%2Fx");
+  });
 });

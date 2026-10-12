@@ -40,11 +40,13 @@ export function ResourceForm({ resource, id, justCreated = false }: {
     justCreated ? { tone: "success", text: `The ${resource.singular} was created. You can keep editing it here.` } : null,
   );
   const [busy, setBusy] = useState(false);
+  // The id comes from the address bar; encoded, it cannot step out of its route.
+  const safeId = id ? encodeURIComponent(id) : undefined;
 
   useEffect(() => {
-    if (!id) return;
+    if (!safeId) return;
     let live = true;
-    adminGet<AdminRow>(`/admin/${resource.name}/${id}`)
+    adminGet<AdminRow>(`/admin/${resource.name}/${safeId}`)
       .then((loaded) => {
         if (!live) return;
         setRow(loaded);
@@ -54,7 +56,7 @@ export function ResourceForm({ resource, id, justCreated = false }: {
     return () => {
       live = false;
     };
-  }, [id, resource]);
+  }, [safeId, resource]);
 
   function change(key: string, value: unknown) {
     setValues((current) => ({ ...current, [key]: value }));
@@ -79,8 +81,8 @@ export function ResourceForm({ resource, id, justCreated = false }: {
     setMessage(null);
     try {
       const payload = toPayload(resource.fields, values);
-      if (id) {
-        await adminSend("PATCH", `${resource.writePath}/${id}`, payload);
+      if (safeId) {
+        await adminSend("PATCH", `${resource.writePath}/${safeId}`, payload);
         setMessage({ tone: "success", text: "Saved. The site shows the change within moments." });
       } else {
         const created = await adminSend<{ id: string }>("POST", resource.writePath, payload);
@@ -98,9 +100,9 @@ export function ResourceForm({ resource, id, justCreated = false }: {
   }
 
   async function remove() {
-    if (!id || !window.confirm(`Delete this ${resource.singular}? This cannot be undone.`)) return;
+    if (!safeId || !window.confirm(`Delete this ${resource.singular}? This cannot be undone.`)) return;
     try {
-      await adminSend("DELETE", `${resource.writePath}/${id}`);
+      await adminSend("DELETE", `${resource.writePath}/${safeId}`);
       router.push(`/admins/${resource.name}`);
     } catch (e) {
       setMessage({ tone: "error", text: (e as Error).message });

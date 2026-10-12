@@ -82,4 +82,14 @@ describe("ResourceForm", () => {
     await userEvent.click(screen.getByRole("button", { name: "Create working area" }));
     expect(await screen.findByText("String must contain at least 1 character(s)")).toBeInTheDocument();
   });
+
+  it("keeps a crafted id inside the resource's own address", async () => {
+    adminGet.mockResolvedValue({ id: "x", nameEn: "A", nameBn: "ক", sortOrder: 0 });
+    adminSend.mockResolvedValue({ id: "x" });
+    render(<ResourceForm resource={areas} id="../../users/x" />);
+    await screen.findByDisplayValue("A");
+    expect(adminGet).toHaveBeenCalledWith("/admin/working-areas/..%2F..%2Fusers%2Fx");
+    await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(adminSend).toHaveBeenCalledWith("PATCH", "/working-areas/..%2F..%2Fusers%2Fx", expect.anything());
+  });
 });
