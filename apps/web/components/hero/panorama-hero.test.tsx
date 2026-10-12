@@ -102,7 +102,7 @@ describe("PanoramaHero", () => {
 
   it("renders a text-only hero when no segments have been published yet", () => {
     renderWithIntl(<PanoramaHero segments={[]} locale="en" />);
-    expect(screen.getByText("Interiors built to be lived in")).toBeInTheDocument();
+    expect(screen.getByText("Architecture and interiors, built to be lived in")).toBeInTheDocument();
     expect(screen.queryAllByRole("img")).toHaveLength(0);
   });
 

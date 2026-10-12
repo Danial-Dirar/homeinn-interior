@@ -32,6 +32,23 @@ describe("message catalogues", () => {
     expect(halfTranslated).toEqual([]);
   });
 
+  it("states no count that can go stale in titles that list things", () => {
+    // "Nine kinds" went stale the day a tenth working area was added, and
+    // "Six ways" the day a seventh service was. These lines describe the list
+    // without counting it.
+    const keys = ["home.areasTitle", "home.servicesTitle", "services.intro"];
+    const english = /\d|\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/i;
+    const bangla = /[০-৯]|(?:^|\s)(এক|দুই|তিন|চার|পাঁচ|ছয়|সাত|আট|নয়|দশ|এগারো|বারো)(?:টি)?(?=\s|$|[,।—])/;
+    const counted = keys.filter((key) => english.test(flatEn[key] ?? "") || bangla.test(flatBn[key] ?? ""));
+    expect(counted).toEqual([]);
+  });
+
+  it("introduces the company as architecture as well as interiors", () => {
+    expect(flatEn["home.statementTitle"]).toMatch(/^Architecture/);
+    expect(flatBn["home.statementTitle"]).toMatch(/^স্থাপত্য/);
+    expect(flatEn["seo.defaultTitle"]).toMatch(/Architecture/);
+  });
+
   it("never use the retired brand name", () => {
     // The company is "Home Inn" now; "Interior Solution" went with the move
     // into architecture, in both languages.
