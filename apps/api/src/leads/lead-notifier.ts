@@ -28,8 +28,17 @@ const TYPE_LABEL: Record<string, string> = {
   CONTACT: "Contact", CONSULTATION: "Consultation", QUOTE: "Quote",
 };
 
+/**
+ * Every character some mail client treats as the end of a line: \n and \r,
+ * vertical tab, form feed, NEL and the Unicode line and paragraph separators.
+ */
+const LINE_BREAK = /\r\n|[\n\r\u000b\u000c\u0085\u2028\u2029]/;
+/** Other control characters, which have no business in an email body. */
+const CONTROL = /[\u0000-\u0008\u000e-\u001f\u007f-\u0084\u0086-\u009f]/g;
+
 /** One line of a visitor's own words: no line breaks to add lines of their own. */
-const oneLine = (value: string) => value.replace(/\s+/g, " ").trim();
+const oneLine = (value: string) =>
+  value.split(LINE_BREAK).join(" ").replace(CONTROL, "").replace(/\s+/g, " ").trim();
 
 /**
  * The visitor wrote the name and the message, so neither may pass for our
@@ -51,7 +60,9 @@ export function emailForLead(lead: NotifiableLead, siteUrl: string) {
     lead.sourcePath ? `Page:     ${lead.sourcePath}` : null,
     "",
     "Their message:",
-    ...(message ? message.split(/\r?\n/).map((line) => `> ${line}`) : ["> (No message.)"]),
+    ...(message
+      ? message.split(LINE_BREAK).map((line) => `> ${line.replace(CONTROL, "")}`)
+      : ["> (No message.)"]),
   ];
   return {
     subject: `New enquiry: ${name} (${TYPE_LABEL[lead.type] ?? lead.type})`,
