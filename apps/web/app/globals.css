@@ -4,19 +4,33 @@
 @source "../../../packages/ui/src";
 
 @theme {
-  /* Spec §8 — these nine values, verbatim. `brand` is CTA, active nav, focus
-     ring and section numerals only; it is never a background wash. */
-  --color-ink: #0B0B0C;
-  --color-ink-raised: #141416;
-  --color-ink-line: #232326;
-  --color-bone: #F6F2EC;
+  /* Taken from the cream Home Inn logo (assets/): charcoal, cream and burnt
+     orange. The dark cover's amber was dropped at Muhammad's call. No accent
+     is a background wash: CTA, active nav, focus ring, section numerals.
+     - `logo`  the mark's exact orange, for the wordmark's "inn" only
+     - `brand` that orange deepened to pass AA as small text on cream (4.73:1)
+     - `ember` that orange lifted to pass AA as small text on charcoal (5.11:1) */
+  --color-ink: #14181A;
+  --color-ink-raised: #1D2225;
+  --color-ink-line: #2B3135;
+  --color-bone: #F3EDE2;
   --color-sand: #E7DFD2;
   --color-sand-dim: #9C948A;
   --color-walnut: #7A5537;
-  --color-amber: #C9A227;
-  --color-brand: #E01B24;
+  --color-brand: #AE4B0B;
+  --color-ember: #D86A27;
+  --color-logo: #B9500C;
 
-  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  /* The accent for whatever ground an element sits on. Brand is 3.24:1 on
+     charcoal and ember 3.00:1 on cream, so neither serves both: light is the
+     default, and `.ground-ink` switches a dark subtree to ember. Components
+     say `text-accent` and never need to know the ground. */
+  --color-accent: var(--color-brand);
+
+  /* Righteous is the logo's face and has no Bangla glyphs; Anek sits right
+     behind it so a bn heading takes Anek for Bangla and Righteous for Latin.
+     `--font-amp` covers the ampersand only — see lib/fonts.ts. */
+  --font-display: var(--font-amp), var(--font-righteous), var(--font-anek), "Noto Sans Bengali", system-ui, sans-serif;
   --font-sans: var(--font-geist), system-ui, -apple-system, sans-serif;
   --font-bangla: var(--font-anek), "Noto Sans Bengali", system-ui, sans-serif;
 
@@ -27,8 +41,8 @@
     to { transform: translateX(-100%); }
   }
 
-  /* The NEW flag. Fades rather than hard-blinks — a hard on/off next to
-     Fraunces reads as a broken image, and a slow pulse still catches the eye. */
+  /* The NEW flag. Fades rather than hard-blinks — a hard on/off reads as a
+     broken image, and a slow pulse still catches the eye. */
   --animate-flag-pulse: flag-pulse 1.6s ease-in-out infinite;
 
   @keyframes flag-pulse {
@@ -60,7 +74,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-brand);
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
 
@@ -91,7 +105,8 @@
     font-family: var(--font-display);
     font-size: calc(var(--type-scale) * clamp(1.25rem, 2vw, 1.6rem));
     line-height: calc(var(--heading-leading) + 0.12);
-    font-weight: 500;
+    /* Righteous ships a single weight; 500 would invite a synthetic bold. */
+    font-weight: 400;
   }
 
   .eyebrow {
@@ -106,16 +121,49 @@
     letter-spacing: 0.04em;
   }
 
-  /* Spec §8 names section numerals as one of the four sanctioned uses of brand. */
+  /* A dark ground. Anything inside it accents in ember rather than brand —
+     see `--color-accent`. */
+  .ground-ink {
+    --color-accent: var(--color-ember);
+  }
+
+  /* A large accent numeral — only the 404 page uses it now. Sections are no
+     longer numbered (see components/sections/section.tsx). */
   .section-numeral {
     font-family: var(--font-display);
-    /* Fixed at 24px, deliberately outside --type-scale: brand is 4.32:1 on
-       bone and 4.07:1 on ink, which clears the 3:1 large-text threshold but
-       not the 4.5:1 small-text one. Scaling it to 0.94 for Bangla would drop
-       it to 22.56px and fail. A numeral needs no optical adjustment anyway. */
+    /* Fixed at 24px, outside --type-scale: a numeral needs no optical
+       adjustment for Bangla, and 24px keeps it in large-text territory. */
     font-size: 1.5rem;
     line-height: 1;
-    color: var(--color-brand);
+    color: var(--color-accent);
     letter-spacing: 0.02em;
   }
+}
+
+/* ---------- The light theme ----------
+
+   `<html data-theme="light">`, set by the lamp in the header. The site opens
+   dark; this turns every dark ground into paper by swapping the tokens on the
+   ground itself — `bg-ink` becomes the paper and `text-sand` / `text-bone` the
+   charcoal, so the whole subtree flips without a component knowing. Paper
+   (#F8F4EC) is a shade lighter than the cream bone sections, which keeps the
+   alternation between sections, and passes AA for brand (5.02:1) and the dim
+   text (6.17:1).
+
+   Photographs stay dark (`.ground-photo`): their captions sit on a dark floor
+   over the image. The header (`.ground-chrome`) takes the logo's own cream so
+   the wordmark reads exactly like the logo file. Hexes are literal because a
+   token cannot be redefined in terms of itself. */
+[data-theme="light"] .ground-ink:not(.ground-photo) {
+  --color-ink: #F8F4EC;
+  --color-ink-raised: #EDE6DA;
+  --color-ink-line: #DCD2C2;
+  --color-sand: #14181A;
+  --color-sand-dim: #5E5B55;
+  --color-bone: #14181A;
+  --color-accent: var(--color-brand);
+}
+
+[data-theme="light"] .ground-chrome {
+  --color-ink: #F3EDE2;
 }

@@ -12,11 +12,27 @@ describe("Statement", () => {
     expect(screen.getByText("13")).toBeInTheDocument();
   });
 
-  it("labels each count", () => {
+  it("states the figures in a sentence, not as a dashboard of big numbers", () => {
+    // Oversized numerals over small tracked labels read as a template. The
+    // figures belong in what the company says about itself.
+    const { container } = renderWithIntl(<Statement locale="en" settings={settingsFixture} />);
+    expect(container.querySelector("dl")).toBeNull();
+    expect(screen.getByText("73").closest("p")).toHaveTextContent(
+      "So far: 73 corporate projects and 57 residential ones, across 13 districts of Bangladesh.",
+    );
+  });
+
+  it("sets the figures at the sentence's own size, picked out only by colour", () => {
     renderWithIntl(<Statement locale="en" settings={settingsFixture} />);
-    expect(screen.getByText("corporate projects")).toBeInTheDocument();
-    expect(screen.getByText("residential projects")).toBeInTheDocument();
-    expect(screen.getByText("districts")).toBeInTheDocument();
+    const figure = screen.getByText("73");
+    expect(figure.tagName).toBe("STRONG");
+    expect(figure).toHaveClass("text-accent");
+    expect(figure.className).not.toMatch(/display-/);
+  });
+
+  it("writes the sentence in Bangla, with Bangla numerals", () => {
+    renderWithIntl(<Statement locale="bn" settings={settingsFixture} />, { locale: "bn" });
+    expect(screen.getByText("৭৩").closest("p")).toHaveTextContent("৫৭টি আবাসিক");
   });
 
   it("never claims clients where the source says projects", () => {

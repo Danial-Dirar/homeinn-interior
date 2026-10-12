@@ -1,4 +1,5 @@
 import type { Locale } from "@homeinn/types";
+import { ArrowUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { WorkingAreaView } from "@/lib/api.types";
@@ -13,19 +14,20 @@ export function WorkingAreas({ locale, areas }: { locale: Locale; areas: Working
   const t = useTranslations("home");
 
   return (
-    <Section numeral="03" eyebrow={t("areasEyebrow")} title={t("areasTitle")} tone="ink">
+    <Section eyebrow={t("areasEyebrow")} title={t("areasTitle")} tone="ink">
       <ul className="divide-y divide-ink-line border-y border-ink-line">
-        {areas.map((area, index) => (
+        {areas.map((area) => (
           <li key={area.id}>
             <Link
               href={`/projects?area=${area.slug}`}
-              className="group flex items-baseline gap-6 py-5 transition-colors hover:text-brand"
+              className="group flex items-center justify-between gap-6 py-5 transition-colors hover:text-accent"
             >
-              {/* Decorative: the link's accessible name is the area, not "01 Landscaping". */}
-              <span aria-hidden="true" className="section-numeral">
-                {String(index + 1).padStart(2, "0")}
-              </span>
               <span className="heading">{text(area, "name", locale)}</span>
+              {/* Decorative: the link's accessible name is the area alone. */}
+              <ArrowUpRight
+                aria-hidden="true"
+                className="size-5 shrink-0 text-accent transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
             </Link>
           </li>
         ))}

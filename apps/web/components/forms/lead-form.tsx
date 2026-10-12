@@ -21,7 +21,7 @@ interface LeadFormProps {
 // option, and "Home Furniture & Office Furniture Supply (Customized Design)"
 // is wide enough to push a phone page 200px into horizontal scroll.
 const SELECT_CLASS =
-  "h-11 w-full min-w-0 truncate border border-current/20 bg-transparent px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+  "h-11 w-full min-w-0 truncate border border-current/20 bg-transparent px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 export function LeadForm({
   locale,
@@ -93,7 +93,7 @@ export function LeadForm({
           autoComplete="tel"
           aria-describedby="lead-phone-hint"
         />
-        <p id="lead-phone-hint" className="text-xs text-current/60">{t("phoneHint")}</p>
+        <p id="lead-phone-hint" className="text-xs text-current/65">{t("phoneHint")}</p>
       </div>
 
       <div className="grid min-w-0 gap-2">
@@ -127,7 +127,9 @@ export function LeadForm({
       <p
         role="status"
         aria-live="polite"
-        className={status === "success" ? "text-sm text-walnut" : "text-sm text-brand"}
+        // Success reads in the surrounding text colour; an error takes the
+        // ground's accent. Both pass AA on ink and on bone.
+        className={status === "success" ? "text-sm font-medium" : "text-sm text-accent"}
       >
         {message}
       </p>

@@ -47,7 +47,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <section className="mt-16 max-w-2xl">
           <p className="eyebrow">{t("storyEyebrow")}</p>
           <p className="mt-4 text-lg text-ink/70">{t("storyBody")}</p>
-          <p className="mt-6 text-ink/60">{common("since", { year: settings.establishedYear })}</p>
+          <p className="mt-6 text-ink/65">{common("since", { year: settings.establishedYear })}</p>
         </section>
 
         <div className="mt-20 grid gap-14 sm:grid-cols-2">
@@ -73,7 +73,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                       />
                     ) : null}
                     <h3 className="heading mt-4">{member.name}</h3>
-                    <p className="text-sm text-ink/60">{text(member, "role", locale)}</p>
+                    <p className="text-sm text-ink/65">{text(member, "role", locale)}</p>
                     {bio ? <p className="mt-2 text-sm text-ink/70">{bio}</p> : null}
                   </li>
                 );

@@ -10,7 +10,7 @@ import { text, textOrNull } from "@/lib/locale-text";
  */
 export function HeroStack({ segments, locale }: { segments: HeroSegmentView[]; locale: Locale }) {
   return (
-    <div className="bg-ink text-sand">
+    <div className="ground-ink ground-photo bg-ink text-sand">
       {segments.map((segment, index) => {
         const caption = textOrNull(segment, "caption", locale);
         return (

@@ -7,7 +7,7 @@ export default function ErrorBoundary({ reset }: { error: Error; reset: () => vo
   const t = useTranslations("errors");
 
   return (
-    <main id="main" className="bg-ink text-sand">
+    <main id="main" className="ground-ink bg-ink text-sand">
       <div className="mx-auto flex min-h-[70svh] max-w-3xl flex-col justify-center px-5">
         <h1 className="display-1">{t("errorTitle")}</h1>
         <p className="mt-6 text-sand-dim">{t("errorBody")}</p>

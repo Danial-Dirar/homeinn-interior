@@ -34,7 +34,7 @@ export function SocialLinks({
               target="_blank"
               rel="noreferrer noopener"
               aria-label={label}
-              className="block transition-colors hover:text-brand"
+              className="block transition-colors hover:text-accent"
             >
               <Icon aria-hidden="true" className="size-[1.15em]" />
             </a>

@@ -32,6 +32,16 @@ describe("SiteFooter", () => {
     expect(screen.queryByRole("link", { name: "YouTube" })).not.toBeInTheDocument();
   });
 
+  it("signs off with the wordmark", () => {
+    renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
+    expect(screen.getByText("inn")).toHaveClass("text-logo");
+  });
+
+  it("sits on an ink ground, so its hover accent is ember", () => {
+    const { container } = renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
+    expect(container.querySelector("footer")).toHaveClass("ground-ink");
+  });
+
   it("credits the established year", () => {
     renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
     expect(screen.getByText(/2015/)).toBeInTheDocument();

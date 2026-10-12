@@ -82,7 +82,7 @@ export default async function ServiceDetailPage({
         <div className="mt-16 grid gap-16 lg:grid-cols-[2fr_1fr]">
           <RichText
             html={text(service, "body", locale)}
-            className="max-w-2xl space-y-4 [&_a]:text-brand [&_a]:underline [&_li]:ml-5 [&_li]:list-disc"
+            className="max-w-2xl space-y-4 [&_a]:text-accent [&_a]:underline [&_li]:ml-5 [&_li]:list-disc"
           />
 
           <aside className="border border-ink/10 p-8">

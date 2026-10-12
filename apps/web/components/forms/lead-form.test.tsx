@@ -62,6 +62,23 @@ describe("LeadForm", () => {
     expect(await screen.findByText(/several enquiries from this connection/)).toBeInTheDocument();
   });
 
+  it("colours an error with the ground's accent, which passes AA on both", async () => {
+    // A fixed colour failed somewhere: brand red was 4.07:1 on ink, and the
+    // walnut success line ~3:1. The accent is amber on ink, burnt orange on bone.
+    stubFetch(201);
+    renderWithIntl(<LeadForm locale="en" services={[]} sourcePath="/en" />);
+    await fillAndSubmit("12345");
+    expect(await screen.findByRole("status")).toHaveClass("text-accent");
+  });
+
+  it("states success in the surrounding text colour rather than a weak tint", async () => {
+    stubFetch(201);
+    renderWithIntl(<LeadForm locale="en" services={[]} sourcePath="/en" />);
+    await fillAndSubmit("01760775454");
+    await screen.findByText(/Thank you/);
+    expect(screen.getByRole("status")).not.toHaveClass("text-walnut");
+  });
+
   it("announces its status to assistive technology", () => {
     renderWithIntl(<LeadForm locale="en" services={[]} sourcePath="/en" />);
     expect(screen.getByRole("status")).toBeInTheDocument();

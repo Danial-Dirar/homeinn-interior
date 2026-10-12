@@ -57,7 +57,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 <dt className="eyebrow text-ink/70">{detail.label}</dt>
                 <dd className="mt-1">
                   {detail.href ? (
-                    <a className="hover:text-brand" href={detail.href}>{detail.value}</a>
+                    <a className="hover:text-accent" href={detail.href}>{detail.value}</a>
                   ) : (
                     detail.value
                   )}

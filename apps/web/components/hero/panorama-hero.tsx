@@ -74,7 +74,7 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
       if (lightPoolRef.current) {
         lightPoolRef.current.style.background =
           `radial-gradient(60vw 60vh at ${lightPoolX(p, count)}% 45%, ` +
-          `color-mix(in oklab, var(--color-amber) 26%, transparent), transparent 70%)`;
+          `color-mix(in oklab, var(--color-ember) 22%, transparent), transparent 70%)`;
       }
       if (progressRef.current) {
         progressRef.current.style.width = `${p * 100}%`;
@@ -89,7 +89,7 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
   if (count === 0) {
     return (
       <>
-        <section aria-label={t("heroFallbackTitle")} className="bg-ink text-sand">
+        <section aria-label={t("heroFallbackTitle")} className="ground-ink bg-ink text-sand">
           <div className="mx-auto flex min-h-[80svh] max-w-7xl flex-col justify-end px-5 pb-20">
             <p className="eyebrow">{common("tagline")}</p>
             <h1 className="display-1 mt-4 max-w-3xl text-sand">{t("heroFallbackTitle")}</h1>
@@ -118,7 +118,7 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
         aria-label={t("heroFallbackTitle")}
         style={{ height: `${scrollDistanceVh(count, target)}vh` }}
       >
-        <div className="sticky top-0 h-dvh overflow-hidden bg-ink">
+        <div className="ground-ink ground-photo sticky top-0 h-dvh overflow-hidden bg-ink">
           {shown.map((segment, index) => (
             <div
               key={segment.id}
@@ -160,7 +160,7 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-ink to-transparent"
           />
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 md:p-12">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 text-sand md:p-12">
             <div className="relative h-24">
               {shown.map((segment, index) => {
                 const caption = textOrNull(segment, "caption", locale);
@@ -182,7 +182,7 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
 
             <div className="mt-6 flex items-center gap-4">
               <div className="h-px flex-1 bg-ink-line">
-                <div ref={progressRef} className="h-px bg-brand" style={{ width: "0%" }} />
+                <div ref={progressRef} className="h-px bg-accent" style={{ width: "0%" }} />
               </div>
               <p className="eyebrow shrink-0">{t("heroCue")}</p>
             </div>

@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { CorporateClientView } from "@/lib/api.types";
-import { renderWithIntl, settingsFixture } from "@/test/render";
+import { renderWithIntl } from "@/test/render";
 import { TrackRecord } from "./track-record";
 
 const flagship: CorporateClientView = {
@@ -14,25 +14,30 @@ const ordinary: CorporateClientView = {
 };
 
 describe("TrackRecord", () => {
-  it("still states the real counts when the client table is empty", () => {
-    // The 73/57/13 figures are in spec §2; the row-level tables are blocked on
-    // the profile PDF. The section must stay truthful without them.
-    renderWithIntl(<TrackRecord locale="en" settings={settingsFixture} clients={[]} />);
-    expect(screen.getByText(/73/)).toBeInTheDocument();
+  it("leads to the full track record when the client table is empty", () => {
+    // The row-level tables are blocked on the profile PDF; the section must
+    // still say something true and point onward.
+    renderWithIntl(<TrackRecord clients={[]} />);
     expect(screen.getByRole("link", { name: /See the full track record/ }))
       .toHaveAttribute("href", "/en/clients");
   });
 
+  it("does not repeat the headline figures as a sum", () => {
+    // The statement above already says them in a sentence; "73 + 57" in large
+    // type was the same dashboard trope again.
+    renderWithIntl(<TrackRecord clients={[]} />);
+    expect(screen.queryByText(/73/)).not.toBeInTheDocument();
+  });
+
   it("surfaces only the flagship references when rows exist", () => {
     renderWithIntl(
-      <TrackRecord locale="en" settings={settingsFixture} clients={[flagship, ordinary]} />);
+      <TrackRecord clients={[flagship, ordinary]} />);
     expect(screen.getAllByText("BFIDC").length).toBeGreaterThan(0);
     expect(screen.queryByText("Some Company Ltd")).not.toBeInTheDocument();
   });
 
-  it("falls back to the counts when rows exist but none are flagged", () => {
-    renderWithIntl(<TrackRecord locale="en" settings={settingsFixture} clients={[ordinary]} />);
+  it("shows no names when rows exist but none are flagged", () => {
+    renderWithIntl(<TrackRecord clients={[ordinary]} />);
     expect(screen.queryByText("Some Company Ltd")).not.toBeInTheDocument();
-    expect(screen.getByText(/73/)).toBeInTheDocument();
   });
 });

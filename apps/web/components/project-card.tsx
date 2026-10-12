@@ -30,7 +30,7 @@ export function ProjectCard({ locale, project }: { locale: Locale; project: Proj
         <h3 className="heading mt-4">{text(project, "title", locale)}</h3>
         {/* Joined rather than concatenated: an imported project may have no
             location yet, and a leading " · " would show for every one. */}
-        <p className="mt-1 text-sm text-current/60">
+        <p className="mt-1 text-sm text-current/65">
           {[
             text(project, "location", locale),
             project.year ? String(project.year) : "",

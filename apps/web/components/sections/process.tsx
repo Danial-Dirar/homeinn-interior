@@ -15,7 +15,7 @@ export function Process() {
   if (!title.trim()) return null;
 
   return (
-    <Section numeral="06" eyebrow={t("processEyebrow")} title={title} tone="ink">
+    <Section eyebrow={t("processEyebrow")} title={title} tone="ink">
       {null}
     </Section>
   );

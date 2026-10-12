@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { SiteSettingsView } from "./api.types";
 import {
   alternatesFor, articleJsonLd, breadcrumbJsonLd, canonicalFor, localBusinessJsonLd,
-  metadataFromSeo,
+  metadataFromSeo, pageMetadata,
 } from "./seo";
 
 const settings: SiteSettingsView = {
@@ -69,10 +69,27 @@ describe("metadataFromSeo", () => {
   });
 });
 
+describe("pageMetadata", () => {
+  const base = { locale: "en" as const, path: "/about", title: "About", description: "Who we are." };
+
+  it("uses a page's own image when it has one", () => {
+    const meta = pageMetadata({ ...base, image: "http://cdn/cover.webp" });
+    expect(meta.openGraph?.images).toEqual([{ url: "http://cdn/cover.webp" }]);
+  });
+
+  it("falls back to the brand card, so a shared link never previews blank", () => {
+    const meta = pageMetadata(base);
+    expect(meta.openGraph?.images).toEqual([
+      { url: "/og.png", width: 1200, height: 630, alt: "Home Inn" },
+    ]);
+  });
+});
+
 describe("localBusinessJsonLd", () => {
   it("carries the real NAP", () => {
     const json = localBusinessJsonLd(settings, "en");
     expect(json["@type"]).toBe("LocalBusiness");
+    expect(json.name).toBe("Home Inn");
     expect(json.telephone).toEqual(["01760775454", "01818843999"]);
     expect(json.email).toBe("homeinnbd14@gmail.com");
     expect(json.address.streetAddress).toContain("Mirpur-10");

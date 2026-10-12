@@ -17,7 +17,7 @@ export function CorporateTable({
   const t = useTranslations("clients");
 
   if (clients.length === 0) {
-    return <p className="max-w-xl text-ink/60">{t("corporateEmpty")}</p>;
+    return <p className="max-w-xl text-ink/65">{t("corporateEmpty")}</p>;
   }
 
   const sorted = [...clients].sort((a, b) => a.serial - b.serial);
@@ -33,7 +33,7 @@ export function CorporateTable({
               {format.format(client.serial)}
             </th>
             <td className="py-3 pr-6">{client.companyName}</td>
-            <td className="py-3 text-ink/60">{client.address}</td>
+            <td className="py-3 text-ink/65">{client.address}</td>
           </tr>
         ))}
       </tbody>

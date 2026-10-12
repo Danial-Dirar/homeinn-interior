@@ -21,7 +21,7 @@ export function PostCard({ locale, post }: { locale: Locale; post: BlogPostView 
             className="aspect-[3/2] w-full object-cover"
           />
         ) : null}
-        <h3 className="heading mt-4 group-hover:text-brand">{text(post, "title", locale)}</h3>
+        <h3 className="heading mt-4 group-hover:text-accent">{text(post, "title", locale)}</h3>
         <p className="mt-2 text-sm text-ink/70">{text(post, "excerpt", locale)}</p>
         {published ? (
           <p className="eyebrow mt-4 text-ink/70">{t("published", { date: published })}</p>

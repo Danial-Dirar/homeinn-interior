@@ -32,6 +32,15 @@ describe("message catalogues", () => {
     expect(halfTranslated).toEqual([]);
   });
 
+  it("never use the retired brand name", () => {
+    // The company is "Home Inn" now; "Interior Solution" went with the move
+    // into architecture, in both languages.
+    const stale = [...Object.entries(flatEn), ...Object.entries(flatBn)]
+      .filter(([, value]) => /Interior Solution|ইন্টেরিয়র সলিউশন/.test(value))
+      .map(([key]) => key);
+    expect(stale).toEqual([]);
+  });
+
   it("never leave English text sitting in the Bangla catalogue", () => {
     const untranslated = Object.entries(flatBn)
       .filter(([key, value]) => value.trim() !== "" && value === flatEn[key])

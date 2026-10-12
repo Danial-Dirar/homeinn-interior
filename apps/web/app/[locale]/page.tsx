@@ -42,7 +42,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
       <ServicesGrid locale={locale} services={services} />
       <WorkingAreas locale={locale} areas={areas} />
       <SelectedProjects locale={locale} projects={projects} />
-      <TrackRecord locale={locale} settings={settings} clients={clients} />
+      <TrackRecord clients={clients} />
       <Process />
       <Testimonials locale={locale} testimonials={testimonials} />
       <Credentials locale={locale} certifications={certifications} />

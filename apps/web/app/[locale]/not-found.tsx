@@ -6,12 +6,12 @@ export default function NotFound() {
   const common = useTranslations("common");
 
   return (
-    <main id="main" className="bg-ink text-sand">
+    <main id="main" className="ground-ink bg-ink text-sand">
       <div className="mx-auto flex min-h-[70svh] max-w-3xl flex-col justify-center px-5">
         <p className="section-numeral">404</p>
         <h1 className="display-1 mt-4">{t("notFoundTitle")}</h1>
         <p className="mt-6 text-sand-dim">{t("notFoundBody")}</p>
-        <Link href="/" className="mt-10 underline underline-offset-4 hover:text-brand">
+        <Link href="/" className="mt-10 underline underline-offset-4 hover:text-accent">
           {common("backHome")}
         </Link>
       </div>

@@ -57,7 +57,7 @@ export function PhoneLines({
     <ul className={className}>
       {phoneLines(settings).map((line) => (
         <li key={line.phone} className="flex items-center gap-3">
-          <a className="hover:text-brand" href={`tel:${line.phone}`}>
+          <a className="hover:text-accent" href={`tel:${line.phone}`}>
             {line.phone}
           </a>
           {line.whatsapp ? (
@@ -68,7 +68,7 @@ export function PhoneLines({
               // Named per number, so a screen reader hears which line it opens
               // rather than two identical "Chat on WhatsApp" links.
               aria-label={`${t("whatsapp")} — ${line.phone}`}
-              className="text-current/60 transition-colors hover:text-brand"
+              className="text-current/65 transition-colors hover:text-accent"
             >
               <WhatsAppIcon className="size-[1.05em]" />
             </a>

@@ -49,7 +49,7 @@ export default async function ProjectsPage({
         {projects.length === 0 ? (
           // Spec §12: case studies stay unpublished until the client confirms
           // the details, so this is what visitors see until then.
-          <p className="mt-16 max-w-xl text-ink/60">{t("empty")}</p>
+          <p className="mt-16 max-w-xl text-ink/65">{t("empty")}</p>
         ) : (
           <ul className="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (

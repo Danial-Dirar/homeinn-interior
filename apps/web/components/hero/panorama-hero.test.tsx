@@ -113,6 +113,20 @@ describe("PanoramaHero", () => {
     expect(screen.getByRole("img")).toBeInTheDocument();
   });
 
+  it("sets the scroll cue in light text, so it reads on the dark floor", () => {
+    // It inherited the body's charcoal and vanished into the gradient.
+    renderWithIntl(<PanoramaHero segments={[segment(0), segment(1)]} locale="en" />);
+    expect(screen.getByText("Scroll to walk through").closest(".text-sand")).not.toBeNull();
+  });
+
+  it("keeps the photographs dark in the light theme", () => {
+    // Captions sit on a dark floor over the photo; flipping it cream would
+    // put sand text on cream.
+    const { container } = renderWithIntl(
+      <PanoramaHero segments={[segment(0), segment(1)]} locale="en" />);
+    expect(container.querySelector(".ground-ink")).toHaveClass("ground-photo");
+  });
+
   it("offers a skip link past the pinned section", () => {
     renderWithIntl(<PanoramaHero segments={[segment(0), segment(1)]} locale="en" />);
     expect(screen.getByRole("link", { name: "Skip the panorama" }))

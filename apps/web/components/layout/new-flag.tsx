@@ -1,12 +1,12 @@
 import { useTranslations } from "next-intl";
 
 /**
- * The small red NEW flag over a nav item.
+ * The small NEW flag over a nav item, in the brand's burnt orange.
  *
- * The word itself is a solid brand chip with white text and never changes
- * opacity — red-on-ink at this size measured 3.7:1, and pulsing the text took
- * it to 2.0. What blinks is the halo behind it, so the flag still catches the
- * eye while the label stays readable at all times.
+ * The word itself is a solid chip with white text (5.51:1) and never changes
+ * opacity — pulsing text drops it below legibility. What blinks is the halo
+ * behind it, so the flag still catches the eye while the label stays readable
+ * at all times. White on brand reads the same in the dark and light header.
  *
  * `motion-safe:` gates the pulse: a blinking element is a real problem for some
  * people, not a preference, so a reduced-motion visitor gets a steady flag.

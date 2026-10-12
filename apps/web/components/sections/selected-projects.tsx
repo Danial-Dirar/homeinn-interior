@@ -25,7 +25,7 @@ export function SelectedProjects({
   if (projects.length === 0) return null;
 
   return (
-    <Section numeral="04" eyebrow={t("projectsEyebrow")} title={t("projectsTitle")} tone="ink">
+    <Section eyebrow={t("projectsEyebrow")} title={t("projectsTitle")} tone="ink">
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {projects.slice(0, MAX).map((project) => (
           <ProjectCard key={project.id} locale={locale} project={project} />
@@ -33,7 +33,7 @@ export function SelectedProjects({
       </div>
       <Link
         href="/projects"
-        className="mt-12 inline-block underline underline-offset-4 hover:text-brand"
+        className="mt-12 inline-block underline underline-offset-4 hover:text-accent"
       >
         {common("viewAll")}
       </Link>

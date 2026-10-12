@@ -54,6 +54,26 @@ describe("SiteHeader", () => {
     expect(screen.queryByRole("link", { name: /Chat on WhatsApp/ })).not.toBeInTheDocument();
   });
 
+  it("carries the Home inn wordmark as the link home", () => {
+    renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(screen.getByRole("link", { name: "Home inn" })).toHaveAttribute("href", "/en");
+  });
+
+  it("sits on an ink ground, so its hover accent is ember", () => {
+    const { container } = renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(container.querySelector("header")).toHaveClass("ground-ink");
+  });
+
+  it("is the site chrome, so the light theme puts it on the logo's cream", () => {
+    const { container } = renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(container.querySelector("header")).toHaveClass("ground-chrome");
+  });
+
+  it("offers the lights switch", () => {
+    renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(screen.getByRole("button", { name: "Lights off" })).toBeInTheDocument();
+  });
+
   it("opens the mobile menu on request", async () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
     await userEvent.click(screen.getByRole("button", { name: "Menu" }));

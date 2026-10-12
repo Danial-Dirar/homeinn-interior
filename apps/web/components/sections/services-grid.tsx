@@ -21,13 +21,12 @@ export function ServicesGrid({
 
   return (
     <Section
-      numeral={bare ? undefined : "02"}
       eyebrow={bare ? undefined : t("servicesEyebrow")}
       title={bare ? undefined : t("servicesTitle")}
       tone="bone"
     >
       {services.length === 0 ? (
-        <p className="text-ink/60">{s("empty")}</p>
+        <p className="text-ink/65">{s("empty")}</p>
       ) : (
         // Hairlines are drawn by each cell's own right/bottom border rather than
         // by a background showing through `gap-px`. Seven services never fill a

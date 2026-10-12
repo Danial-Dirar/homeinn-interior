@@ -14,6 +14,7 @@ import { getSettings } from "@/lib/content";
 import { fontVariables } from "@/lib/fonts";
 import { siteUrl } from "@/lib/env";
 import { localBusinessJsonLd, organizationJsonLd, pageMetadata } from "@/lib/seo";
+import { DEFAULT_THEME, themeBootScript } from "@/lib/theme";
 import { fontClassFor } from "@/lib/typography";
 import "../globals.css";
 
@@ -56,7 +57,13 @@ export default async function LocaleLayout({
   const settings = await getSettings();
 
   return (
-    <html lang={locale} className={fontVariables}>
+    // `data-theme` is light from the server; the boot script switches it to a
+    // stored dark choice before paint, which is the one attribute React must
+    // not complain about on hydration.
+    <html lang={locale} className={fontVariables} data-theme={DEFAULT_THEME} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body className={fontClassFor(locale)}>
         <NextIntlClientProvider>
           <JsonLd data={localBusinessJsonLd(settings, locale)} />

@@ -70,7 +70,7 @@ export function ProductCard({
               : formatTaka(product.priceBdt, locale)}
           </p>
         </div>
-        <p className="mt-1 text-sm text-current/60">{text(product, "summary", locale)}</p>
+        <p className="mt-1 text-sm text-current/65">{text(product, "summary", locale)}</p>
       </Link>
     </li>
   );

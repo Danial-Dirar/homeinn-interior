@@ -5,6 +5,12 @@ import { siteUrl } from "./env";
 
 const LOCALES: Locale[] = ["en", "bn"];
 
+/** The company's name everywhere it is stated as data — titles, OG, JSON-LD. */
+export const BRAND = "Home Inn";
+
+/** The wordmark on charcoal, for any page without an image of its own. */
+const BRAND_CARD = { url: "/og.png", width: 1200, height: 630, alt: BRAND };
+
 /** `/services` → `https://site/en/services`; `/` → `https://site/en`. */
 export function canonicalFor(locale: Locale, path: string): string {
   const clean = path === "/" ? "" : path;
@@ -70,10 +76,10 @@ export function pageMetadata({
       title,
       description,
       url: canonicalFor(locale, path),
-      siteName: "Home Inn Interior Solution",
+      siteName: BRAND,
       locale: locale === "bn" ? "bn_BD" : "en_US",
       type: "website",
-      images: image ? [{ url: image }] : undefined,
+      images: image ? [{ url: image }] : [BRAND_CARD],
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -98,7 +104,7 @@ export function localBusinessJsonLd(settings: SiteSettingsView, locale: Locale) 
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    name: "Home Inn Interior Solution",
+    name: BRAND,
     url: canonicalFor(locale, "/"),
     telephone: telephones(settings),
     email: settings.email,
@@ -118,7 +124,7 @@ export function organizationJsonLd(settings: SiteSettingsView, locale: Locale) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Home Inn Interior Solution",
+    name: BRAND,
     url: canonicalFor(locale, "/"),
     email: settings.email,
     telephone: telephones(settings),
@@ -156,6 +162,6 @@ export function articleJsonLd(
     description: locale === "bn" ? post.excerptBn : post.excerptEn,
     datePublished: post.publishedAt ?? undefined,
     mainEntityOfPage: canonicalFor(locale, `/blog/${post.slug}`),
-    author: { "@type": "Organization", name: "Home Inn Interior Solution" },
+    author: { "@type": "Organization", name: BRAND },
   };
 }

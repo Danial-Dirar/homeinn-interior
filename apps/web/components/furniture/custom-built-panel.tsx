@@ -84,7 +84,7 @@ export function CustomBuiltPanel() {
 
         <Link
           href="/contact"
-          className="mt-8 inline-block underline underline-offset-4 transition-all duration-700 ease-out hover:text-brand"
+          className="mt-8 inline-block underline underline-offset-4 transition-all duration-700 ease-out hover:text-accent"
           style={{
             opacity: revealed ? 1 : 0,
             transform: `translateY(${revealed ? 0 : 12}px)`,

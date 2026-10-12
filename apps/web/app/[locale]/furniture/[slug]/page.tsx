@@ -86,7 +86,7 @@ export default async function ProductPage({
         </div>
 
         <div className="lg:pt-6">
-          <Link href="/furniture" className="eyebrow text-ink/70 hover:text-brand">
+          <Link href="/furniture" className="eyebrow text-ink/70 hover:text-accent">
             {t("backToFurniture")}
           </Link>
 

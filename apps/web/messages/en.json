@@ -1,6 +1,6 @@
 {
   "common": {
-    "brand": "Home Inn Interior Solution",
+    "brand": "Home Inn",
     "tagline": "touch your dream with us",
     "skipToContent": "Skip to content",
     "skipHero": "Skip the panorama",
@@ -30,17 +30,17 @@
     "english": "English",
     "bangla": "বাংলা",
     "furniture": "Furniture",
-    "new": "New"
+    "new": "New",
+    "lightsOn": "Lights on",
+    "lightsOff": "Lights off"
   },
   "home": {
     "heroCue": "Scroll to walk through",
     "heroFallbackTitle": "Interiors built to be lived in",
     "statementEyebrow": "Since 2015",
     "statementTitle": "Interior design, custom furniture, and project implementation across Bangladesh.",
-    "statementBody": "Home Inn Interior Solution has designed, built and fitted out corporate offices, banks, resorts, showrooms and homes since 2015, working under the trade license of M/S Ahasan Enterprise.",
-    "statCorporate": "corporate projects",
-    "statResidential": "residential projects",
-    "statDistricts": "districts",
+    "statementBody": "Home Inn has designed, built and fitted out corporate offices, banks, resorts, showrooms and homes since 2015, working under the trade license of M/S Ahasan Enterprise.",
+    "statementFigures": "So far: <n>{corporate}</n> corporate projects and <n>{residential}</n> residential ones, across <n>{districts}</n> districts of Bangladesh.",
     "servicesEyebrow": "What we do",
     "servicesTitle": "Six ways we take a space from drawing to handover.",
     "areasEyebrow": "Where we work",
@@ -64,7 +64,7 @@
   "about": {
     "title": "About Home Inn",
     "storyEyebrow": "Our story",
-    "storyBody": "Home Inn Interior Solution has operated in Bangladesh since 2015, under the trade license of M/S Ahasan Enterprise, delivering interior design, custom furniture and full project implementation for corporate and residential clients.",
+    "storyBody": "Home Inn has operated in Bangladesh since 2015, under the trade license of M/S Ahasan Enterprise, delivering interior design, custom furniture and full project implementation for corporate and residential clients.",
     "visionTitle": "Vision",
     "visionBody": "",
     "missionTitle": "Mission",
@@ -145,9 +145,9 @@
     "required": "Required"
   },
   "seo": {
-    "defaultTitle": "Home Inn Interior Solution — Interior design and custom furniture in Bangladesh",
+    "defaultTitle": "Home Inn — Interior design and custom furniture in Bangladesh",
     "defaultDescription": "Interior design, custom furniture and project implementation across Bangladesh since 2015. 73 corporate projects delivered.",
-    "titleTemplate": "{page} — Home Inn Interior Solution"
+    "titleTemplate": "{page} — Home Inn"
   },
   "errors": {
     "notFoundTitle": "That page does not exist",

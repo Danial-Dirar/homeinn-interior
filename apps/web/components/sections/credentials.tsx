@@ -17,7 +17,7 @@ export function Credentials({
 
   return (
     <Section
-      numeral="08"
+     
       eyebrow={t("credentialsEyebrow")}
       title={t("credentialsTitle")}
       tone="bone"
@@ -29,10 +29,10 @@ export function Credentials({
           <li key={certification.id} className="border-b border-r border-ink/10 bg-bone p-8">
             <h3 className="heading">{text(certification, "title", locale)}</h3>
             {certification.issuer ? (
-              <p className="mt-2 text-sm text-ink/60">{certification.issuer}</p>
+              <p className="mt-2 text-sm text-ink/65">{certification.issuer}</p>
             ) : null}
             {certification.reference ? (
-              <p className="mt-1 text-sm text-ink/60">{certification.reference}</p>
+              <p className="mt-1 text-sm text-ink/65">{certification.reference}</p>
             ) : null}
           </li>
         ))}

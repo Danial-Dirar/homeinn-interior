@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { SiteSettingsView } from "@/lib/api.types";
 import { text } from "@/lib/locale-text";
+import { Wordmark } from "@/components/brand/wordmark";
 import { PhoneLines } from "./phone-lines";
 
 const SOCIALS = [
@@ -16,10 +17,10 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
   const nav = useTranslations("nav");
 
   return (
-    <footer className="bg-ink text-sand-dim">
+    <footer className="ground-ink bg-ink text-sand-dim">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-display text-lg text-sand">{t("brand")}</p>
+          <Wordmark tone="ink" className="block text-3xl" />
           <p className="mt-2 text-sm">{t("tagline")}</p>
           <p className="mt-6 text-sm">{t("since", { year: settings.establishedYear })}</p>
         </div>
@@ -29,7 +30,7 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
           <p className="mt-2 text-sand">{text(settings, "address", locale)}</p>
           <PhoneLines settings={settings} className="mt-4 space-y-1" />
           <p className="mt-1">
-            <a className="hover:text-brand" href={`mailto:${settings.email}`}>{settings.email}</a>
+            <a className="hover:text-accent" href={`mailto:${settings.email}`}>{settings.email}</a>
           </p>
           <p className="mt-4">{text(settings, "hours", locale)}</p>
         </address>
@@ -40,7 +41,7 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
             {/* Same order as the header, minus Home. */}
             {(["services", "projects", "furniture", "clients", "blog", "about", "contact"] as const).map((key) => (
               <li key={key}>
-                <Link href={`/${key}`} className="hover:text-brand">{nav(key)}</Link>
+                <Link href={`/${key}`} className="hover:text-accent">{nav(key)}</Link>
               </li>
             ))}
           </ul>
@@ -53,7 +54,7 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
               settings[key] ? (
                 <li key={key}>
                   <a
-                    className="hover:text-brand"
+                    className="hover:text-accent"
                     href={settings[key] as string}
                     target="_blank"
                     rel="noreferrer noopener"

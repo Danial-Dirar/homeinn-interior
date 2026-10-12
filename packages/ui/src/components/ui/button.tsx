@@ -8,11 +8,11 @@ import { cn } from "../../lib/utils";
  * square edges read as architectural rather than as a web app.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
   {
     variants: {
       variant: {
-        // `text-white`, not `text-bone`: bone on brand is 4.32:1, just under AA.
+        // White on the burnt-orange brand is 5.51:1.
         solid: "bg-brand text-white hover:bg-brand/90",
         outline: "border border-current bg-transparent hover:bg-current/5",
         ghost: "bg-transparent hover:bg-current/5",

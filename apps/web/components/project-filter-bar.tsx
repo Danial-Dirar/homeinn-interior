@@ -22,8 +22,8 @@ export function ProjectFilterBar({
         aria-current={isActive ? "true" : undefined}
         className={[
           "inline-block border px-4 py-2 text-sm transition-colors",
-          // Filled rather than brand-coloured text: brand on bone is 4.32:1 at
-          // 14px. Spec §8 sanctions brand for active nav, and this passes AA.
+          // Filled, so the active chip reads at a glance: white on brand is
+          // 5.51:1. Active nav is one of the sanctioned uses of brand.
           isActive
             ? "border-brand bg-brand text-white"
             : "border-ink/15 hover:border-ink/40",

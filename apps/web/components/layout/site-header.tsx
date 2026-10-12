@@ -7,9 +7,11 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { SiteSettingsView } from "@/lib/api.types";
 import { useScrolled } from "@/hooks/use-scrolled";
+import { Wordmark } from "@/components/brand/wordmark";
 import { LocaleSwitcher } from "./locale-switcher";
 import { NewFlag } from "./new-flag";
 import { SocialLinks } from "./social-links";
+import { ThemeToggle } from "./theme-toggle";
 
 /**
  * Nav order, and it is deliberate: the work comes before the company. A visitor
@@ -34,7 +36,6 @@ const ROUTES = [
  */
 export function SiteHeader({ locale, settings }: { locale: Locale; settings: SiteSettingsView }) {
   const t = useTranslations("nav");
-  const common = useTranslations("common");
   const scrolled = useScrolled();
   // Only the home page opens on a dark hero. Everywhere else the page ground is
   // `bone`, and sand-on-bone is 1.18:1 — the nav would simply be invisible.
@@ -45,19 +46,16 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
   return (
     <header
       className={[
-        "fixed inset-x-0 top-0 z-50 text-sand transition-colors duration-300",
+        "ground-ink ground-chrome fixed inset-x-0 top-0 z-50 text-sand transition-colors duration-300",
         overHero ? "bg-ink/80 backdrop-blur-sm" : "bg-ink/95 backdrop-blur-sm",
       ].join(" ")}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 sm:gap-6">
-        {/* `min-w-0` is load-bearing: a flex item defaults to `min-width: auto`,
-            so without it this long name refuses to shrink and pushes the menu
-            button off a phone screen entirely. */}
-        <Link
-          href="/"
-          className="min-w-0 truncate font-display text-base tracking-tight sm:text-lg"
-        >
-          {common("brand")}
+        {/* `min-w-0` stays load-bearing: a flex item defaults to
+            `min-width: auto` and will not shrink, which once pushed the menu
+            button off a phone screen. */}
+        <Link href="/" className="min-w-0 shrink-0 text-2xl sm:text-[1.7rem]">
+          <Wordmark tone="ink" />
         </Link>
 
         <nav aria-label={t("menu")} className="hidden items-center gap-7 lg:flex">
@@ -65,7 +63,7 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
             <Link
               key={route.href}
               href={route.href}
-              className="relative text-sm hover:text-brand"
+              className="relative text-sm hover:text-accent"
             >
               {t(route.key)}
               {"flag" in route ? <NewFlag /> : null}
@@ -75,6 +73,7 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
 
         <div className="flex shrink-0 items-center gap-4">
           <LocaleSwitcher locale={locale} />
+          <ThemeToggle />
           <SocialLinks
             settings={settings}
             className="hidden items-center gap-3 sm:flex"
@@ -86,7 +85,7 @@ export function SiteHeader({ locale, settings }: { locale: Locale; settings: Sit
                 <Menu aria-hidden="true" className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-ink text-sand">
+            <SheetContent side="right" className="ground-ink bg-ink text-sand">
               <SheetTitle className="heading">{t("menu")}</SheetTitle>
               <nav className="mt-8 flex flex-col gap-5">
                 {ROUTES.map((route) => (

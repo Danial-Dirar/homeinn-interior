@@ -16,10 +16,16 @@ describe("WorkingAreas", () => {
       .toHaveAttribute("href", "/en/projects?area=landscaping");
   });
 
-  it("numbers the areas", () => {
+  it("lists the areas without numbering them", () => {
     renderWithIntl(<WorkingAreas locale="en" areas={areas} />);
-    expect(screen.getByText("01")).toBeInTheDocument();
-    expect(screen.getByText("02")).toBeInTheDocument();
+    expect(screen.queryByText("01")).not.toBeInTheDocument();
+  });
+
+  it("marks each row as a way through with a decorative arrow", () => {
+    const { container } = renderWithIntl(<WorkingAreas locale="en" areas={areas} />);
+    const arrows = container.querySelectorAll("a svg");
+    expect(arrows).toHaveLength(2);
+    expect(arrows[0]).toHaveAttribute("aria-hidden", "true");
   });
 
   it("renders Bangla names for bn", () => {

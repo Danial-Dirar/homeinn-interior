@@ -12,7 +12,7 @@ import { ProductCard } from "./product-card";
 const BANDS: PriceBand[] = ["any", "under50k", "50kTo1lakh", "over1lakh"];
 
 const CONTROL =
-  "h-11 w-full min-w-0 border border-ink/20 bg-transparent px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+  "h-11 w-full min-w-0 border border-ink/20 bg-transparent px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 /** One column split, used by both rows so the page reads as two columns. */
 const COLUMNS = "grid gap-10 lg:grid-cols-[1.6fr_1fr] lg:gap-20";
@@ -111,7 +111,7 @@ export function ProductCatalogue({
                 onChange={(event) =>
                   setQuery((q) => ({ ...q, madeToOrderOnly: event.target.checked }))
                 }
-                className="size-4 accent-[--color-brand]"
+                className="size-4 accent-brand"
               />
               {t("madeToOrder")}
             </label>

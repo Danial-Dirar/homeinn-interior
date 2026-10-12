@@ -88,13 +88,13 @@ export default async function BlogPostPage({
 
         <RichText
           html={text(post, "body", locale)}
-          className="mt-12 space-y-4 text-lg [&_a]:text-brand [&_a]:underline [&_li]:ml-5 [&_li]:list-disc"
+          className="mt-12 space-y-4 text-lg [&_a]:text-accent [&_a]:underline [&_li]:ml-5 [&_li]:list-disc"
         />
 
         {post.tags.length > 0 ? (
           <footer className="mt-16 border-t border-ink/10 pt-6">
             <h2 className="eyebrow text-ink/70">{t("tags")}</h2>
-            <ul className="mt-3 flex flex-wrap gap-3 text-sm text-ink/60">
+            <ul className="mt-3 flex flex-wrap gap-3 text-sm text-ink/65">
               {post.tags.map((tag) => <li key={tag}>{tag}</li>)}
             </ul>
           </footer>

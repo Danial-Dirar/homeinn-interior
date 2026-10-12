@@ -22,7 +22,7 @@ export function Testimonials({
 
   return (
     <Section
-      numeral="07"
+     
       eyebrow={t("testimonialsEyebrow")}
       title={t("testimonialsTitle")}
       tone="ink"

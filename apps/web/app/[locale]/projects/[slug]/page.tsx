@@ -84,7 +84,7 @@ export default async function ProjectDetailPage({
       ) : null}
 
       <div className="mx-auto max-w-7xl px-5 py-28">
-        <Link href={`/projects?area=${project.workingArea.slug}`} className="eyebrow text-brand">
+        <Link href={`/projects?area=${project.workingArea.slug}`} className="eyebrow text-accent">
           {text(project.workingArea, "name", locale)}
         </Link>
         <h1 className="display-1 mt-4 max-w-4xl">{text(project, "title", locale)}</h1>

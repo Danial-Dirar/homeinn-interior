@@ -39,7 +39,7 @@ export function WhatsAppFloat({ settings }: { settings: SiteSettingsView }) {
         "fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-full bg-[#25D366]",
         "px-4 py-3 text-ink shadow-lg transition-all duration-300",
         "hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2",
-        "focus-visible:outline-brand motion-safe:hover:scale-[1.03]",
+        "focus-visible:outline-accent motion-safe:hover:scale-[1.03]",
         overHero
           ? "pointer-events-none translate-y-3 opacity-0"
           : "pointer-events-auto translate-y-0 opacity-100",

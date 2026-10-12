@@ -18,7 +18,7 @@ export function Cta({
   const common = useTranslations("common");
 
   return (
-    <Section numeral="09" eyebrow={t("ctaEyebrow")} title={t("ctaTitle")} tone="ink" id="enquire">
+    <Section eyebrow={t("ctaEyebrow")} title={t("ctaTitle")} tone="ink" id="enquire">
       <div className="grid gap-14 lg:grid-cols-2">
         <div>
           <p className="max-w-md text-lg text-sand-dim">{t("ctaBody")}</p>
