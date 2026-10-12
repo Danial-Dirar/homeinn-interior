@@ -17,12 +17,15 @@ afterAll(async () => {
 });
 
 describe("seed data", () => {
-  it("creates the 7 services from the company profile", async () => {
-    expect(await prisma.service.count()).toBe(7);
+  // The profile lists 7; its "2D Plan & Solution" and "3D Model & Visualization"
+  // were merged into one on 2026-08-10 (see seed-data/services.ts).
+  it("creates the 6 services: the profile's 7 with 2D and 3D merged", async () => {
+    expect(await prisma.service.count()).toBe(6);
   });
 
-  it("creates the 9 working areas", async () => {
-    expect(await prisma.workingArea.count()).toBe(9);
+  // The profile's 9, plus `factory-works` added on 2026-08-09 for the archive.
+  it("creates the 10 working areas: the profile's 9 plus factory works", async () => {
+    expect(await prisma.workingArea.count()).toBe(10);
   });
 
   it("translates every working area rather than repeating the English", async () => {
@@ -31,7 +34,7 @@ describe("seed data", () => {
   });
 
   it("publishes the services so the public list is not empty", async () => {
-    expect(await prisma.service.count({ where: { published: true } })).toBe(7);
+    expect(await prisma.service.count({ where: { published: true } })).toBe(6);
   });
 
   it("creates the 3 credentials from the profile", async () => {
