@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Blueprint } from "@/components/blueprint/blueprint";
+import { Reveal } from "@/components/motion/reveal";
 import { Section } from "./section";
 
 /** Static section imagery from Home Inn's own design study (PDF References/Variations). */
@@ -47,8 +48,15 @@ export function Process() {
         </div>
       ),
     },
-    { key: "model", media: <StepImage name="model" alt={t("processModelAlt")} /> },
-    { key: "render", media: <StepImage name="render" alt={t("processRenderAlt")} /> },
+    // Unveiled after the plan has begun to draw: plan, then model, then render.
+    {
+      key: "model",
+      media: <Reveal variant="wipe" delay={350}><StepImage name="model" alt={t("processModelAlt")} /></Reveal>,
+    },
+    {
+      key: "render",
+      media: <Reveal variant="wipe" delay={700}><StepImage name="render" alt={t("processRenderAlt")} /></Reveal>,
+    },
   ] as const;
 
   return (

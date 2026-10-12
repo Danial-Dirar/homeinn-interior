@@ -20,4 +20,9 @@ describe("Section", () => {
     const { container } = render(<Section tone="bone" eyebrow="Since 2015">x</Section>);
     expect(container.querySelector("section")).not.toHaveClass("ground-ink");
   });
+
+  it("lets its heading rise in as it scrolls into view", () => {
+    const { container } = render(<Section tone="bone" eyebrow="Since 2015" title="Work">x</Section>);
+    expect(container.querySelector("header")).toHaveAttribute("data-reveal", "rise");
+  });
 });

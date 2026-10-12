@@ -52,9 +52,10 @@ export default async function ProjectsPage({
           <p className="mt-16 max-w-xl text-ink/65">{t("empty")}</p>
         ) : (
           <ul className="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
+            {projects.map((project, index) => (
               <li key={project.id}>
-                <ProjectCard locale={locale} project={project} />
+                {/* Three to a row, so the stagger repeats every three. */}
+                <ProjectCard locale={locale} project={project} index={index % 3} />
               </li>
             ))}
           </ul>

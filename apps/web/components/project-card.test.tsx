@@ -46,4 +46,11 @@ describe("ProjectCard", () => {
     renderWithIntl(<ProjectCard locale="en" project={older} />);
     expect(screen.getByRole("link", { name: /Brick-Screen Villa/ })).toBeInTheDocument();
   });
+
+  it("unveils its picture as it scrolls into view, staggered by its place in the row", () => {
+    const { container } = renderWithIntl(<ProjectCard locale="en" project={project()} index={2} />);
+    const picture = container.querySelector("[data-reveal]") as HTMLElement;
+    expect(picture).toHaveAttribute("data-reveal", "wipe");
+    expect(picture.style.transitionDelay).toBe("180ms");
+  });
 });

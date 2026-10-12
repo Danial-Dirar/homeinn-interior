@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import type { ServiceView } from "@/lib/api.types";
 import { iconFor } from "@/lib/icons";
 import { text } from "@/lib/locale-text";
+import { Reveal } from "@/components/motion/reveal";
 import { Section } from "./section";
 
 /** `bare` drops the section header, for pages that carry their own `<h1>`. */
@@ -33,10 +34,11 @@ export function ServicesGrid({
         // three-column row, and the background trick paints those empty cells
         // grey, which reads as a broken tile.
         <ul className="grid border-l border-t border-ink/10 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service) => {
+          {services.map((service, index) => {
             const Icon = iconFor(service.icon);
             return (
-              <li key={service.id} className="border-b border-r border-ink/10 bg-bone">
+              // Staggered across a row of three, so a row arrives left to right.
+              <Reveal as="li" key={service.id} delay={(index % 3) * 90} className="border-b border-r border-ink/10 bg-bone">
                 <Link
                   href={`/services/${service.slug}`}
                   className="flex h-full flex-col gap-4 p-8 transition-colors hover:bg-sand/40"
@@ -45,7 +47,7 @@ export function ServicesGrid({
                   <h3 className="heading">{text(service, "title", locale)}</h3>
                   <p className="text-sm text-ink/70">{text(service, "summary", locale)}</p>
                 </Link>
-              </li>
+              </Reveal>
             );
           })}
         </ul>

@@ -63,6 +63,12 @@ export default async function LocaleLayout({
     <html lang={locale} className={fontVariables} data-theme={DEFAULT_THEME} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        {/* Without JavaScript nothing would ever reveal: show it all, still. */}
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: '<style>[data-revealed="false"]{opacity:1!important;transform:none!important;clip-path:none!important}</style>',
+          }}
+        />
       </head>
       <body className={fontClassFor(locale)}>
         <NextIntlClientProvider>

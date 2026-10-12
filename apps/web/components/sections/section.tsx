@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Reveal } from "@/components/motion/reveal";
 
 interface SectionProps {
   eyebrow?: string;
@@ -19,10 +20,10 @@ export function Section({ eyebrow, title, tone = "bone", id, children }: Section
         {/* No numbered 01 / 02 / 03: it reads as a template, and with the
             sections that hide when empty the visible run had gaps. */}
         {(eyebrow || title) && (
-          <header className="mb-12 max-w-3xl">
+          <Reveal as="header" className="mb-12 max-w-3xl">
             {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
             {title ? <h2 className="display-2 mt-4">{title}</h2> : null}
-          </header>
+          </Reveal>
         )}
         {children}
       </div>

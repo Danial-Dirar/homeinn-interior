@@ -186,3 +186,31 @@
   pointer-events: none;
   color: rgb(20 24 26 / 0.45);
 }
+
+/* ---------- Entrances (components/motion/reveal.tsx) ----------
+
+   Content rises in, and pictures unveil from the bottom up like the
+   blueprints drawing themselves, the first time each scrolls into view.
+   Waiting content is transparent or clipped, never removed: it stays in the
+   accessibility tree, and keyboard focus finishes the entrance at once. */
+[data-reveal] {
+  transition:
+    opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+    clip-path 1.1s cubic-bezier(0.65, 0, 0.35, 1);
+}
+[data-reveal="rise"][data-revealed="false"] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+}
+[data-reveal="wipe"] {
+  clip-path: inset(0 0 0 0);
+}
+[data-reveal="wipe"][data-revealed="false"] {
+  clip-path: inset(100% 0 0 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
+}

@@ -1,23 +1,28 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePrefersReducedMotion } from "./use-prefers-reduced-motion";
+
+const REDUCED = "(prefers-reduced-motion: reduce)";
 
 /**
  * Reveals an element the first time it enters the viewport. The whole animation
  * is a CSS transition on the returned flag — no animation runtime, which is what
  * keeps the §7 performance budget reachable on a mid-range Android over 4G.
+ *
+ * It shows at once, with no animation, whenever it cannot wait safely: when
+ * the visitor asked for less motion, and in a browser without
+ * IntersectionObserver, where the event it waits for would never come.
  */
 export function useReveal<T extends HTMLElement>() {
   const ref = useRef<T>(null);
-  const reduced = usePrefersReducedMotion();
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    // Ask the media query itself. `reduced` starts true until the preference
-    // has been read, and trusting that first value revealed everything on
-    // mount — every entrance had finished before anyone scrolled to it.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Ask the media query itself, at mount. Trusting a hook's initial guess
+    // once revealed everything on mount — every entrance finished before
+    // anyone scrolled to it.
+    const reduced = typeof window.matchMedia === "function" && window.matchMedia(REDUCED).matches;
+    if (reduced || typeof IntersectionObserver === "undefined") {
       setRevealed(true);
       return;
     }
@@ -42,7 +47,7 @@ export function useReveal<T extends HTMLElement>() {
       observer.disconnect();
       element.removeEventListener("focusin", reveal);
     };
-  }, [reduced]);
+  }, []);
 
   return { ref, revealed };
 }

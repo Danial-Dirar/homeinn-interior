@@ -27,8 +27,8 @@ export function SelectedProjects({
   return (
     <Section eyebrow={t("projectsEyebrow")} title={t("projectsTitle")} tone="ink">
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-        {projects.slice(0, MAX).map((project) => (
-          <ProjectCard key={project.id} locale={locale} project={project} />
+        {projects.slice(0, MAX).map((project, index) => (
+          <ProjectCard key={project.id} locale={locale} project={project} index={index} />
         ))}
       </div>
       <Link

@@ -38,4 +38,13 @@ describe("Process", () => {
       .toEqual(["প্ল্যান", "মডেল", "রেন্ডার"]);
     expect(screen.getByAltText(/^৩ডি রেন্ডার:/)).toBeInTheDocument();
   });
+
+  it("unveils the model and then the render, after the plan starts drawing", () => {
+    renderWithIntl(<Process />);
+    const model = screen.getByAltText(/massing model/).closest("[data-reveal]") as HTMLElement;
+    const render = screen.getByAltText(/^3D render:/).closest("[data-reveal]") as HTMLElement;
+    expect(model).toHaveAttribute("data-reveal", "wipe");
+    expect(render).toHaveAttribute("data-reveal", "wipe");
+    expect(parseInt(render.style.transitionDelay, 10)).toBeGreaterThan(parseInt(model.style.transitionDelay, 10));
+  });
 });

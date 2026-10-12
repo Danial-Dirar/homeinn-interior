@@ -37,4 +37,11 @@ describe("ServicesGrid", () => {
     const { container } = renderWithIntl(<ServicesGrid locale="en" services={[service()]} />);
     expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
   });
+
+  it("brings its services in one after another across a row", () => {
+    const { container } = renderWithIntl(<ServicesGrid locale="en" services={[service({ id: "a", slug: "a" }), service({ id: "b", slug: "b" })]} />);
+    const cells = [...container.querySelectorAll("li[data-reveal]")] as HTMLElement[];
+    expect(cells).toHaveLength(2);
+    expect(cells[1]!.style.transitionDelay).toBe("90ms");
+  });
 });

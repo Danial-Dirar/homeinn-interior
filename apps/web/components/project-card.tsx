@@ -4,6 +4,7 @@ import { Picture } from "@/components/media/picture";
 import { Link } from "@/i18n/navigation";
 import type { ProjectView } from "@/lib/api.types";
 import { text } from "@/lib/locale-text";
+import { Reveal } from "@/components/motion/reveal";
 
 /** Design-stage work is filed here, and is shown in renders rather than photographs. */
 const RENDERED_AREA = "architectural-design";
@@ -14,13 +15,18 @@ const RENDERED_AREA = "architectural-design";
  * studies and a card has no way to know which it is holding. The detail page
  * decides, where the working area is in scope.
  */
-export function ProjectCard({ locale, project }: { locale: Locale; project: ProjectView }) {
+export function ProjectCard({ locale, project, index = 0 }: {
+  locale: Locale;
+  project: ProjectView;
+  /** Place in the grid; staggers the picture's unveiling across a row. */
+  index?: number;
+}) {
   const t = useTranslations("projects");
 
   return (
     <article className="group">
       <Link href={`/projects/${project.slug}`} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden bg-ink-raised">
+        <Reveal variant="wipe" delay={(index % 4) * 90} className="relative aspect-[4/3] overflow-hidden bg-ink-raised">
           {project.cover ? (
             <Picture
               media={project.cover}
@@ -36,7 +42,7 @@ export function ProjectCard({ locale, project }: { locale: Locale; project: Proj
               {t("renderTag")}
             </span>
           ) : null}
-        </div>
+        </Reveal>
         <h3 className="heading mt-4">{text(project, "title", locale)}</h3>
         {/* Joined rather than concatenated: an imported project may have no
             location yet, and a leading " · " would show for every one. */}

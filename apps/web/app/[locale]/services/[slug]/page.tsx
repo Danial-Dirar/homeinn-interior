@@ -113,9 +113,9 @@ export default async function ServiceDetailPage({
           <section className="mt-24">
             <h2 className="heading">{t("designs")}</h2>
             <ul className="mt-6 grid gap-10 sm:grid-cols-2">
-              {designs.map((project) => (
+              {designs.map((project, index) => (
                 <li key={project.id}>
-                  <ProjectCard locale={locale} project={project} />
+                  <ProjectCard locale={locale} project={project} index={index % 2} />
                 </li>
               ))}
             </ul>
