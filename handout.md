@@ -2011,3 +2011,84 @@ nothing.
 - `Blueprint` merges its classes with `cn()`, so a caller's `absolute`
   replaces the default `relative` instead of fighting it.
 - The thicker plan lines and the reveal fix, both above.
+
+### Branch review, and what it changed
+
+A fresh reviewer (Opus) read the whole branch, `c3383dd..e7689f6`. Its verdict
+was "with fixes". It confirmed all five risks the plan had flagged:
+
+- reduced motion
+- theme colours
+- the missing-renders refusal
+- Bangla captions
+- the empty facts box
+
+It found four more problems, all fixed in `5f4fdb9`. Each fix began with a test
+that failed:
+
+| Finding | Fix | Checked in the browser |
+| --- | --- | --- |
+| **Critical:** the reveal fix made 4 of 6 furniture cards unreachable by keyboard. The cards waited behind `visibility: hidden`, which never mattered while reveals fired on mount. Tab went from card 2 straight to the footer. | The cards and the custom-built panel now wait transparent instead of hidden. Keyboard focus counts as arriving (`focusin`). | Tab reaches 6 of 6 cards at 1280 and 393 wide |
+| The villas sat in "Recent work" beside photographs of built offices, with nothing visible to say they are renders. | The project list now includes each project's working-area slug. Design-stage cards show a **3D render / ৩ডি রেন্ডার** tag on the picture, in the same style as "Made to order". | Tag on both villas on the home page, `/projects` and the Architecture page, in en and bn; built work has none |
+| The statement's backdrop plan made the page scroll sideways at 1024–1300px. | `-right-10` → `right-0` | `scrollWidth` matches the window at 1024, 1280, 1300 and 1440, en and bn |
+| The Model caption said "the plan built up in 3D", which joins two different houses into one project. | It now reads "A design built up in 3D…" / "নকশাকে ৩ডি-তে গড়ে তোলা…". | — |
+
+After the fixes:
+
+- **Tests:** typecheck 5/5; unit tests web 300, api 74, types 21, ui 5;
+  lint clean; api e2e 89 passed (3 todo).
+- **axe:** 0 violations in the full sweep in light and in dark.
+
+**Deferred, small** (noted, not fixed):
+
+- **No share description on villa pages.** They have no meta or OG
+  description; it falls back to the location, which is empty. A shared link
+  says nothing about renders.
+- **Project order isn't fixed.** The public list has no final tiebreak. On a
+  database with other featured projects at sortOrder 0 or 1, the villas may
+  not lead, or may swap places.
+- **`seed:architecture` has two gaps.**
+  - It runs without a transaction, so a failure partway through leaves orphan
+    media.
+  - It refuses to run on a server where the renders were deleted after
+    seeding.
+- **The Bangla count guard has gaps.** It misses দুটি, ছ'টি and the
+  precomposed য়.
+- **Stale comments:**
+  - "nine" in `working-areas.ts`
+  - "seven" in `icons.test.ts`
+  - the body comment in `services.ts`
+  - the `[reduced]` dependency in `use-reveal.ts`
+- **The footer menu repeats the header's route list** instead of deriving
+  from it.
+- **Untested:** the hidden empty facts row, and the seed's
+  refuse-before-write order and "kept" path.
+
+**For Muhammad to decide:**
+
+- **Overlapping services.** The new Architectural Design service overlaps the
+  existing "2D & 3D Plan, Model & Visualization".
+- **The Blog route.** `/blog` still works and is still in the sitemap; only
+  its nav link is gone.
+
+### Deploying this
+
+1. **Copy the renders in**, using the block above.
+2. **Rebuild and restart the API.** The project list's new `workingArea`
+   field comes from the API. Until it restarts, cards render without the
+   3D-render tag; they do not break.
+3. **Run `pnpm seed`, then `pnpm seed:architecture`.** Run these before the
+   web build or revalidation. Until the seed has created the Architectural
+   Design service, the nav's Architecture link returns 404.
+   - Note: `pnpm seed` overwrites admin edits to services and working areas.
+     That has always been true, and this branch adds two rows to it.
+4. **Build and start the web app.**
+
+### Running state
+
+- **API on :4000** runs in Muhammad's own terminal from the old build. Its
+  `dist/` has been rebuilt, so **a restart there** (Ctrl-C, then
+  `pnpm --filter @homeinn/api start`) brings in the render tags.
+- **Web on :3100** was rebuilt with the LAN `.env` and restarted from this
+  session.
+- **The second API on :4100**, used only for the browser checks, was stopped.
