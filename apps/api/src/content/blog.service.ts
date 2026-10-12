@@ -15,7 +15,7 @@ const DETAIL_INCLUDE = { cover: true, seo: { include: { ogImage: true } } } as c
  * A post going live without an explicit date would be invisible to `listPublic`,
  * which filters on `publishedAt`. Stamp it so publishing always means published.
  */
-function stampPublishedAt(input: { published?: boolean; publishedAt?: Date }) {
+function stampPublishedAt(input: { published?: boolean; publishedAt?: Date | null }) {
   return input.published && !input.publishedAt ? { publishedAt: new Date() } : {};
 }
 

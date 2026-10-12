@@ -1,7 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import type { PublicMedia } from "@homeinn/types";
+import type { ShopProduct } from "@prisma/client";
+import type { CreateProductInput, PublicMedia, UpdateProductInput } from "@homeinn/types";
 import { PrismaService } from "../prisma/prisma.service";
 import { MediaService } from "../media/media.service";
+import { uniqueSlug } from "../common/slug";
+import { connectGallery, notFoundIfMissing, setGallery } from "./content.helpers";
 
 export interface PublicProduct {
   id: string;
@@ -49,5 +52,32 @@ export class ProductsService {
       cover: this.media.view(row.cover),
       gallery: this.media.viewMany(row.gallery),
     };
+  }
+
+  async create(input: CreateProductInput): Promise<ShopProduct> {
+    const { galleryIds, ...fields } = input;
+    const slug = await uniqueSlug(fields.nameEn, async (s) =>
+      (await this.prisma.shopProduct.count({ where: { slug: s } })) > 0);
+    return this.prisma.shopProduct.create({ data: { ...fields, slug, ...connectGallery(galleryIds) } });
+  }
+
+  async update(id: string, input: UpdateProductInput): Promise<ShopProduct> {
+    const { galleryIds, ...fields } = input;
+    try {
+      return await this.prisma.shopProduct.update({
+        where: { id },
+        data: { ...fields, ...setGallery(galleryIds) },
+      });
+    } catch (e) {
+      throw notFoundIfMissing(e, "Product not found");
+    }
+  }
+
+  async remove(id: string): Promise<void> {
+    try {
+      await this.prisma.shopProduct.delete({ where: { id } });
+    } catch (e) {
+      throw notFoundIfMissing(e, "Product not found");
+    }
   }
 }

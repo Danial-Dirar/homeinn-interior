@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { bilingualText } from "./common.js";
 
-const url = z.string().trim().url().max(300);
+/** A link, or `""` to remove it from the site. */
+const url = z
+  .union([z.string().trim().url().max(300), z.literal("")])
+  .transform((value) => (value === "" ? null : value));
 
 /**
  * The whole settings row is editable, so create and update are the same shape:
@@ -15,8 +18,8 @@ export const updateSettingsSchema = bilingualText("address", 500)
       whatsapp: z.string().trim().min(1).max(40),
       // A second line, optional. `""` clears it rather than leaving a stale
       // number on the site, so the admin can remove one without a null.
-      phoneSecondary: z.string().trim().max(40).optional(),
-      whatsappSecondary: z.string().trim().max(40).optional(),
+      phoneSecondary: z.string().trim().max(40).nullable().optional(),
+      whatsappSecondary: z.string().trim().max(40).nullable().optional(),
       email: z.string().trim().toLowerCase().email(),
       facebookUrl: url.optional(),
       instagramUrl: url.optional(),
