@@ -1,27 +1,41 @@
-import { render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
-import { describe, expect, it } from "vitest";
-import en from "@/messages/en.json";
+import { screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderWithIntl } from "@/test/render";
 import { Process } from "./process";
 
-function renderWith(messages: Record<string, unknown>) {
-  return render(
-    <NextIntlClientProvider locale="en" messages={messages}>
-      <Process />
-    </NextIntlClientProvider>,
-  );
-}
+beforeEach(() => {
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: false, media: query, addEventListener: vi.fn(), removeEventListener: vi.fn(),
+  }));
+  vi.stubGlobal("IntersectionObserver", class { observe() {} disconnect() {} });
+});
 
 describe("Process", () => {
-  it("renders nothing while the copy source is missing", () => {
-    // home.processTitle is empty in both catalogues: its source is the profile
-    // PDF's six key strengths, which is not in this repository (spec §12).
-    const { container } = renderWith(en);
-    expect(container).toBeEmptyDOMElement();
+  it("shows plan, model and render, in that order", () => {
+    renderWithIntl(<Process />);
+    expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent))
+      .toEqual(["Plan", "Model", "Render"]);
   });
 
-  it("renders once the copy is written", () => {
-    renderWith({ ...en, home: { ...en.home, processTitle: "Six steps, every time." } });
-    expect(screen.getByText("Six steps, every time.")).toBeInTheDocument();
+  it("draws the plan as a labelled blueprint", () => {
+    renderWithIntl(<Process />);
+    expect(screen.getByRole("img", { name: /Ground-floor plan/ })).toBeInTheDocument();
+  });
+
+  it("calls the render a render, so it is never taken for a photograph", () => {
+    renderWithIntl(<Process />);
+    expect(screen.getByAltText(/^3D render:/)).toHaveAttribute("src", "/process/render-1600.webp");
+  });
+
+  it("serves the model and render at more than one width", () => {
+    renderWithIntl(<Process />);
+    expect(screen.getByAltText(/3D massing model/)).toHaveAttribute("srcset", "/process/model-640.webp 640w, /process/model-1280.webp 1280w");
+  });
+
+  it("speaks Bangla on bn pages", () => {
+    renderWithIntl(<Process />, { locale: "bn" });
+    expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent))
+      .toEqual(["প্ল্যান", "মডেল", "রেন্ডার"]);
+    expect(screen.getByAltText(/^৩ডি রেন্ডার:/)).toBeInTheDocument();
   });
 });
