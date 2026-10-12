@@ -53,15 +53,21 @@ export class UsersService {
     if (existing.role === "ADMIN" && input.role === "EDITOR" && (await this.adminCount()) === 1) {
       throw new ConflictException("This is the last admin; make someone else an admin first");
     }
-    return this.prisma.adminUser.update({
+    // A reset password or a changed role ends that person's sessions: a reset is
+    // what you do when a password may be known to someone else.
+    const endsSessions = Boolean(input.password) || (input.role !== undefined && input.role !== existing.role);
+    const updated = await this.prisma.adminUser.update({
       where: { id },
       data: {
         name: input.name,
         role: input.role,
         ...(input.password ? { passwordHash: await this.passwords.hash(input.password) } : {}),
+        ...(endsSessions ? { sessionsValidAfter: new Date() } : {}),
       },
       ...PUBLIC,
     });
+    if (endsSessions) await this.revokeRefreshTokens(id);
+    return updated;
   }
 
   async remove(id: string, actingUserId: string): Promise<void> {
@@ -71,7 +77,7 @@ export class UsersService {
     if (existing.role === "ADMIN" && (await this.adminCount()) === 1) {
       throw new ConflictException("This is the last admin");
     }
-    await this.prisma.refreshToken.deleteMany({ where: { userId: id } });
+    await this.revokeRefreshTokens(id);
     await this.prisma.adminUser.delete({ where: { id } });
   }
 
@@ -81,9 +87,19 @@ export class UsersService {
     if (!record || !(await this.passwords.verify(record.passwordHash, current))) {
       throw new BadRequestException("The current password is not correct");
     }
+    // Every other device is signed out; the caller re-issues this session's
+    // tokens after this, so they are issued after the cut-off.
     await this.prisma.adminUser.update({
       where: { id },
-      data: { passwordHash: await this.passwords.hash(next) },
+      data: { passwordHash: await this.passwords.hash(next), sessionsValidAfter: new Date() },
+    });
+    await this.revokeRefreshTokens(id);
+  }
+
+  private async revokeRefreshTokens(userId: string): Promise<void> {
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
     });
   }
 

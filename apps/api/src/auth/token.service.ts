@@ -19,7 +19,9 @@ export class TokenService {
 
   signAccess(user: AuthUser): Promise<string> {
     return this.jwt.signAsync(
-      { sub: user.id, email: user.email, name: user.name, role: user.role },
+      // `iatMs`: `iat` is whole seconds, too coarse to tell a token issued just
+      // before a password reset from one issued just after it.
+      { sub: user.id, email: user.email, name: user.name, role: user.role, iatMs: Date.now() },
       { secret: process.env.JWT_ACCESS_SECRET, expiresIn: "15m" },
     );
   }

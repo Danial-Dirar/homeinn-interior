@@ -72,7 +72,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     await this.users.changePassword(user.id, body.currentPassword, body.newPassword);
-    await this.tokens.revokeAll(user.id);
     res.cookie(ACCESS_COOKIE, await this.tokens.signAccess(user), cookieOptions(15 * 60_000));
     res.cookie(REFRESH_COOKIE, await this.tokens.issueRefresh(user.id), cookieOptions(7 * 86_400_000));
     return { ok: true };

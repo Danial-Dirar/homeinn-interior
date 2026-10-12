@@ -141,6 +141,40 @@ describe("accounts", () => {
     await request(server()).delete(`/api/users/${admin.id}`).set("Cookie", cookies).expect(400);
   });
 
+  it("signs a person out everywhere when an admin resets their password", async () => {
+    // A reset is what you do when a password may be known to someone else;
+    // a session opened with it must not outlive it.
+    const theirs = await login("editor@homeinn.test");
+    const cookies = await login("admin@homeinn.test");
+    const editor = await prisma.adminUser.findUniqueOrThrow({ where: { email: "editor@homeinn.test" } });
+    await request(server()).patch(`/api/users/${editor.id}`).set("Cookie", cookies)
+      .send({ password: "reset-by-admin-1" }).expect(200);
+
+    await request(server()).post("/api/auth/refresh").set("Cookie", theirs).expect(401);
+    await request(server()).get("/api/auth/me").set("Cookie", theirs).expect(401);
+  });
+
+  it("ends a demoted admin's session at once, so the rights go with it, not when the token expires", async () => {
+    const cookies = await login("admin@homeinn.test");
+    const editor = await prisma.adminUser.findUniqueOrThrow({ where: { email: "editor@homeinn.test" } });
+    await request(server()).patch(`/api/users/${editor.id}`).set("Cookie", cookies).send({ role: "ADMIN" }).expect(200);
+    const promoted = await login("editor@homeinn.test");
+    await request(server()).get("/api/users").set("Cookie", promoted).expect(200);
+
+    await request(server()).patch(`/api/users/${editor.id}`).set("Cookie", cookies).send({ role: "EDITOR" }).expect(200);
+
+    await request(server()).get("/api/users").set("Cookie", promoted).expect(401);
+  });
+
+  it("ends a deleted account's session at once", async () => {
+    const theirs = await login("editor@homeinn.test");
+    const cookies = await login("admin@homeinn.test");
+    const editor = await prisma.adminUser.findUniqueOrThrow({ where: { email: "editor@homeinn.test" } });
+    await request(server()).delete(`/api/users/${editor.id}`).set("Cookie", cookies).expect(204);
+
+    await request(server()).get("/api/auth/me").set("Cookie", theirs).expect(401);
+  });
+
   it("never demotes the last admin", async () => {
     // Otherwise nobody could manage accounts again without the database.
     const cookies = await login("admin@homeinn.test");
