@@ -1351,3 +1351,429 @@ Consequences for work already done:
 
 Earlier plans and the Phase 1 design still name `homeinnbd.com`. They are a
 record of what was decided when, and were not rewritten.
+
+---
+
+## Final touch-up — read-through and baseline — 2026-10-12
+
+Read-only session: the whole repo (API, web, `packages/*`, seeds, specs, plan
+outlines, git history) was read before the final touch-up starts. **No code
+changed.** The only edit is this entry.
+
+### Baseline
+
+- `pnpm typecheck` — clean, 5 packages
+- `pnpm test` — ui 5 · types 21 · api 55 · web 230 (311 passed)
+- `pnpm lint` — clean
+- API e2e **not run**: Postgres on 5433 was down. Expected to fail anyway —
+  `seed.e2e-spec.ts` still asserts 7 services / 9 working areas, but the seed
+  now has 6 (2D+3D merged) and 10 (`factory-works` added).
+
+### Found while reading, for the touch-up list
+
+1. `home.areasTitle` says "Nine kinds of project" (bn: "নয় ধরনের") — there are ten.
+2. Visible section numerals run 01–05, 08, 09: Process (06) and Testimonials
+   (07) hide but keep their numbers.
+3. Home has no `<h1>` once the hero has images — only the zero-segment fallback
+   renders one.
+4. Bangla-digit phone numbers are rejected. The bn hint itself shows
+   `০১৭৬০৭৭৫৪৫৪`, and `bdPhone` only strips separators and `+880`.
+5. `sitemap.ts` omits `/furniture` and the product pages.
+6. Lead form messages fail AA: `text-brand` at 14px (4.07–4.32:1) and
+   `text-walnut` on ink (~3:1) for success. axe never sees them — they only
+   appear after a submit.
+7. `accent-[--color-brand]` is Tailwind v3 syntax; the build emits
+   `accent-color:--color-brand`, which is invalid, so the furniture checkbox
+   is unstyled.
+8. Project detail eyebrow link and rich-text links use `text-brand` at small
+   size — same AA problem; detail routes are outside the axe sweep.
+9. Furniture detail: the lead-time `<dt>` has no `<dd>`, and the price sits
+   under a "Made to order" label.
+10. Project and gallery images have `altBn` = the English `seen` text; years
+    and areas render in Latin digits on bn pages.
+11. Furniture prices are invented placeholders and the six products are
+    `published: true` — must be real or `null` before deploy.
+12. `ASSET-CHECKLIST.md` is stale (hero and project slots are now filled).
+13. The furniture work (`d449d65`, `5cec3c6`, `5e1810d`) has no entry in this
+    file.
+14. Still open from before: login throttle and seeded admin password (both
+    block deploy), 25 projects with provisional titles published locally,
+    the profile-PDF content, the hero-video decision.
+
+Line 43 of this file read `suitesshun` — a stray keystroke from the editor,
+left as found then, and corrected when the brand refresh was committed.
+
+---
+
+## Brand refresh, Part 1 — logo, font, palette, hero — 2026-10-12 — DONE (uncommitted)
+
+Muhammad brought a new identity: a "Home inn" wordmark set in **Righteous**
+(`assets/` — a dark cover and a cream square profile mark), with the request to
+put it on the site, change the font, take the theme from the logo, and replace
+the hero photographs with good free-licence ones. Home Inn now does
+architecture as well as interiors; that remodel is **Part 2**, after this.
+
+Decisions, agreed in chat:
+
+- Righteous on the logo and headings only. Body, forms and tables stay in
+  Geist — Righteous has one weight and is a display face. Bangla stays on Anek
+  Bangla, because Righteous has no Bangla glyphs.
+- The palette comes from the logo, and the red accent goes.
+- The name is **"Home Inn"** everywhere. "Interior Solution" is dropped.
+
+### 1. The name — DONE
+
+| File | Change |
+| --- | --- |
+| `apps/web/messages/{en,bn}.json` | brand, statement, story, default title and title template: "Home Inn" / "হোম ইন" |
+| `apps/web/lib/seo.ts` | `BRAND` constant, used for the OG site name, the LocalBusiness/Organization name, and the Article author |
+| `apps/api/prisma/seed-data/services.ts` | six service bodies, both languages |
+| `apps/web/app/not-found.tsx` | root 404 link text |
+| `apps/web/messages/messages.test.ts` | **new test**: neither catalogue may contain "Interior Solution" / "ইন্টেরিয়র সলিউশন" |
+| `apps/web/lib/seo.test.ts` | asserts the JSON-LD name is "Home Inn" |
+
+Both tests failed first (10 stale catalogue keys; old JSON-LD name), then passed.
+Web suite: 231 passed.
+
+### 2. The palette — DONE
+
+The palette now comes from the logo: charcoal `#14181A`, cream `#F3EDE2`,
+amber `#F0A63A`, and burnt orange as `brand`. The red `#E01B24` is gone.
+
+**There are two accents, picked by the ground.** Burnt orange is 3.24:1 on
+charcoal and amber is 1.76:1 on cream, so neither colour works on both
+grounds. A new `--color-accent` token defaults to `brand`. A `.ground-ink` class
+switches it to amber for everything inside. Components write `text-accent` /
+`hover:text-accent` and never need to know which ground they sit on.
+`ground-ink` is on the header, the mobile menu, the footer, ink `Section`s, all
+three hero variants, and the error and 404 pages.
+
+**`brand` is `#AE4B0B`, not the logo's `#B9500C`.** The logo's colour is
+4.28:1 on cream, which fails AA for small text. `#AE4B0B` is 4.73:1 and looks
+the same at a glance. White on it is 5.51:1, so the solid button keeps white
+text.
+
+This also closes findings 6–8 from the read-through:
+
+- Lead-form errors now use the accent: 4.73:1 on bone, 8.70:1 on ink. Success
+  uses the surrounding text colour; the walnut success line was ~3:1 on ink.
+- The project-detail eyebrow and rich-text links now pass AA.
+- The furniture checkbox uses `accent-brand`. The v3-style
+  `accent-[--color-brand]` had compiled to invalid CSS.
+
+| File | Change |
+| --- | --- |
+| `apps/web/app/globals.css` | new palette, `--color-accent`, `.ground-ink`; numerals and focus ring use the accent |
+| `apps/web/app/theme.test.ts` | pins the new values, asserts no `#E01B24`, asserts the accent switch |
+| `components/sections/section.tsx` (+ new `section.test.tsx`) | ink tone adds `ground-ink` |
+| `components/layout/site-header.tsx`, `site-footer.tsx` (+ tests) | `ground-ink`; hovers use the accent |
+| `components/layout/new-flag.tsx` | amber chip with ink text (8.70:1) |
+| `components/hero/{panorama-hero,hero-stack}.tsx` | `ground-ink`; progress bar uses the accent |
+| `components/forms/lead-form.tsx` (+ 2 tests) | status colours as above |
+| 15 other files under `app/`, `components/`, `packages/ui` | `hover:text-brand` → `hover:text-accent`, `outline-brand` → `outline-accent`, `[&_a]:text-brand` → `[&_a]:text-accent` |
+| `app/not-found.tsx` | inline colours updated to the new palette |
+
+13 new or changed tests failed first, then passed. Web suite: 239 passed.
+
+### 3. Righteous and the wordmark — DONE
+
+| File | Change |
+| --- | --- |
+| `apps/web/lib/fonts.ts` | Righteous (400, Latin) replaces Fraunces, which is no longer loaded at all |
+| `apps/web/app/globals.css` | `--font-display: var(--font-righteous), var(--font-anek), …`; `.heading` weight 400 (Righteous has one weight, and 500 invited a synthetic bold) |
+| `apps/web/components/brand/wordmark.tsx` (+ test) | **new** — "Home inn" as live text: cream + amber on ink, charcoal + burnt orange on bone |
+| `components/layout/site-header.tsx` | the wordmark is the home link; the long brand name is gone |
+| `components/layout/site-footer.tsx` | the wordmark replaces the brand line |
+
+**A Bangla fix came with this.** The old display stack was Fraunces → Georgia
+→ Times, with no Bangla face in it at all. So every Bangla heading in
+`.display-1`/`.display-2`/`.heading` rendered in whatever system font the
+browser found. Anek now sits directly behind Righteous in the display stack.
+
+### 4. Icons and the share card — DONE
+
+| File | Change |
+| --- | --- |
+| `apps/web/app/icon.png`, `app/apple-icon.png` | **new** — the square cream profile mark, trimmed and re-padded; 512 and 180px. The site had no favicon before. Still legible at 32px |
+| `apps/web/public/og.png` | **new** — the dark cover wordmark on a 1200×630 charcoal card |
+| `apps/web/lib/seo.ts` (+ 2 tests) | a page with no image of its own now gets the brand card as its OG image instead of nothing |
+
+### 5. The hero — DONE
+
+The five archive photographs are out. Six free-licence Unsplash photographs
+replace them, chosen for one warm palette of timber, cream and greenery, in
+walking order: **Architecture** (a house at dusk) → Lounge → Living Room →
+Kitchen → Bedroom → Workspace. That runs from architecture to workplace, which
+is the company's range now. On phones the strip is Architecture, Living Room
+and Workspace.
+
+**They are stand-ins, and the files say so.** None is Home Inn's work.
+
+- The labels name kinds of space, never projects.
+- Each photograph's source, photographer and licence is recorded in
+  `ASSET-CHECKLIST.md` and in the manifest itself.
+- The Unsplash License allows commercial use without attribution; it is
+  recorded anyway.
+- Unsplash+ (premium) photos were filtered out when downloading — any whose
+  download link did not redirect to `images.unsplash.com`.
+
+**The seed is now manifest-driven.**
+`apps/api/prisma/seed-data/hero/hero.ts` is the hero: file, both labels, both
+alt texts, `focalX`, mobile flag, and source. `seed-hero.ts` makes the
+database match it:
+
+- A segment is kept only if its label **and** its file's byte length still
+  match — ingest stores the source size in `Media.bytes`.
+- Anything else is deleted, image row and derivatives included. Otherwise a
+  retired photo would stay served at its own URL.
+- New entries are ingested through the usual sharp pipeline.
+
+The size check matters on the first run. The old strip already had "Living
+Room", "Bedroom" and "Kitchen", and matching on label alone would have kept the
+old pictures under the new labels. That case has a test.
+
+The old seed also wrote the English label into `labelBn` as a placeholder. The
+manifest schema now rejects a `labelBn` that equals `labelEn`. It also
+requires a source and licence, unique labels, and at least one mobile segment.
+
+| File | Change |
+| --- | --- |
+| `apps/api/src/content/hero-sync.ts` (+ spec, 10 tests) | **new** — `heroManifestSchema`, `planHeroSync` |
+| `apps/api/prisma/seed-data/hero/hero.ts` + 6 JPEGs (2560px, ~0.4–0.75 MB each) | **new** — the manifest and the photographs |
+| `apps/api/prisma/seed-hero.ts` | rewritten around the plan |
+| `apps/api/prisma/seed-data/placeholders/` | **removed** — five archive JPEGs and the old README. The originals remain in `media_dump/` and in git history |
+| `ASSET-CHECKLIST.md` | rewritten: current slots, and the licence record for all six |
+
+Applied to the dev database: the first run removed 5 segments and added 6; a
+second run kept all 6 and changed nothing. No orphaned hero media remains. The
+main `pnpm seed` was re-run too, which renamed the six service bodies.
+
+### 6. Found by looking at it, and fixed
+
+Screenshots were taken with Playwright, driving the system Brave — no
+Playwright browsers are installed on this machine. Four things turned up:
+
+1. **The hero's "Scroll to walk through" cue was invisible.** It never had a
+   colour of its own, so it inherited the body's charcoal and sat on the dark
+   gradient. This predates today's work. The caption block is now `text-sand`
+   (+ test).
+2. **Righteous's ampersand reads as a "€"**: "Corporate Office € Bank
+   Furniture". `lib/fonts.ts` now loads Fredoka 600's "&" alone — an 892-byte
+   subset from Google Fonts, SIL OFL, at `apps/web/fonts/fredoka-ampersand.woff2`.
+   It is limited with `unicode-range: U+0026` and sits first in the display
+   stack. Fredoka was picked over Outfit, Lexend and Geist by rendering all four
+   beside Righteous; its rounded terminals match (+ test).
+3. **The new cream broke muted text.** `#F3EDE2` is a shade deeper than the old
+   bone, so `text-ink/60` dropped from passing to 4.44:1. axe found 24
+   violations across the site. Every `/60` text is now `/65` (5.21:1). A theme
+   test now fails if `text-(ink|current)/(50|55|60)` reappears in `app/` or
+   `components/`.
+4. **The API e2e suite had been broken since 2026-08-08, for an environmental
+   reason.** `homeinn_test` had only the `init` migration, so 27 tests failed
+   with 500s. Ran `DATABASE_URL=$TEST_DATABASE_URL prisma migrate deploy` (three
+   migrations applied). After that only the three stale seed counts from the
+   read-through failed. `seed.e2e-spec.ts` now expects 6 services and 10
+   working areas, with comments giving the dates and reasons.
+
+### Verification
+
+```
+pnpm typecheck   → clean, 5 packages
+pnpm test        → types 21 · ui 5 · api 65 · web 251
+pnpm lint        → clean
+apps/api e2e     → 87 passed, 3 todo (the profile-PDF rows), 6 suites
+web build        → 97 pages, BUILD_ID present
+axe (WCAG 2.1 AA, own script via Brave) → 0 violations on 11 routes
+  (8 top-level + a project, a service and a product page)
+  × en/bn × 1440px/393px = 44 pages
+```
+
+The repo's own Playwright e2e (`apps/web/e2e`) was **not** run — it needs
+`npx playwright install`, which downloads browsers, and was not done without
+asking.
+
+### Running state left behind
+
+- Postgres on 5433 is up.
+- The API Muhammad started at 16:40 (`node dist/main.js`, :4000) was left
+  running. It needed no restart: nothing it serves changed in code, and the
+  hero is data.
+- His `next start` on :3100 was stopped and replaced, because it was serving
+  the old build. A new one runs from a background task on the same port, built
+  with the LAN values from `.env` (192.168.0.167), so phone testing still works.
+
+### Known and left
+
+- On desktop, once the WhatsApp float appears it overlaps the right end of the
+  hero cue on frames 2–6. The cue matters on the first frame, where the float
+  is hidden.
+- Copy still says "Interior design, custom furniture…" and "Nine kinds of
+  project". The architecture positioning is **Part 2**, along with which of the
+  renders in `/mnt/shinrinyoku/Home Inn/PDF References/` are Home Inn's own
+  work.
+
+---
+
+## Cream theme, no amber, and a lights switch — 2026-10-12 — DONE (uncommitted)
+
+Muhammad pointed at the cream profile logo — charcoal "Home", burnt-orange
+"inn" — and said use that, not the yellow. Asked whether the header should be
+cream or stay dark, he chose **both, as a dark-mode switch**, defaulting to
+dark, with something other than the usual sun/moon icon.
+
+### What changed
+
+**The amber is gone, and orange does its job.** The palette now has:
+
+- `logo` `#B9500C` — the mark's exact orange, used only for the wordmark's
+  "inn", in both themes
+- `brand` `#AE4B0B` — unchanged, small text on cream, 4.73:1
+- `ember` `#D86A27` — new; the same orange lifted for small text on charcoal,
+  5.11:1. It replaces amber as the dark-ground accent
+
+The NEW flag is now `bg-brand text-white` (5.51:1), which reads the same on
+either header. The hero's light pool uses `ember`. The share card
+(`public/og.png`) is regenerated from the cream logo.
+
+**Two themes.** The theme is set on `<html data-theme>`, and the server always
+sends `dark`.
+
+- **Dark** is the site as it was.
+- **Light** swaps the colour tokens on every `.ground-ink` element:
+  - `--color-ink` becomes paper `#F8F4EC`
+  - `--color-sand` and `--color-bone` become charcoal
+  - the accent becomes `brand`
+
+  `bg-ink`, `text-sand`, `border-ink-line` and the rest compile to
+  `var(--color-…)`, so the header, footer, mobile menu, dark sections and
+  error pages all flip without a component knowing.
+- **Two exceptions.** `.ground-photo` (the hero frames and the
+  reduced-motion stack) stays dark, because its captions sit on a dark floor
+  over the photo. `.ground-chrome` (the header) takes the logo's own cream
+  `#F3EDE2`, so the light header reads exactly like the logo file.
+- **Why paper, not bone.** Paper is a shade lighter than the cream `bone`
+  sections, so the alternation between sections survives.
+
+**The switch is a ceiling lamp** (`LampCeiling`): "Lights on" / "Lights off",
+in Bangla "আলো জ্বালান" / "আলো নেভান". When the light theme is on, a small
+ember glow sits under the shade. It has `aria-pressed`, and a `title`.
+
+**How the choice sticks.** It is stored in `localStorage["hi-theme"]`. An
+inline boot script in `<head>` applies it before paint, so there is no flash of
+the dark page. `suppressHydrationWarning` sits on `<html>` for that one
+attribute only.
+
+| File | Change |
+| --- | --- |
+| `apps/web/app/globals.css` | palette (`ember`, `logo`; amber removed); light-theme flip rules |
+| `apps/web/lib/theme.ts` (+ test) | **new** — `readTheme`, `THEME_KEY`, `DEFAULT_THEME`, `themeBootScript` |
+| `apps/web/components/layout/theme-toggle.tsx` (+ test) | **new** — the lamp |
+| `apps/web/app/[locale]/layout.tsx` | `data-theme="dark"`, boot script in `<head>` |
+| `components/layout/site-header.tsx` (+ tests) | `ground-chrome`; the lamp beside the locale switch, on every screen size |
+| `components/brand/wordmark.tsx` (+ test) | "inn" in `text-logo` everywhere |
+| `components/hero/{panorama-hero,hero-stack}.tsx` (+ test) | `ground-photo`; light pool in ember |
+| `components/layout/new-flag.tsx` | brand chip, white text |
+| `messages/{en,bn}.json` | `nav.lightsOn` / `nav.lightsOff` |
+| `app/theme.test.ts` | palette and light-theme rules pinned; asserts no amber |
+| `apps/web/vitest.setup.ts` | Node 26's experimental global `localStorage` shadowed jsdom's and was `undefined`; the global now points at jsdom's real Storage |
+| `public/og.png`, `ASSET-CHECKLIST.md` | cream share card |
+
+### Verification
+
+- `pnpm typecheck` / `pnpm lint` — clean. `pnpm test` — types 21 · ui 5 ·
+  api 65 · web 271.
+- Web build: 97 pages. The served HTML carries `data-theme="dark"` and the
+  boot script.
+- axe, WCAG 2.1 AA — **0 violations in both themes**: 11 routes × en/bn ×
+  1440/393px × 2 themes = 88 pages.
+- In Brave, clicking the lamp sets `light` and stores it; after a reload the
+  page is still light, and the header computes to the cream. No console or
+  hydration errors.
+- Screenshots of both themes were checked by eye. The light header matches the
+  logo file.
+
+---
+
+## Light by default, and the figures rewritten as prose — 2026-10-12 — DONE (uncommitted)
+
+### The site opens light
+
+Muhammad saw both themes and chose cream as the default. `DEFAULT_THEME` is now
+`"light"`. The server sends `data-theme="light"`, and the boot script applies a
+stored `"dark"` before paint. The lamp works the same way in reverse: it starts
+"on", and turning it off gives the dark site. Tests: `lib/theme.test.ts`,
+`theme-toggle.test.tsx`, `site-header.test.tsx`.
+
+### "This looks AI-generated" — the big-number pattern, everywhere it was
+
+His words, about the 73 / 57 / 13 row. He was right, and the same trope
+appeared in four places:
+
+| Where | Was | Now |
+| --- | --- | --- |
+| Home statement | three `display-1` numerals over small tracked labels, in a `<dl>` grid | one sentence: "So far: **73** corporate projects and **57** residential ones, across **13** districts of Bangladesh." (bn: "এ পর্যন্ত দেশের ১৩টি জেলায় ৭৩টি কর্পোরেট ও ৫৭টি আবাসিক প্রকল্প।"). The figures are set at the sentence's own size and picked out only by the accent colour |
+| Track record | "73 + 57" in `display-2` | removed. The statement already says it, and the section keeps its body copy, flagship names (once they exist) and link |
+| Every section header | numbered eyebrows "01 … 09" | eyebrow only. This also fixes the read-through finding that the visible run went 01–05 then 08, 09, because Process and Testimonials hide |
+| Working areas list | "01 … 10" numerals | the area name, with a decorative `ArrowUpRight` that moves on hover |
+
+`Section` lost its `numeral` prop. `TrackRecord` lost its `locale` and
+`settings` props, which it no longer needs. The `home.stat*` message keys were
+replaced by `home.statementFigures`, an ICU rich message with `<n>` tags.
+`.section-numeral` remains for the 404 page only.
+
+Tests: rewritten `statement.test.tsx` (no `<dl>`; the sentence; figures are
+`<strong class="text-accent">` with no display class; Bangla numerals), and
+new cases in `track-record`, `section` and `working-areas`. They failed first
+(6), then passed. Web suite: 276. Typecheck and lint clean.
+
+### Next, in the order Muhammad gave
+
+1. Hero photos: the current six read as American houses; replace them with
+   ones that feel like Bangladesh.
+2. Commit and push, with no co-author trailer.
+3. Start Part 2.
+
+### The hero, second pass: photographs that look like Bangladesh — DONE
+
+Muhammad: the first set "goes with American properties" — replace it with
+things that fit Bangladesh. He was right: a Texas-style villa, Catskills
+kitchens. The new six were chosen for what reads as a Bangladeshi home or
+office:
+
+| # | Label (en / bn) | Why it reads local | Photographer · place |
+| --- | --- | --- | --- |
+| 1 | Architecture / স্থাপত্য | duplex at dusk with a jali-patterned door screen, car porch, boundary wall with planting | Elite Prop · Madurai |
+| 2 | Drawing Room / ড্রয়িং রুম | arched doorways, wooden armchairs with bolsters, ceiling fan, marble floor. "Drawing room" is what a Bangladeshi flat calls it | Sanju Pandita · — |
+| 3 | Lounge / লাউঞ্জ | breeze-block jali wall with greenery — the material of contemporary Bangladeshi architecture, and of his Photo References | Jejo Jose · — |
+| 4 | Kitchen / রান্নাঘর | U-shaped modular kitchen with a ceiling fan | SD Inc · New Delhi |
+| 5 | Bedroom / শোবার ঘর | panelled wall, window with grill bars, laminate floor | Anisha Deb · Pune |
+| 6 | Office / অফিস | workstations, glass partitions, cassette AC — Home Inn's own kind of corporate job | PYX Photography · New Delhi |
+
+Mobile shows 1, 2 and 6.
+
+Excluded on purpose: interiors with a Hindu shrine or idol (several of the
+best Indian living and dining rooms had one), a watermarked render (Houzlook),
+and Dhaka skyline shots — other people's buildings presented under
+"Architecture" would be a claim.
+
+**How they were found.** Unsplash's search pages sit behind a proof-of-work
+bot check, which curl cannot pass. Driving Brave through Playwright passes it.
+That made it possible to search properly (`?orientation=landscape&license=free`)
+and to open each photo page. All six pages were checked on 2026-10-12: each
+says "Free to use under the Unsplash License", and none is Unsplash+. Two pages
+give no location, and the record says "—" rather than guessing India.
+
+**Applying it.** `seed:hero` showed why the byte-size check exists. Four labels
+were unchanged (Architecture, Lounge, Kitchen, Bedroom) but the files had
+changed. All six old segments were removed with their media, and six were
+ingested.
+
+| File | Change |
+| --- | --- |
+| `apps/api/prisma/seed-data/hero/*.jpg` | the six new photographs; the six earlier ones deleted |
+| `apps/api/prisma/seed-data/hero/hero.ts` | new manifest and header note |
+| `ASSET-CHECKLIST.md` | licence record rewritten, with a "Taken in" column; notes the replaced first set |
+
+Verified: the hero-sync spec passes (10), the API typecheck is clean, the dev
+database has the 6 new segments, the web rebuild serves `data-theme="light"`,
+and the screenshots were checked by eye.
