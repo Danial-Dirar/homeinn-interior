@@ -1811,7 +1811,7 @@ or install `gh` — his call, not done here.
 
 ---
 
-## Part 2 — Architecture remodel — 2026-10-12 — STARTED (design stage, nothing built)
+## Part 2 — Architecture remodel — 2026-10-12 — design notes (built: see "Part 2 — built" below)
 
 Home Inn now does "everything starting from architecture design". The site
 still introduces itself as interiors and furniture. Part 2 repositions it and
@@ -1891,3 +1891,123 @@ Muhammad's answers:
 - The API on :4000 and Postgres on 5433 were left as they were. Muhammad
   started both earlier.
 - Everything is committed and pushed. GitHub `main` matches local.
+
+---
+
+## Part 2 — built — 2026-10-12
+
+Muhammad answered the deferred questions: the villas get descriptive names,
+with location, year and client left blank; the floor plan's owner is unknown,
+so it stands on its own; and yes to a "Plan → Model → Render" section. He
+approved the design and the spec. He then added: "lagle tui blog tab ta
+shoraye oikhaneo architecture rakhte parish" — so the empty Blog tab gave its
+place in the nav to Architecture.
+
+- Spec: `docs/superpowers/specs/2026-10-12-architecture-remodel-design.md`
+- Plan: `docs/superpowers/plans/2026-10-12-architecture-remodel.md` (seven
+  tasks plus 6b)
+- Built on branch `feat/architecture-remodel`, with each step tested first and
+  then made to pass.
+
+### Per task
+
+| Task | Commit | Files | What |
+| --- | --- | --- | --- |
+| 1 | `67fdc50` | `messages/{en,bn}.json`, `messages.test.ts`, `panorama-hero.test.tsx` | Introduces the company as architecture, interiors and custom furniture: the statement, SEO title and description, the about story and the hero fallback. The stale "Nine kinds" and "Six ways" lines lost their counts, and a test now refuses any digit or number word in those titles, in either language. |
+| 2 | `d534ce5` | `seed-data/services.ts`, `seed-data/working-areas.ts`, `lib/icons.ts`, `seed.e2e-spec.ts` | **Architectural Design / স্থাপত্য নকশা** is now the first service (icon `drafting-compass`) and the first working area. The others moved down one place. There are 7 services and 11 working areas. |
+| 3 | `d570e70` | `src/content/architecture-manifest.ts` (+ spec), `prisma/seed-data/architecture.ts`, `prisma/seed-architecture.ts`, `package.json`, `.gitignore` | `pnpm seed:architecture` imports two projects. **Brick-Screen Villa / ইটের জালির ভিলা** and **Rooftop-Pool Villa / ছাদে পুলসহ ভিলা** each get a cover and 10 gallery renders, and both are published and featured. A zod schema refuses any alt text that does not begin "3D render:" / "৩ডি রেন্ডার:", and the seed refuses to run if a file is missing. It matches projects by slug, so a second run changes nothing. It also sets the service cover from the brick villa's front view. |
+| 4 | `a9f5548` | `components/blueprint/blueprint.tsx` (+ test), `public/blueprints/{ground,first}-floor.webp` | `<Blueprint plan>` draws the A.02/A.03 floor plans. The line art is used as a CSS mask over `currentColor`, so the lines follow the theme. On scroll, a `clip-path` wipe draws the plan left to right, with an accent "pen" edge. Under reduced motion it appears complete and still. Decorative copies are `aria-hidden`; labelled ones are `role="img"`. |
+| 5 | `e11acfa` | `components/sections/process.tsx` (+ test), `public/process/*.webp`, catalogues | The home Process section, which used to render nothing, now shows three panels. **Plan:** the ground floor drawing itself in. **Model:** the SketchUp study of the duplex (`Variations/try 4.JPG`). **Render:** the duplex render (`Variations/2 (7).JPG`). The captions do not claim the plan belongs to the same house. |
+| 6 | `607445a` | `statement.tsx`, `services/[slug]/page.tsx`, `projects/[slug]/page.tsx`, `blueprint.tsx` | Adds the first-floor plan, faint (7%), behind the statement on large screens, and the ground-floor plan on the Architectural Design service page. Project pages no longer show an empty facts box when a project has no location, year or client, which is the case for both villas. |
+| 6b | `0d53a38` | `site-header.tsx`, `site-footer.tsx` (+ tests), `services/[slug]/page.tsx`, catalogues | The nav now reads Home · **Architecture** · Services · Projects · Furniture · Clients · About · Contact, and the footer follows the same order. **Architecture** links to `/services/architectural-design`, which now lists the two designs below the plan. The Blog route still exists; only the nav link is gone. |
+| 7 | `c0f0723` | `hooks/use-reveal.ts`, `blueprint.test.tsx`, both blueprint webps | Two things found during verification, below. |
+
+### Found during verification, and fixed
+
+- **Every scroll reveal on the site was firing on page load.** `useReveal`
+  trusted the first value from `usePrefersReducedMotion`. That value is
+  `true` until the preference has been read, so every entrance had already
+  finished before anyone scrolled to it. This affected the blueprint wipe,
+  the furniture cards and the custom-built panel. The effect now reads the
+  media query directly. A test was added first and seen to fail ("waits
+  until it is in view before drawing"). A browser check then confirmed the
+  plan stays fully clipped at load and draws when scrolled into view,
+  finishing in about 2.6s.
+- **Plan lines too thin.** At panel size the 1px CAD lines faded into the
+  dark ground. Both masks were rebuilt with
+  `-morphology Dilate Disk:1`.
+
+### Assets, and how they were made
+
+- **Floor plans:**
+  1. `pdftoppm` rendered the A.02/A.03 PDFs from `Drawings/` to PNG.
+  2. ImageMagick turned the PNG into alpha line art: white → transparent,
+     lines → opaque, then dilated by 1px and trimmed.
+  3. The result was saved as WebP at 1600 px wide: ground 154 KB, first
+     123 KB.
+- **The PromeAI watermark was cropped off, not painted over.** `2 (7).JPG`
+  is 5504×3640, and the watermark sits in the bottom band. It was cropped to
+  `5504x3240+0+0`, then saved as WebP at 1600 and 960 wide (64 KB / 29 KB).
+- **Model:** `try 4.JPG` (1306×871), saved as WebP at 1280 and 640 wide.
+- **Correction:** the floor plan's surface area reads **2,814.19 sq ft**. The
+  design notes above say 2,614 sq ft; that was a misreading.
+- **Not published:** `16.09/Reference/` (other people's villas), the AI
+  `output_0*` files, and the Wix file.
+
+### The renders live outside git — copy them before seeding
+
+`architecture_renders/` is gitignored, the same as `media_dump/`, so the
+22 renders (about 40 MB) stay out of the repository. On a new machine or
+server, copy them in first, from the repo root:
+
+```bash
+R="/mnt/shinrinyoku/Home Inn/PDF References"; A=architecture_renders
+mkdir -p $A/brick-screen-villa $A/rooftop-pool-villa
+b() { cp "$R/Renders 2/$1" "$A/brick-screen-villa/$2"; }; p() { cp "$R/16.09/$1" "$A/rooftop-pool-villa/$2"; }
+b "2.jpg" front.jpg; b "1_16 - Photo.jpg" gate.jpg; b "1_18 - Photo.jpg" street-corner.jpg
+b "2_1 - Photo.jpg" aerial-roof-terrace.jpg; b "2_6 - Photo.jpg" aerial-entrance.jpg; b "13.jpg" stair-hall.jpg
+b "14.jpg" dining.jpg; b "15.jpg" living-room.jpg; b "16.jpg" bedroom.jpg; b "4.jpg" cutaway-ground.jpg; b "6.jpg" cutaway-upper.jpg
+p "1_7 - Photo.jpg" front.jpg; p "1_5 - Photo.jpg" garden-approach.jpg; p "1_1 - Photo.jpg" aerial-pool.jpg
+p "1_3 - Photo.jpg" aerial-roof.jpg; p "1_6 - Photo.jpg" aerial-porch.jpg; p "8.jpg" pool-deck.jpg; p "11.jpg" living-room.jpg
+p "9.jpg" dining-hall.jpg; p "12.jpg" stair.jpg; p "3.jpg" plan-view.jpg; p "4.jpg" cutaway-ground.jpg
+```
+
+Then run `cd apps/api && pnpm seed && pnpm seed:architecture`. On the dev
+database, the first run added both villas (a cover and 10 renders each) and
+set the service cover. The second run reported "kept" for both and added
+nothing.
+
+### Verification
+
+- **Suites:** typecheck 5/5; unit tests: web 291, api 74, types 21, ui 5;
+  lint clean; api e2e 88 passed (3 todo).
+- **axe (WCAG 2.1 AA, Brave via Playwright):** 0 violations, in both
+  locales, both themes, and at desktop and mobile width.
+  - The targeted pass covered 72 pages: home, services, the architecture
+    service page, projects, the brick villa and the architecture filter.
+  - Full-site sweeps found 0 in light and 0 in dark.
+- **Every route returns 200.**
+- **Screenshots, checked by eye:**
+  - The process section in both themes: the plan draws in and its lines are
+    visible.
+  - The statement backdrop sits faint, behind the text.
+  - The Architecture page shows the cover, the plan and both designs.
+  - The villa pages have no empty facts box.
+  - The projects filter lists Architectural Design first.
+  - The nav reads Home · Architecture · ….
+
+### Rulings made along the way (from the build ledger)
+
+- Built on a branch in place rather than a worktree. The app depends on
+  gitignored local state (`.env`, uploads, `media_dump/`,
+  `architecture_renders/`) that a fresh worktree would not have.
+- Added Task 6b (the nav change), on Muhammad's invitation. The spec's "nav
+  not changed" was written before he made it.
+- The English areas title "one standard of finish" tripped the count guard
+  on "one". It became "finished to the same standard"; the guard was left
+  as strict as it was.
+- Wrapped the process images in `<picture>`, the same way
+  `components/media/picture.tsx` avoids the `no-img-element` lint rule.
+- `Blueprint` merges its classes with `cn()`, so a caller's `absolute`
+  replaces the default `relative` instead of fighting it.
+- The thicker plan lines and the reveal fix, both above.
