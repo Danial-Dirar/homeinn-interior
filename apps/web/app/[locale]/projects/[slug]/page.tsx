@@ -8,6 +8,7 @@ import { RichText } from "@/components/rich-text";
 import { Link } from "@/i18n/navigation";
 import { getProject, getProjects } from "@/lib/content";
 import { text } from "@/lib/locale-text";
+import { plainExcerpt } from "@/lib/rich-text";
 import { largestSrc } from "@/lib/media";
 import { breadcrumbJsonLd, metadataFromSeo, pageMetadata } from "@/lib/seo";
 
@@ -27,7 +28,9 @@ export async function generateMetadata({
 
   const { title, description } = metadataFromSeo(project.seo, locale, {
     title: text(project, "title", locale),
-    description: text(project, "location", locale),
+    // The location when there is one; otherwise the opening of the
+    // description, which for a design says it is shown in 3D renders.
+    description: text(project, "location", locale) || plainExcerpt(text(project, "description", locale), 160),
   });
 
   return pageMetadata({

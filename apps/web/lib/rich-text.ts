@@ -27,3 +27,24 @@ const OPTIONS: sanitizeHtml.IOptions = {
 export function sanitizeRichText(html: string): string {
   return sanitizeHtml(html, OPTIONS);
 }
+
+const ENTITIES: Record<string, string> = {
+  "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&nbsp;": " ",
+};
+
+/**
+ * A CMS body as one plain line, for a page's meta description when nothing
+ * better is set. Cut at a word, with an ellipsis, inside `max` characters.
+ */
+export function plainExcerpt(html: string, max: number): string {
+  const spaced = html.replace(/<\/(p|h[1-6]|li|blockquote|figcaption)>|<br\s*\/?>/gi, " ");
+  const text = sanitizeHtml(spaced, { allowedTags: [], allowedAttributes: {} })
+    .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (entity) => ENTITIES[entity] ?? entity)
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.–—-]+$/, "")}…`;
+}
+

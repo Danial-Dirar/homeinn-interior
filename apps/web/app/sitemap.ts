@@ -1,16 +1,17 @@
 import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
-import { getBlogPosts, getProjects, getServices } from "@/lib/content";
+import { getBlogPosts, getProducts, getProjects, getServices } from "@/lib/content";
 import { canonicalFor } from "@/lib/seo";
 
-const STATIC_PATHS = ["/", "/about", "/services", "/projects", "/clients", "/blog", "/contact"];
+const STATIC_PATHS = ["/", "/about", "/services", "/projects", "/furniture", "/clients", "/blog", "/contact"];
 
 /** Spec §11: generated from published content, both locales. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [services, projects, posts] = await Promise.all([
+  const [services, projects, posts, products] = await Promise.all([
     getServices(),
     getProjects(),
     getBlogPosts(),
+    getProducts(),
   ]);
 
   const paths = [
@@ -18,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...services.map((service) => `/services/${service.slug}`),
     ...projects.map((project) => `/projects/${project.slug}`),
     ...posts.map((post) => `/blog/${post.slug}`),
+    ...products.map((product) => `/furniture/${product.slug}`),
   ];
 
   return paths.flatMap((path) =>

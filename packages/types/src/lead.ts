@@ -25,7 +25,11 @@ export function isSitePath(path: string): boolean {
 /** Bangladeshi mobile: 11 digits, 01[3-9] prefix. Accepts +880/880 and separators. */
 const bdPhone = z
   .string()
-  .transform((raw) => raw.replace(/[\s-()]/g, "").replace(/^\+?880/, "0"))
+  // Bangla keyboards type Bangla digits (০১৭…); read them as the same number.
+  .transform((raw) => raw
+    .replace(/[০-৯]/g, (digit) => String(digit.charCodeAt(0) - 0x09e6))
+    .replace(/[\s-()]/g, "")
+    .replace(/^\+?880/, "0"))
   .refine((v) => /^01[3-9]\d{8}$/.test(v), {
     message: "Must be a valid Bangladeshi mobile number",
   });

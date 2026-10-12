@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeRichText } from "./rich-text";
+import { plainExcerpt, sanitizeRichText } from "./rich-text";
 
 describe("sanitizeRichText", () => {
   it("keeps the formatting an editor actually uses", () => {
@@ -28,3 +28,22 @@ describe("sanitizeRichText", () => {
     expect(sanitizeRichText("")).toBe("");
   });
 });
+
+describe("plainExcerpt", () => {
+  it("turns a CMS body into one plain sentence for a page description", () => {
+    expect(plainExcerpt("<p>A two-storey <strong>family</strong> house.</p><p>Shown in 3D renders.</p>", 160))
+      .toBe("A two-storey family house. Shown in 3D renders.");
+  });
+
+  it("cuts long text at a word, not in the middle of one", () => {
+    const text = plainExcerpt(`<p>${"word ".repeat(60)}</p>`, 40);
+    expect(text.length).toBeLessThanOrEqual(41);
+    expect(text.endsWith("…")).toBe(true);
+    expect(text).not.toMatch(/wor…$/);
+  });
+
+  it("decodes the entities an editor writes", () => {
+    expect(plainExcerpt("<p>Tiles &amp; timber</p>", 160)).toBe("Tiles & timber");
+  });
+});
+

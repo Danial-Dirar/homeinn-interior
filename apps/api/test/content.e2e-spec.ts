@@ -237,6 +237,18 @@ describe("projects", () => {
     expect(res.body.map((p: { slug: string }) => p.slug)).toEqual(["highlight", "ordinary"]);
   });
 
+  it("breaks a tie in featured and order the same way every time, by title", async () => {
+    // Without a final key the database may return equal rows in any order,
+    // so the home page's "Selected projects" could swap between requests.
+    const area = await seedWorkingArea();
+    await seedProject(area.id, { slug: "zeta", titleEn: "Zeta Villa", featured: true });
+    await seedProject(area.id, { slug: "alpha", titleEn: "Alpha Villa", featured: true });
+
+    const res = await request(server()).get("/api/projects").expect(200);
+
+    expect(res.body.map((p: { slug: string }) => p.slug)).toEqual(["alpha", "zeta"]);
+  });
+
   it("filters the public list by working area slug", async () => {
     const residential = await seedWorkingArea();
     const commercial = await seedWorkingArea({ slug: "commercial", nameEn: "Commercial" });

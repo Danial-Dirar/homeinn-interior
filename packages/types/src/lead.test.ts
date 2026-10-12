@@ -13,6 +13,11 @@ describe("createLeadSchema", () => {
     expect(createLeadSchema.parse({ ...base, phone: "8801760775454" }).phone).toBe("01760775454");
   });
 
+  it("reads a number typed in Bangla digits, as a Bangla keyboard gives it", () => {
+    expect(createLeadSchema.parse({ ...base, phone: "০১৭৬০-৭৭৫৪৫৪" }).phone).toBe("01760775454");
+    expect(createLeadSchema.parse({ ...base, phone: "+৮৮০১৭৬০৭৭৫৪৫৪" }).phone).toBe("01760775454");
+  });
+
   it("strips spaces and dashes before validating", () => {
     expect(createLeadSchema.parse({ ...base, phone: "01760-775 454" }).phone).toBe("01760775454");
   });

@@ -6,8 +6,9 @@ import { MediaService } from "../media/media.service";
 import { uniqueSlug } from "../common/slug";
 import { connectGallery, notFoundIfMissing, setGallery } from "./content.helpers";
 
-// Featured projects lead the grid; sortOrder breaks the tie within each group.
-const PUBLIC_ORDER = [{ featured: "desc" }, { sortOrder: "asc" }] as const;
+// Featured projects lead the grid; sortOrder breaks the tie within each group,
+// and the title breaks any tie left, so equal rows never swap between requests.
+const PUBLIC_ORDER = [{ featured: "desc" }, { sortOrder: "asc" }, { titleEn: "asc" }] as const;
 
 // The working area's slug travels with each card, so a design shown in renders
 // can say so beside built work.
