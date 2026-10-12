@@ -4,6 +4,24 @@ import { localeSchema, paginationQuerySchema } from "./common.js";
 export const leadTypeSchema = z.enum(["CONTACT", "CONSULTATION", "QUOTE"]);
 export const leadStatusSchema = z.enum(["NEW", "CONTACTED", "QUALIFIED", "WON", "LOST"]);
 
+/**
+ * A path on this site — "/bn/contact" — as a browser would read it. Never
+ * "//host" or "/\\host", and never one that becomes either: browsers drop
+ * tabs and newlines before parsing, so those and any other whitespace or
+ * control character are refused too, and the final check is the URL parser's
+ * own answer. Shared by the API (which refuses anything else) and the admin
+ * inbox (which links nothing else).
+ */
+export function isSitePath(path: string): boolean {
+  if (!path.startsWith("/") || /[\u0000-\u0020\u007F\\]/.test(path)) return false;
+  try {
+    const base = "https://site.invalid";
+    return new URL(path, base).origin === base;
+  } catch {
+    return false;
+  }
+}
+
 /** Bangladeshi mobile: 11 digits, 01[3-9] prefix. Accepts +880/880 and separators. */
 const bdPhone = z
   .string()
@@ -25,7 +43,7 @@ export const createLeadSchema = z.object({
   sourcePath: z
     .string()
     .max(300)
-    .refine((path) => /^\/(?![/\\])/.test(path), { message: "Must be a path on this site" })
+    .refine(isSitePath, { message: "Must be a path on this site" })
     .optional(),
   locale: localeSchema,
 });

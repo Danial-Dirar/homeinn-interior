@@ -35,7 +35,11 @@ describe("createLeadSchema", () => {
     // It is shown as a link in the admin inbox; a javascript: or off-site URL
     // there would run or open whatever a visitor typed.
     expect(createLeadSchema.parse({ ...base, sourcePath: "/bn/contact" }).sourcePath).toBe("/bn/contact");
-    for (const bad of ["javascript:alert(1)", "https://evil.example/", "//evil.example/x", "contact"]) {
+    for (const bad of [
+      "javascript:alert(1)", "https://evil.example/", "//evil.example/x", "contact",
+      // Browsers drop tabs and newlines before parsing, turning these into //evil.example.
+      "/\t/evil.example", "/\n/evil.example", "/\\evil.example",
+    ]) {
       expect(() => createLeadSchema.parse({ ...base, sourcePath: bad }), bad).toThrow();
     }
   });

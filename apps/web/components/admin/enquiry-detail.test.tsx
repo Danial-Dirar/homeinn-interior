@@ -56,6 +56,13 @@ describe("EnquiryDetail", () => {
     expect(screen.queryByRole("link", { name: /javascript:/ })).not.toBeInTheDocument();
   });
 
+  it("does not link an address a browser would read as another site", async () => {
+    adminGet.mockResolvedValue({ ...lead, sourcePath: "/\t/evil.example" });
+    render(<EnquiryDetail id="l1" />);
+    await screen.findByText(/Please call after 5pm\./);
+    expect(screen.queryByRole("link", { name: /evil/ })).not.toBeInTheDocument();
+  });
+
   it("keeps a crafted id inside the enquiry's own address", async () => {
     // A link to /admins/enquiries/..%2Fusers%2Fx must not make "Delete enquiry"
     // delete an account.

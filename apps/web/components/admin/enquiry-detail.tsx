@@ -1,5 +1,6 @@
 "use client";
 
+import { isSitePath } from "@homeinn/types";
 import { Button } from "@homeinn/ui";
 import { ArrowLeft, Mail, MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
@@ -10,11 +11,6 @@ import { LEAD_STATUSES, STATUS_LABEL, STATUS_TONE, TYPE_LABEL, type AdminLead, t
 import { whatsappHref } from "@/lib/whatsapp";
 import { useAdmin } from "./admin-context";
 import { Badge, controlClass, FieldShell, fullDate, Loading, Notice, PageHeader, Panel } from "./ui";
-
-/** Only a path on this site becomes a link; anything else is shown as text. */
-function isLocalPath(path: string): boolean {
-  return /^\/(?![/\\])/.test(path);
-}
 
 export function EnquiryDetail({ id }: { id: string }) {
   // The id comes from the address bar; encoded, a crafted "../users/x" stays
@@ -142,7 +138,7 @@ export function EnquiryDetail({ id }: { id: string }) {
               <dt className="text-ink/65">Language</dt><dd>{lead.locale === "bn" ? "Bangla" : "English"}</dd>
               <dt className="text-ink/65">Page</dt>
               <dd className="break-all">
-                {!lead.sourcePath ? "Unknown" : isLocalPath(lead.sourcePath) ? (
+                {!lead.sourcePath ? "Unknown" : isSitePath(lead.sourcePath) ? (
                   <a href={lead.sourcePath} target="_blank" rel="noreferrer" className="underline underline-offset-4">{lead.sourcePath}</a>
                 ) : <span>{lead.sourcePath}</span>}
               </dd>

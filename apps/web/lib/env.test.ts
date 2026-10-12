@@ -27,3 +27,18 @@ describe("siteUrl", () => {
       .toBe("https://homeinn-interior.com");
   });
 });
+
+describe("the browser build", () => {
+  it("names each public variable literally, so Next writes its value into the browser bundle", async () => {
+    // Next replaces only the literal text `process.env.NEXT_PUBLIC_…`. Read
+    // through a variable (`env = process.env`), the browser got an empty object
+    // and every visitor's lead form posted to http://localhost:4000 — their own
+    // machine — instead of the API.
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const source = readFileSync(join(__dirname, "env.ts"), "utf8");
+    expect(source).toContain("process.env.NEXT_PUBLIC_API_URL");
+    expect(source).toContain("process.env.NEXT_PUBLIC_SITE_URL");
+  });
+});
+
