@@ -89,14 +89,18 @@ export default async function ProjectDetailPage({
         </Link>
         <h1 className="display-1 mt-4 max-w-4xl">{text(project, "title", locale)}</h1>
 
-        <dl className="mt-12 grid gap-8 border-y border-ink/10 py-8 sm:grid-cols-4">
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt className="eyebrow text-ink/70">{fact.label}</dt>
-              <dd className="mt-2">{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
+        {/* Both villa designs have no location, year, area or client yet; an
+            empty bordered row would look broken. */}
+        {facts.length > 0 ? (
+          <dl className="mt-12 grid gap-8 border-y border-ink/10 py-8 sm:grid-cols-4">
+            {facts.map((fact) => (
+              <div key={fact.label}>
+                <dt className="eyebrow text-ink/70">{fact.label}</dt>
+                <dd className="mt-2">{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
 
         <RichText
           html={text(project, "description", locale)}

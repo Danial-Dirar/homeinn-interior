@@ -61,4 +61,13 @@ describe("Blueprint", () => {
     expect(container.firstElementChild).toHaveAttribute("data-revealed", "true");
     expect(container.querySelector("[data-blueprint-pen]")).toBeNull();
   });
+
+  it("lets a caller position it, without a competing relative class", () => {
+    // The statement lays it absolutely behind the copy; "relative absolute"
+    // would let stylesheet order decide which wins.
+    motion(false);
+    const { container } = render(<Blueprint plan="first-floor" className="absolute" />);
+    expect(container.firstElementChild).toHaveClass("absolute");
+    expect(container.firstElementChild).not.toHaveClass("relative");
+  });
 });

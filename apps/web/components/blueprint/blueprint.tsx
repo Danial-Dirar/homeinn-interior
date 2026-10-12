@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@homeinn/ui";
 import type { CSSProperties } from "react";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useReveal } from "@/hooks/use-reveal";
@@ -57,7 +58,8 @@ export function Blueprint({
       aria-label={label}
       aria-hidden={label ? undefined : true}
       data-revealed={revealed}
-      className={`relative ${className}`}
+      // Merged, so a caller's "absolute" replaces the default "relative".
+      className={cn("relative", className)}
       style={{ aspectRatio: ratio }}
     >
       <div

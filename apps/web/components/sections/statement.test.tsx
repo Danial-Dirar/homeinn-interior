@@ -1,7 +1,14 @@
 import { screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl, settingsFixture } from "@/test/render";
 import { Statement } from "./statement";
+
+beforeEach(() => {
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: false, media: query, addEventListener: vi.fn(), removeEventListener: vi.fn(),
+  }));
+  vi.stubGlobal("IntersectionObserver", class { observe() {} disconnect() {} });
+});
 
 describe("Statement", () => {
   it("shows the three headline counts from settings", () => {
@@ -39,5 +46,13 @@ describe("Statement", () => {
     // Spec §2's counting rule: the corporate list repeats clients across sites.
     renderWithIntl(<Statement locale="en" settings={settingsFixture} />);
     expect(screen.queryByText(/corporate clients/i)).not.toBeInTheDocument();
+  });
+
+  it("lays a faint first-floor plan behind the statement, hidden from assistive technology", () => {
+    const { container } = renderWithIntl(<Statement locale="en" settings={settingsFixture} />);
+    const plan = container.querySelector("[data-blueprint-lines]")?.parentElement;
+    expect(plan).toHaveAttribute("aria-hidden", "true");
+    expect((plan?.querySelector("[data-blueprint-lines]") as HTMLElement).style.maskImage)
+      .toContain("first-floor");
   });
 });

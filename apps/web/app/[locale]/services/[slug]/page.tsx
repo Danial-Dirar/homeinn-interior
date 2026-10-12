@@ -4,12 +4,16 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { LeadForm } from "@/components/forms/lead-form";
 import { Picture } from "@/components/media/picture";
+import { Blueprint } from "@/components/blueprint/blueprint";
 import { JsonLd } from "@/components/seo/json-ld";
 import { RichText } from "@/components/rich-text";
 import { getService, getServices } from "@/lib/content";
 import { text } from "@/lib/locale-text";
 import { largestSrc } from "@/lib/media";
 import { breadcrumbJsonLd, metadataFromSeo, pageMetadata } from "@/lib/seo";
+
+/** Services that show one of the company's floor plans beside their copy. */
+const DRAWN = new Set(["architectural-design"]);
 
 export async function generateStaticParams() {
   const services = await getServices();
@@ -80,10 +84,15 @@ export default async function ServiceDetailPage({
         <p className="mt-6 max-w-2xl text-lg text-ink/70">{text(service, "summary", locale)}</p>
 
         <div className="mt-16 grid gap-16 lg:grid-cols-[2fr_1fr]">
-          <RichText
-            html={text(service, "body", locale)}
-            className="max-w-2xl space-y-4 [&_a]:text-accent [&_a]:underline [&_li]:ml-5 [&_li]:list-disc"
-          />
+          <div>
+            <RichText
+              html={text(service, "body", locale)}
+              className="max-w-2xl space-y-4 [&_a]:text-accent [&_a]:underline [&_li]:ml-5 [&_li]:list-disc"
+            />
+            {DRAWN.has(slug) ? (
+              <Blueprint plan="ground-floor" className="mt-12 max-w-xl text-ink/30" />
+            ) : null}
+          </div>
 
           <aside className="border border-ink/10 p-8">
             <h2 className="heading">{t("enquire")}</h2>
