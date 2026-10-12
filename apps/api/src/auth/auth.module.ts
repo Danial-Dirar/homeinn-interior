@@ -6,11 +6,12 @@ import { JwtGuard } from "./jwt.guard";
 import { PasswordService } from "./password.service";
 import { RolesGuard } from "./roles.guard";
 import { TokenService } from "./token.service";
+import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
 
 @Module({
   imports: [JwtModule.register({})],
-  controllers: [AuthController],
+  controllers: [AuthController, UsersController],
   providers: [AuthService, PasswordService, TokenService, UsersService, JwtGuard, RolesGuard],
   exports: [TokenService, UsersService, PasswordService, JwtGuard, RolesGuard, JwtModule],
 })

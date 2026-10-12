@@ -1,6 +1,10 @@
 import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards, UsePipes } from "@nestjs/common";
+import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
 import type { Request, Response } from "express";
-import { loginSchema, type AuthUser, type LoginInput } from "@homeinn/types";
+import {
+  changePasswordSchema, loginSchema,
+  type AuthUser, type ChangePasswordInput, type LoginInput,
+} from "@homeinn/types";
 import { ZodValidationPipe } from "../common/zod-validation.pipe";
 import { AuthService } from "./auth.service";
 import { CurrentUser } from "./current-user.decorator";
@@ -9,6 +13,14 @@ import { TokenService } from "./token.service";
 import { UsersService } from "./users.service";
 
 const ACCESS_COOKIE = "hi_access";
+
+/**
+ * Ten attempts per address per fifteen minutes: generous for a mistyped
+ * password, useless for guessing one. Read per request so the e2e suite, which
+ * logs in from one address dozens of times, can raise it.
+ */
+const LOGIN_WINDOW_MS = 15 * 60_000;
+const loginLimit = () => Number(process.env.LOGIN_THROTTLE_LIMIT ?? 10);
 const REFRESH_COOKIE = "hi_refresh";
 
 function cookieOptions(maxAgeMs: number) {
@@ -31,6 +43,8 @@ export class AuthController {
 
   @Post("login")
   @HttpCode(200)
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: LOGIN_WINDOW_MS, limit: loginLimit } })
   @UsePipes(new ZodValidationPipe(loginSchema))
   async login(@Body() body: LoginInput, @Res({ passthrough: true }) res: Response) {
     const { user, access, refresh } = await this.auth.login(body);
@@ -43,6 +57,25 @@ export class AuthController {
   @UseGuards(JwtGuard)
   me(@CurrentUser() user: AuthUser) {
     return { user };
+  }
+
+  /**
+   * Replaces your own password. Every other session is signed out; this one
+   * gets fresh tokens, so changing a password never logs you out mid-task.
+   */
+  @Post("password")
+  @HttpCode(200)
+  @UseGuards(JwtGuard)
+  async changePassword(
+    @CurrentUser() user: AuthUser,
+    @Body(new ZodValidationPipe(changePasswordSchema)) body: ChangePasswordInput,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.users.changePassword(user.id, body.currentPassword, body.newPassword);
+    await this.tokens.revokeAll(user.id);
+    res.cookie(ACCESS_COOKIE, await this.tokens.signAccess(user), cookieOptions(15 * 60_000));
+    res.cookie(REFRESH_COOKIE, await this.tokens.issueRefresh(user.id), cookieOptions(7 * 86_400_000));
+    return { ok: true };
   }
 
   @Post("refresh")

@@ -1,11 +1,11 @@
 import {
-  BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Post, Query,
+  BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query,
   UploadedFile, UseGuards, UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
-  paginationQuerySchema, uploadMediaSchema,
-  type PaginationQuery, type UploadMediaInput,
+  mediaListQuerySchema, uploadMediaSchema,
+  type MediaListQuery, type UploadMediaInput,
 } from "@homeinn/types";
 import { JwtGuard } from "../auth/jwt.guard";
 import { Roles } from "../auth/roles.decorator";
@@ -32,9 +32,20 @@ export class MediaController {
     return this.media.toPublic(row);
   }
 
+  /** The library. `?q=` searches the English and Bangla alt text. */
   @Get()
-  list(@Query(new ZodValidationPipe(paginationQuerySchema)) query: PaginationQuery) {
+  list(@Query(new ZodValidationPipe(mediaListQuerySchema)) query: MediaListQuery) {
     return this.media.list(query);
+  }
+
+  /** Alt text is required at upload and must stay correctable afterwards. */
+  @Patch(":id")
+  @Roles("ADMIN", "EDITOR")
+  async updateAlt(
+    @Param("id") id: string,
+    @Body(new ZodValidationPipe(uploadMediaSchema)) body: UploadMediaInput,
+  ) {
+    return this.media.toPublic(await this.media.updateAlt(id, body));
   }
 
   @Delete(":id")

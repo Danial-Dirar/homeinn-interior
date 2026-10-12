@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { localeSchema } from "./common.js";
+import { localeSchema, paginationQuerySchema } from "./common.js";
 
 export const leadTypeSchema = z.enum(["CONTACT", "CONSULTATION", "QUOTE"]);
 export const leadStatusSchema = z.enum(["NEW", "CONTACTED", "QUALIFIED", "WON", "LOST"]);
@@ -29,3 +29,9 @@ export const updateLeadSchema = z.object({
   internalNotes: z.string().max(4000).optional(),
 });
 export type UpdateLeadInput = z.infer<typeof updateLeadSchema>;
+
+/** `GET /api/leads?status=NEW&page=1` — the inbox's filter and paging. */
+export const leadListQuerySchema = paginationQuerySchema.extend({
+  status: leadStatusSchema.optional(),
+});
+export type LeadListQuery = z.infer<typeof leadListQuerySchema>;

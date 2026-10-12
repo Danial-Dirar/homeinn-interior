@@ -15,3 +15,7 @@ if (!/\/[a-z0-9_]*_test(\?|$)/i.test(url)) {
 }
 
 process.env.DATABASE_URL = url;
+
+// Every e2e file logs in from one address. The real limit (10 per 15 minutes)
+// is exercised by auth-throttle.e2e-spec.ts, which sets its own.
+process.env.LOGIN_THROTTLE_LIMIT ??= "10000";

@@ -7,6 +7,11 @@ import { AppModule } from "./app.module";
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(cookieParser());
+  // Behind a tunnel or reverse proxy every request arrives from the proxy, and
+  // the per-IP limits on login and the lead form would collapse into one bucket
+  // that a single visitor could exhaust. Trust the forwarded address from the
+  // loopback proxy by default; TRUST_PROXY overrides it (Express syntax).
+  app.set("trust proxy", process.env.TRUST_PROXY ?? "loopback");
   app.useStaticAssets(join(process.cwd(), process.env.UPLOAD_DIR ?? "./uploads"), { prefix: "/media/" });
   app.setGlobalPrefix("api");
   // The lead form posts straight from the browser (the throttler is per-IP, so

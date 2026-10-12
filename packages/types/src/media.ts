@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { paginationQuerySchema } from "./common.js";
 
 export const uploadMediaSchema = z.object({
   altEn: z.string().trim().min(1).max(300),
@@ -30,3 +31,9 @@ export const publicMediaSchema = z.object({
   sources: z.array(mediaSourceSchema),
 });
 export type PublicMedia = z.infer<typeof publicMediaSchema>;
+
+/** `GET /api/media?q=villa&page=1` — the library's search and paging. */
+export const mediaListQuerySchema = paginationQuerySchema.extend({
+  q: z.string().trim().max(120).optional(),
+});
+export type MediaListQuery = z.infer<typeof mediaListQuerySchema>;

@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { Prisma, type Media } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
-import type { PaginationQuery, PublicMedia } from "@homeinn/types";
+import type { MediaListQuery, PublicMedia, UploadMediaInput } from "@homeinn/types";
 import { PrismaService } from "../prisma/prisma.service";
 import { blurhashOf } from "./blurhash";
 import { StorageService } from "./storage/storage.interface";
@@ -91,16 +91,36 @@ export class MediaService {
     return rows.map((m) => this.toPublic(m));
   }
 
-  async list(query: PaginationQuery) {
+  async list(query: MediaListQuery) {
+    const where = query.q
+      ? {
+          OR: [
+            { altEn: { contains: query.q, mode: "insensitive" as const } },
+            { altBn: { contains: query.q, mode: "insensitive" as const } },
+          ],
+        }
+      : {};
     const [rows, total] = await Promise.all([
       this.prisma.media.findMany({
+        where,
         orderBy: { createdAt: "desc" },
         skip: (query.page - 1) * query.perPage,
         take: query.perPage,
       }),
-      this.prisma.media.count(),
+      this.prisma.media.count({ where }),
     ]);
     return { items: rows.map((m) => this.toPublic(m)), total, page: query.page, perPage: query.perPage };
+  }
+
+  async updateAlt(id: string, alt: UploadMediaInput): Promise<Media> {
+    try {
+      return await this.prisma.media.update({ where: { id }, data: { altEn: alt.altEn, altBn: alt.altBn } });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
+        throw new NotFoundException("Media not found");
+      }
+      throw e;
+    }
   }
 
   async remove(id: string): Promise<void> {
