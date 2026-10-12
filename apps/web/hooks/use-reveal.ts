@@ -14,7 +14,10 @@ export function useReveal<T extends HTMLElement>() {
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    if (reduced) {
+    // Ask the media query itself. `reduced` starts true until the preference
+    // has been read, and trusting that first value revealed everything on
+    // mount — every entrance had finished before anyone scrolled to it.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setRevealed(true);
       return;
     }

@@ -70,4 +70,14 @@ describe("Blueprint", () => {
     expect(container.firstElementChild).toHaveClass("absolute");
     expect(container.firstElementChild).not.toHaveClass("relative");
   });
+
+  it("waits until it is in view before drawing", () => {
+    // useReveal used to reveal on mount: the reduced-motion hook starts true
+    // until the preference is read, and the first effect took that as "reduce".
+    // Every reveal on the site finished before anyone scrolled to it.
+    motion(false);
+    vi.stubGlobal("IntersectionObserver", class { observe() {} disconnect() {} });
+    const { container } = render(<Blueprint plan="ground-floor" />);
+    expect(container.firstElementChild).toHaveAttribute("data-revealed", "false");
+  });
 });
