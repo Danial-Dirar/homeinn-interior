@@ -17,6 +17,7 @@
     "seed:projects": "tsx prisma/seed-projects.ts",
     "seed:logos": "tsx prisma/seed-client-logos.ts",
     "seed:products": "tsx prisma/seed-products.ts",
+    "seed:architecture": "tsx prisma/seed-architecture.ts",
     "media:inventory": "tsx scripts/media-inventory.ts"
   },
   "prisma": {
