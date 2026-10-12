@@ -49,6 +49,13 @@ describe("message catalogues", () => {
     expect(flatEn["seo.defaultTitle"]).toMatch(/Architecture/);
   });
 
+  it("never says the model was built from the plan beside it", () => {
+    // The plan and the model are two different houses. Each caption says what
+    // its picture is; none of them joins the three into one project.
+    expect(flatEn["home.processModelBody"]).not.toMatch(/\bplan\b/i);
+    expect(flatBn["home.processModelBody"]).not.toMatch(/প্ল্যান/);
+  });
+
   it("never use the retired brand name", () => {
     // The company is "Home Inn" now; "Interior Solution" went with the move
     // into architecture, in both languages.

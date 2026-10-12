@@ -248,6 +248,15 @@ describe("projects", () => {
     expect(res.body.map((p: { slug: string }) => p.slug)).toEqual(["office-one"]);
   });
 
+  it("names each listed project's working area, so a card can tell a design from built work", async () => {
+    const area = await seedWorkingArea({ slug: "architectural-design", nameEn: "Architectural Design" });
+    await seedProject(area.id);
+
+    const res = await request(server()).get("/api/projects").expect(200);
+
+    expect(res.body[0].workingArea).toEqual({ slug: "architectural-design" });
+  });
+
   it("hides a draft project behind a 404", async () => {
     const area = await seedWorkingArea();
     await seedProject(area.id, { slug: "draft-project", published: false });

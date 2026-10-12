@@ -24,17 +24,24 @@ export function useReveal<T extends HTMLElement>() {
     const element = ref.current;
     if (!element) return;
 
+    // Keyboard focus arriving counts as being seen: whatever has focus must
+    // not be waiting, transparent, for a scroll that may not come.
+    const reveal = () => setRevealed(true);
+    element.addEventListener("focusin", reveal);
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          setRevealed(true);
+          reveal();
           observer.disconnect();
         }
       },
       { rootMargin: "0px 0px -12% 0px" },
     );
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      element.removeEventListener("focusin", reveal);
+    };
   }, [reduced]);
 
   return { ref, revealed };

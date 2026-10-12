@@ -12,7 +12,7 @@ function project(over: Partial<ProjectView> = {}): ProjectView {
     locationEn: "Dhaka", locationBn: "ঢাকা",
     areaSqft: 4200, year: 2024,
     descriptionEn: "<p>x</p>", descriptionBn: "<p>x</p>",
-    workingAreaId: "w1", featured: true, published: true, sortOrder: 0, cover: null,
+    workingAreaId: "w1", workingArea: { slug: "corporate-office" }, featured: true, published: true, sortOrder: 0, cover: null,
     ...over,
   };
 }

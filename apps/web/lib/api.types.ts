@@ -41,6 +41,8 @@ export interface ProjectView {
   year: number | null;
   descriptionEn: string; descriptionBn: string;
   workingAreaId: string;
+  /** Absent from an API built before cards needed it. */
+  workingArea?: { slug: string };
   featured: boolean;
   published: boolean;
   sortOrder: number;

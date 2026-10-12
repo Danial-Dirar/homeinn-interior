@@ -58,7 +58,7 @@
     "processPlanBody": "Measured floor plans: every room, wall and door, and the way you move between them.",
     "processPlanAlt": "Ground-floor plan of a house, with rooms, furniture and a two-car garage",
     "processModelTitle": "Model",
-    "processModelBody": "The plan built up in 3D, so the massing and the light can be judged before anything is built.",
+    "processModelBody": "A design built up in 3D, so the massing and the light can be judged before anything is built.",
     "processModelAlt": "A 3D massing model of a modern duplex, with boxed balconies",
     "processRenderTitle": "Render",
     "processRenderBody": "The same model rendered as it will look, close enough to decide on.",
@@ -106,7 +106,8 @@
     "year": "Year",
     "client": "Client",
     "areaUnit": "sq ft",
-    "filterLabel": "Filter by working area"
+    "filterLabel": "Filter by working area",
+    "renderTag": "3D render"
   },
   "clients": {
     "title": "Track record",

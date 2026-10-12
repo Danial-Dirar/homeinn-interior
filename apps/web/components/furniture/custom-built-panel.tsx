@@ -25,13 +25,9 @@ export function CustomBuiltPanel() {
   const { ref, revealed } = useReveal<HTMLDivElement>();
 
   return (
-    <aside
-      ref={ref}
-      className="lg:sticky lg:top-28"
-      // The whole panel leaves the accessibility tree until it reveals, rather
-      // than sitting there as invisible text axe reads as a contrast failure.
-      style={{ visibility: revealed ? "visible" : "hidden" }}
-    >
+    // Never `visibility: hidden` while it waits: that would take the link out
+    // of the tab order until someone happened to scroll past.
+    <aside ref={ref} className="lg:sticky lg:top-28">
       <div className="relative pl-6">
         {/* The rule draws downward, then the words arrive against it. */}
         <span

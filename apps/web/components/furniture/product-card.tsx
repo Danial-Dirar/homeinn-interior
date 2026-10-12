@@ -36,10 +36,9 @@ export function ProductCard({
       style={{
         opacity: revealed ? 1 : 0,
         transform: `translateY(${revealed ? 0 : 24}px)`,
+        // Transparent while it waits, never `visibility: hidden`: that takes a
+        // card below the fold out of the tab order and the accessibility tree.
         transitionDelay: `${Math.min(index, 3) * 90}ms`,
-        // Not just transparent — out of the accessibility tree entirely while
-        // it waits, so it is never read as unreadable text.
-        visibility: revealed ? "visible" : "hidden",
       }}
     >
       <Link href={`/furniture/${product.slug}`} className="block">

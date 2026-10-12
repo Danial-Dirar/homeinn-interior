@@ -9,7 +9,9 @@ import { connectGallery, notFoundIfMissing, setGallery } from "./content.helpers
 // Featured projects lead the grid; sortOrder breaks the tie within each group.
 const PUBLIC_ORDER = [{ featured: "desc" }, { sortOrder: "asc" }] as const;
 
-const LIST_INCLUDE = { cover: true } as const;
+// The working area's slug travels with each card, so a design shown in renders
+// can say so beside built work.
+const LIST_INCLUDE = { cover: true, workingArea: { select: { slug: true } } } as const;
 const DETAIL_INCLUDE = {
   cover: true,
   gallery: true,

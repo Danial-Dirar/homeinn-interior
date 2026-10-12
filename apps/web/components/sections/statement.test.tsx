@@ -55,4 +55,13 @@ describe("Statement", () => {
     expect((plan?.querySelector("[data-blueprint-lines]") as HTMLElement).style.maskImage)
       .toContain("first-floor");
   });
+
+  it("keeps the backdrop plan inside the page, so it never scrolls sideways", () => {
+    // Nothing above the statement clips overflow and the container pads only
+    // 20px, so a negative right offset pushed the plan past the viewport edge
+    // on laptop widths: 1044px of page in a 1024px window.
+    const { container } = renderWithIntl(<Statement locale="en" settings={settingsFixture} />);
+    const plan = container.querySelector("[data-blueprint-lines]")?.parentElement as HTMLElement;
+    expect(plan.className).not.toMatch(/(^|\s)-right-/);
+  });
 });
