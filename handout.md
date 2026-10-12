@@ -2214,3 +2214,94 @@ help, and anything left over gets polished. **Don't ask anything.**
   - Reads the new password from `ADMIN_NEW_PASSWORD`.
   - `--create "Name"` makes a new admin.
   - It ends that account's sessions.
+- **Web: the panel's foundations** (`feat(web): the admin panel's
+  foundations…`):
+  - `lib/admin/api.ts` sends every panel request with cookies. On a 401 it
+    refreshes once and retries, and requests that fail together share that
+    one refresh. When the refresh also fails, it goes to
+    `/admins/login?next=…`, and `next` may only point inside `/admins`.
+  - `lib/admin/fields.ts` and `payload.ts` are the field engine. It converts
+    between a saved row, the form state and what the API expects:
+    - bilingual pairs
+    - images as ids, galleries as lists of ids
+    - prices in taka on screen, poisha in the database
+    - empty optional fields as `null`
+  - `lib/admin/resources.ts` describes the twelve content types and the
+    settings form. A test checks the list against the API's.
+  - The middleware leaves `/admins` alone. `/admin` redirects with a 308.
+    `robots.txt` disallows both.
+  - Tiptap was added for the text editor.
+- **Web: the panel** (`feat(web): the admin panel at /admins`). The pages:
+  - **Sign-in:** `app/admins/login`.
+  - **The frame:** `components/admin/admin-shell.tsx` shows nothing until
+    `/auth/me` answers. The sidebar is grouped Inbox / Work / Home page /
+    Company / Journal / Library / Site, with a count of new enquiries. On a
+    phone it becomes a sheet.
+  - **Overview:** the waiting enquiries are given in a sentence, not as a
+    stat tile. It also lists the latest five, the drafts and a link into
+    every area.
+  - **Inbox:** status tabs, opening on New.
+  - **Enquiry page:** call, WhatsApp and email links, status, internal notes,
+    and delete (admins only).
+  - **The editor:** `resource-form.tsx` generates the editor for all twelve
+    content types. It has an image picker that can upload (alt text required
+    in both languages) and an editor that offers only what the site's
+    sanitiser keeps.
+  - **Media library:** upload, alt text, delete. An image still in use says
+    so.
+  - **Settings:** editors can read them; only admins can change them.
+  - **Accounts and your own password.**
+
+  Every page is `noindex`. In the editor, gallery images can be added and
+  removed but not reordered: the implicit join table keeps no order, so
+  offering reordering would promise something the site cannot keep.
+- **Security review → fixed** (`fix: keep admin requests on their own
+  route…` and `fix: the browser now reaches the real API…`). The review found
+  three problems:
+  1. **Crafted ids.** Ids from the address bar went into API paths
+     unencoded. A link to `/admins/enquiries/..%2Fusers%2F<id>` would have
+     made "Delete enquiry" delete an account. Every id is now
+     `encodeURIComponent`-ed.
+  2. **Untrusted links.** `sourcePath`, which comes from the anonymous form,
+     was rendered as a link. A `javascript:` value would have run when
+     clicked.
+  3. **Tab and newline tricks.** The first fix for (2) could be fooled by
+     tabs or newlines, which browsers strip, so `"/<tab>/evil"` becomes
+     `//evil`.
+
+  For (2) and (3), `isSitePath()` in `@homeinn/types` now refuses
+  whitespace, control characters and backslashes, then asks the URL parser
+  itself. The API's lead schema and the inbox both use it.
+- **Found in the browser check: the live site's contact form would never
+  have reached the API.** This bug predates tonight:
+  - `apiBaseUrl()` read `process.env` through a variable. Next only inlines
+    the literal `process.env.NEXT_PUBLIC_…`, so in the browser the value was
+    always the fallback, `http://localhost:4000/api`.
+  - On the live site, every visitor's lead form would have posted to their
+    own computer. It went unnoticed because every test browser ran on the
+    machine that also runs the API.
+  - Fixed by writing out `process.env.NEXT_PUBLIC_API_URL` and `_SITE_URL`
+    literally, with a guard test. The browser bundle now contains the
+    configured address (checked).
+- **Verification**, against a fresh API on :4100 and the web app on :3100,
+  with revalidation switched on:
+  - **Tests:**
+    - typecheck 5/5
+    - unit tests: web 368, api 88, types 22, ui 5
+    - lint clean
+    - API e2e 135 passed (3 todo)
+  - **Brave walkthrough** (`scratchpad/admin-walk.cjs`):
+    - signed out → login, remembering the page
+    - a wrong password gets a plain message
+    - sign in → back to the page
+    - a test enquiry: status saved, then deleted
+    - a project's title edited: **the public page showed the change at once**
+      (revalidation works); the title was then put back
+    - an image uploaded, then deleted
+    - settings, accounts, your password, new furniture, hero
+  - **axe:** 0 violations on every page. The one exception was the phone
+    header wordmark at 3.58:1, now fixed by setting it at 24px.
+  - **Test data:** a temporary admin, `qa-overnight@homeinn.local`, was
+    created for the check and is removed at the end. The test enquiries were
+    deleted. The two "Playwright" enquiries from 9 Aug were already in the
+    dev database and were left alone.
