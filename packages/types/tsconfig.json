@@ -1,6 +1,12 @@
 {
   "extends": "@homeinn/config/tsconfig.base.json",
-  "compilerOptions": { "rootDir": "src", "outDir": "dist" },
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    // These schemas run in the browser and in Node. Both provide the WHATWG
+    // URL global that isSitePath() asks; DOM's lib is where its type lives.
+    "lib": ["ES2023", "DOM"]
+  },
   "include": ["src/**/*"],
   "exclude": ["src/**/*.test.ts"]
 }

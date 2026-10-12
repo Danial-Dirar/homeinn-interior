@@ -71,7 +71,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </aside>
 
         <div className="flex items-center justify-between bg-ink px-5 py-3 text-bone lg:hidden">
-          <span className="font-display text-xl">Home <span className="text-logo">inn</span> <span className="text-sm text-bone/70">Admin</span></span>
+          {/* 24px, as in the sidebar: the logo orange on ink is 3.6:1, which
+              passes only as large text. */}
+          <span className="font-display text-2xl">Home <span className="text-logo">inn</span> <span className="font-sans text-sm text-bone/70">Admin</span></span>
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger className="inline-flex items-center gap-2 text-sm" aria-label="Open the menu">
               <Menu aria-hidden="true" className="size-5" />
