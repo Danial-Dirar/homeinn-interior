@@ -2,6 +2,7 @@ import { INestApplication } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import request from "supertest";
 import * as argon2 from "argon2";
+import { setAdminPassword } from "../scripts/admin-password";
 import { makeApp, resetDb } from "./setup-db";
 
 const prisma = new PrismaClient();
@@ -184,5 +185,31 @@ describe("accounts", () => {
       .set("Cookie", cookies)
       .send({ role: "EDITOR" })
       .expect(409);
+  });
+});
+
+describe("pnpm admin:password", () => {
+  it("replaces a password the seed's upsert would never touch, and ends that account's sessions", async () => {
+    const theirs = await login("admin@homeinn.test");
+    await setAdminPassword(prisma, { email: "Admin@HomeInn.test", password: "set-from-the-shell-1" });
+
+    await login("admin@homeinn.test", "set-from-the-shell-1");
+    await request(server()).get("/api/auth/me").set("Cookie", theirs).expect(401);
+  });
+
+  it("creates the account as an admin when asked to", async () => {
+    await setAdminPassword(prisma, {
+      email: "owner@homeinn.test", password: "a-brand-new-one-1", create: true, name: "Owner",
+    });
+    const res = await request(server()).post("/api/auth/login")
+      .send({ email: "owner@homeinn.test", password: "a-brand-new-one-1" }).expect(200);
+    expect(res.body.user.role).toBe("ADMIN");
+  });
+
+  it("refuses an unknown email unless asked to create it, and a short password always", async () => {
+    await expect(setAdminPassword(prisma, { email: "ghost@homeinn.test", password: "long-enough-pw" }))
+      .rejects.toThrow(/No account/);
+    await expect(setAdminPassword(prisma, { email: "admin@homeinn.test", password: "short" }))
+      .rejects.toThrow(/at least 10/);
   });
 });
