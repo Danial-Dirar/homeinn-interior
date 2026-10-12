@@ -1029,6 +1029,107 @@ git commit -m "feat(web): set blueprints behind the statement and on the design 
 
 ---
 
+### Task 6b: Architecture in the nav, in Blog's place
+
+Added at Muhammad's invitation ("blog tab shoraye oikhaneo architecture rakhte
+parish … jeta tor bhalo mone hoy"). The blog has no posts. "Architecture" takes
+its nav slot, right after Home (the company now starts from architecture), and
+leads to the Architectural Design service page. That page gains a "Designs"
+grid of the architecture projects. The `/blog` routes and the sitemap stay;
+only the nav link goes.
+
+**Files:**
+- Modify: `apps/web/components/layout/site-header.tsx`, `site-header.test.tsx`, `site-footer.tsx`, `site-footer.test.tsx`
+- Modify: `apps/web/messages/en.json`, `apps/web/messages/bn.json` (`nav.architecture`, `services.designs`)
+- Modify: `apps/web/app/[locale]/services/[slug]/page.tsx`
+
+**Interfaces:**
+- Consumes: the service and working-area slug `architectural-design` (Task 2), the `DRAWN` set (Task 6), `getProjects(area)` and `ProjectCard`.
+- Produces: nav entry `{ href: "/services/architectural-design", key: "architecture" }`.
+
+- [ ] **Step 1: Write the failing tests.** In `site-header.test.tsx`:
+  - Change the order test's expectation to `["Home", "Architecture", "Services", "Projects", "FurnitureNew", "Clients", "About", "Contact"]`.
+  - In "links to every route", replace `"Blog"` with `"Architecture"`.
+  - Add:
+
+```tsx
+  it("leads to architecture where the blog used to be", () => {
+    renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
+    expect(screen.getAllByRole("link", { name: "Architecture" })[0])
+      .toHaveAttribute("href", "/en/services/architectural-design");
+    expect(screen.queryByRole("link", { name: "Blog" })).not.toBeInTheDocument();
+  });
+```
+
+In `site-footer.test.tsx` add:
+
+```tsx
+  it("lists architecture, not the blog, in its menu", () => {
+    renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
+    expect(screen.getByRole("link", { name: "Architecture" }))
+      .toHaveAttribute("href", "/en/services/architectural-design");
+    expect(screen.queryByRole("link", { name: "Blog" })).not.toBeInTheDocument();
+  });
+```
+
+- [ ] **Step 2: Run them to verify they fail**
+
+Run: `cd apps/web && pnpm vitest run components/layout`
+Expected: FAIL — the order still has Blog, and there is no Architecture link.
+
+- [ ] **Step 3: Implement.**
+  - **Messages.** Add `"architecture": "Architecture"` to `nav` in en.json and `"architecture": "স্থাপত্য"` in bn.json. Add `"designs": "Designs"` / `"designs": "নকশা"` under `services`.
+  - **Header.** In `site-header.tsx` `ROUTES`, remove `{ href: "/blog", key: "blog" }` and insert `{ href: "/services/architectural-design", key: "architecture" }` directly after Home.
+  - **Footer.** In `site-footer.tsx`, replace the inline key list with the same order minus Home, carrying hrefs:
+
+```tsx
+const MENU = [
+  { href: "/services/architectural-design", key: "architecture" },
+  { href: "/services", key: "services" },
+  { href: "/projects", key: "projects" },
+  { href: "/furniture", key: "furniture" },
+  { href: "/clients", key: "clients" },
+  { href: "/about", key: "about" },
+  { href: "/contact", key: "contact" },
+] as const;
+```
+
+  and map `MENU` to `<Link href={item.href}>{nav(item.key)}</Link>`.
+
+- [ ] **Step 4: Add the designs grid to the service page.** In `services/[slug]/page.tsx`:
+  - Import `ProjectCard` and `getProjects`.
+  - After the service is loaded: `const designs = DRAWN.has(slug) ? await getProjects("architectural-design") : [];`
+  - After the main grid, before the gallery, add:
+
+```tsx
+        {designs.length > 0 ? (
+          <section className="mt-24">
+            <h2 className="heading">{t("designs")}</h2>
+            <ul className="mt-6 grid gap-10 sm:grid-cols-2">
+              {designs.map((project) => (
+                <li key={project.id}>
+                  <ProjectCard locale={locale} project={project} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+```
+
+- [ ] **Step 5: Run the tests and checks**
+
+Run: `cd apps/web && pnpm vitest run && pnpm typecheck && pnpm lint`
+Expected: PASS and clean.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add apps/web/components/layout apps/web/messages "apps/web/app/[locale]/services/[slug]/page.tsx"
+git commit -m "feat(web): put architecture in the nav where the empty blog was"
+```
+
+---
+
 ### Task 7: Apply, verify, record
 
 **Files:**
@@ -1068,6 +1169,7 @@ PORT=3100 pnpm --filter @homeinn/web start   # in the background
 
 - [ ] **Step 4: Verify in a browser**, using the scratchpad scripts (Brave via Playwright):
   - axe WCAG 2.1 AA on `/`, `/services`, `/services/architectural-design`, `/projects`, `/projects/brick-screen-villa` and `/projects?area=architectural-design`, en and bn, both themes. Expect 0 violations.
+  - the nav reads Home · Architecture · Services · …, and the Architecture page shows the cover, the plan and the two designs
   - Screenshots, checked by eye:
     - the process section in both themes: the plan draws in, and its lines are visible on each ground
     - the statement backdrop: faint, behind the text, not over it
