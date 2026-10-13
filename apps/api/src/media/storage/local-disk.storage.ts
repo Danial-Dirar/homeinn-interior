@@ -2,10 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { StorageService } from "./storage.interface";
+import { uploadRoot } from "../../common/upload-root";
 
 @Injectable()
 export class LocalDiskStorage extends StorageService {
-  private readonly root = process.env.UPLOAD_DIR ?? "./uploads";
+  private readonly root = uploadRoot();
   private readonly base = process.env.PUBLIC_MEDIA_BASE_URL ?? "http://localhost:4000/media";
 
   async put(key: string, data: Buffer): Promise<void> {
