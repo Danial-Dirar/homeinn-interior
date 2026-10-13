@@ -27,6 +27,11 @@ PNPM="npx --yes pnpm@$PNPM_VERSION"
 echo "▶ installing exactly the committed lockfile…"
 $PNPM install --frozen-lockfile
 
+# @prisma/client's own postinstall cannot find apps/api/prisma/schema.prisma
+# from inside a pnpm workspace and leaves an empty stub; generate it here.
+echo "▶ generating the Prisma client…"
+$PNPM --filter @homeinn/api exec prisma generate
+
 echo "▶ applying database migrations…"
 $PNPM --filter @homeinn/api exec prisma migrate deploy
 
