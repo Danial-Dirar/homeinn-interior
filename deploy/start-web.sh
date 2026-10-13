@@ -5,5 +5,6 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 set -a; . ./.env; set +a
+[ -n "${NODE_BIN_DIR:-}" ] && PATH="$NODE_BIN_DIR:$PATH"
 cd apps/web
 exec node node_modules/next/dist/bin/next start -H 127.0.0.1 -p "${WEB_PORT:-3200}"

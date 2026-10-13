@@ -8,7 +8,7 @@ the authority for the shared parts: Cloudflare Tunnel → Caddy → launchd).
 homeinn.xyz, www  ─┐                       ┌─▶ 127.0.0.1:3200  homeinn-web  (next start)
 api.homeinn.xyz   ─┴─▶ tunnel ─▶ Caddy :8080 ┴─▶ 127.0.0.1:4200  homeinn-api  (node dist/main.js)
                                                      │
-                                         Postgres (Homebrew) localhost:5432 / homeinn
+                                         Postgres 18 (Homebrew) localhost:5433 / homeinn
 ```
 
 ## Pieces
@@ -24,7 +24,7 @@ For this host:
 
 | Variable | Value |
 | --- | --- |
-| `DATABASE_URL` | `postgresql://<mac user>@localhost:5432/homeinn?schema=public` |
+| `DATABASE_URL` | `postgresql://<mac user>@localhost:5433/homeinn?schema=public` (Homebrew `postgresql@18` on 5433; another Postgres already holds 5432) |
 | `HOST`, `PORT` | `127.0.0.1`, `4200` |
 | `WEB_PORT` | `3200` |
 | `API_INTERNAL_URL` | `http://127.0.0.1:4200/api` |
@@ -36,6 +36,7 @@ For this host:
 | `NODE_ENV` | `production` (secure cookies) |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `REVALIDATE_SECRET` | long random strings (`openssl rand -hex 32`) |
 | `WEB_REVALIDATE_URL` | `http://127.0.0.1:3200/api/revalidate` |
+| `NODE_BIN_DIR` | `/opt/homebrew/opt/node@24/bin`: Home Inn's own Node (pnpm 11 needs ≥ 22.13; the host's shared Node is older and serves the other sites) |
 | `SMTP_*`, `LEAD_NOTIFY_TO` | optional, for enquiry emails |
 
 `NEXT_PUBLIC_*` are fixed when the site is built: change them, then deploy.

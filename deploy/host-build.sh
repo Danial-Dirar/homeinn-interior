@@ -14,9 +14,15 @@ cd "$(dirname "$0")/.."
 [ -f .env ] || { echo "✗ no .env at $(pwd) — see deploy/README.md"; exit 1; }
 set -a; . ./.env; set +a
 
-# pnpm through corepack: nothing to install globally, and the version is the
-# one package.json pins.
-PNPM="corepack pnpm"
+# Home Inn brings its own Node (NODE_BIN_DIR, a keg-only Homebrew node@24): the
+# host's shared /usr/local Node serves the other sites and stays as it is.
+[ -n "${NODE_BIN_DIR:-}" ] && PATH="$NODE_BIN_DIR:$PATH"
+echo "▶ node $(node -v)"
+
+# The pnpm version package.json pins, run through npx: nothing installed
+# globally, and no corepack (the host's corepack predates npm's key rotation).
+PNPM_VERSION="$(node -p "require('./package.json').packageManager.split('@')[1]")"
+PNPM="npx --yes pnpm@$PNPM_VERSION"
 
 echo "▶ installing exactly the committed lockfile…"
 $PNPM install --frozen-lockfile
