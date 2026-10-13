@@ -2423,3 +2423,80 @@ running `next build`, not only at start:
 - **Two old test enquiries named "Playwright"** (9 Aug) are still in the dev
   inbox. They are Muhammad's data; delete them from the panel if they are
   not wanted.
+
+---
+
+## Hosting on the Mac — 2026-10-13 — host side DONE; DNS waiting on Muhammad
+
+Muhammad: "host it on the Mac", domain **`homeinn.xyz`**. It was bought on
+Spaceship on 2026-09-19. Its nameservers are still Spaceship's, so it shows a
+parked page.
+
+The MacBook already hosts haifa-ai.com and providing-it-services.com from
+`~/Development/Hosting`. That setup's own `README.md` and `HANDOUT.md` are the
+authority on how the machine works. Home Inn joined it the same way the other
+sites did.
+
+**Done on the Mac (reached over Tailscale with `ssh mac`):**
+
+- **Postgres:** Homebrew `postgresql@18` runs on **port 5433**. An older
+  EnterpriseDB Postgres 17 already holds 5432 and was left alone. The
+  database is `homeinn`.
+- **Node:** Homebrew `node@24`, keg-only, via `NODE_BIN_DIR`. The shared
+  `/usr/local` Node 22.12 serves the other sites. It is too old for pnpm 11,
+  and its corepack cannot verify pnpm. It was not touched.
+- **Checkout:** `~/Development/Hosting/sites/homeinn`. Its production `.env`
+  (mode 600) has secrets generated on the Mac, never printed.
+- **Content:** the dev database was copied with `pg_dump`/`pg_restore`: 27
+  projects, 165 images, 7 services, 8 enquiries. `apps/api/uploads` was
+  copied with `rsync` (178 folders, 102 MB).
+- **Sessions:** the dev refresh tokens were deleted.
+- **Admin password:** set to a fresh random password. It is in
+  `~/homeinn-admin-password.txt` on the Mac (mode 600). Muhammad should sign
+  in, change it, and delete the file.
+- **Services:** `com.hosting.homeinn-api` (127.0.0.1:4200) and
+  `com.hosting.homeinn-web` (127.0.0.1:3200), started by
+  `deploy/start-api.sh` and `deploy/start-web.sh`.
+- **Caddy:** `caddy/sites/homeinn.caddy`. The apex goes to :3200, www
+  redirects to the apex, and `api.` goes to :4200. `X-Forwarded-For` is taken
+  from Cloudflare's `Cf-Connecting-Ip`. Without that, every visitor would
+  share one address, and the login and enquiry limits would apply to the
+  whole site at once.
+- **`hosting.sh`:** Home Inn has two rows, with health paths. `deploy` runs a
+  site's own `deploy/host-build.sh` and restarts every service built from the
+  same checkout. This was committed in the Hosting repo (`b908c0a`).
+- **Verified:**
+  - `hosting deploy homeinn` ran end to end: API 200, site 200.
+  - Through Caddy: `/en`, `/bn/projects` and `/admins/login` answer 200, and
+    www gives a 301.
+  - haifa-ai.com and providing-it-services.com still answer 200 publicly.
+
+**Changes in this repo for it:**
+
+- The API binds to `HOST`.
+- The web server reaches the API over `API_INTERNAL_URL`.
+- `deploy/host-build.sh`, `deploy/start-*.sh` and `deploy/README.md`.
+- An explicit `prisma generate`: inside the workspace, `@prisma/client`'s own
+  postinstall leaves only a stub.
+
+**What is left needs Muhammad's accounts.** The domain stays registered at
+Spaceship; only its DNS moves to Cloudflare. The Mac has no public address
+(CGNAT), so the site reaches the internet through the Cloudflare Tunnel, the
+same way haifa-ai.com does. Cloudflare routes a hostname down a tunnel only if
+that hostname's DNS zone is in the Cloudflare account. The steps:
+
+1. In the Cloudflare dashboard, in the account that has haifa-ai.com, add
+   the site `homeinn.xyz` on the Free plan.
+2. In Spaceship, under homeinn.xyz → Nameservers → Custom, enter the two
+   nameservers Cloudflare shows.
+3. In the `homeinn.xyz` zone, add three **proxied** CNAMEs: `@`, `www` and
+   `api`, each pointing to
+   `3d1a3f81-0f5a-4aed-a339-be4496a16304.cfargotunnel.com`.
+   (`cloudflared tunnel route dns` would put them in the haifa-ai.com zone by
+   mistake; see the Hosting HANDOUT §7.)
+
+cloudflared itself needs no change.
+
+**Optional, later:** `SMTP_*` and `LEAD_NOTIFY_TO` in the Mac's `.env`, for
+enquiry emails (needs a Gmail app password). Then run
+`hosting deploy homeinn`.
