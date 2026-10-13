@@ -2135,7 +2135,7 @@ panel build kora start korbo". The admin design was agreed on 2026-09-14
 
 ---
 
-## Admin panel at `/admins` — 2026-10-13 — IN PROGRESS (built overnight)
+## Admin panel at `/admins` — 2026-10-13 — DONE (built overnight; merged to main)
 
 Muhammad, before going offline: build an admin panel where the Contact Us
 messages can be read, "and not only that, everything else too". It goes at
@@ -2305,3 +2305,121 @@ help, and anything left over gets polished. **Don't ask anything.**
     created for the check and is removed at the end. The test enquiries were
     deleted. The two "Playwright" enquiries from 9 Aug were already in the
     dev database and were left alone.
+- **Entrances on the public site** (`feat(web): quiet entrances…`). Muhammad
+  liked the blueprint drawing itself, so `components/motion/reveal.tsx`
+  adds a few entrances in the same spirit:
+  - section headings rise in
+  - services and working areas arrive one after another across a row
+  - project pictures unveil from the bottom up, staggered along the row
+  - in the process section, the model and then the render unveil after the
+    plan starts drawing
+
+  The hero is untouched. Content that is waiting is transparent or clipped,
+  never removed from the accessibility tree, and keyboard focus finishes the
+  entrance at once. Everything shows at once, without animation, under
+  reduced motion and in a browser without IntersectionObserver or
+  matchMedia. A `<noscript>` style shows it without JavaScript.
+
+  Checked in Brave:
+  - nothing is left hidden after scrolling to the bottom
+  - reduced motion: nothing waits
+  - JavaScript off: nothing hidden
+  - axe on the full public site: 0 violations in light, 0 in dark
+- **Leftovers polished** (`fix: small things left over…`):
+  - `sitemap.xml` now lists `/furniture` and every published piece.
+  - A villa page with no location now uses the opening of its description
+    as its share description.
+  - The lead form accepts a phone number typed in Bangla digits.
+  - Projects with the same featured flag and order now list by title, so
+    they no longer swap places between requests.
+- **Whole-branch review → fixed** (`fix: act on the branch review…` and
+  `fix(api): quote a visitor's message…`). A fresh Opus reviewer found
+  nothing critical. Auth, sessions, CSRF, XSS and revalidation all held up.
+  - **Two Important problems**, both of which would have blocked the panel's
+    first real jobs:
+    1. **Imported projects and furniture could not be saved.** Their
+       descriptions are empty on purpose, but a description was required.
+       Descriptions may now be empty.
+    2. **Settings could not be saved.** The seeded first-line WhatsApp is
+       empty on purpose, but it was required. It may now be empty.
+
+    Both were checked in the browser: an imported photo project, a furniture
+    piece and the settings all save.
+  - **Smaller problems:**
+    - **Blog dates** show the Dhaka day, and saving never moves a post. A
+      newly chosen day starts at midnight in Dhaka.
+    - **Prices** are capped at what the INT4 column holds, so an oversized
+      price gets a 400 instead of a 500.
+    - **Validation problems inside a list** are shown on the list's field.
+    - **Refreshes are serialised across tabs** with Web Locks. Without this,
+      two tabs could send the same refresh token and end every session.
+    - **An unreachable API** now gets "can't reach the server" with a Try
+      again button, instead of a spinner that never ends.
+    - **`TRUST_PROXY`** now accepts numbers and booleans.
+    - **Links in every write schema** must be http(s).
+    - **The Published badge** updates after a save.
+    - **The image picker** restarts at page one each time it opens.
+  - **Enquiry emails:** the reviewer, then an automatic commit review, found
+    that a visitor could make lines in the email that pass for ours. The
+    name is now one line, the real admin link comes first, and every line of
+    the message is quoted with "> ". It splits on every separator a mail
+    client may break lines on: \r, \v, \f, NEL, U+2028 and U+2029.
+  - **Final suites:** typecheck 5/5; unit tests web 394, api 95, types 29,
+    ui 5; lint clean; API e2e 138 passed (3 todo).
+- **Clean-up:** the temporary QA admin is deleted. No QA enquiries are left.
+  The dev database's only account is `admin@homeinnbd.com` (ADMIN).
+
+### Going live: what the two apps need
+
+Set these on the Mac, in the environment of each process.
+
+**Web — `NEXT_PUBLIC_*` are fixed at build time**, so they must be set when
+running `next build`, not only at start:
+
+| Variable | Value |
+| --- | --- |
+| `NEXT_PUBLIC_API_URL` | `https://api.homeinn-interior.com/api` |
+| `NEXT_PUBLIC_SITE_URL` | `https://homeinn-interior.com` |
+| `REVALIDATE_SECRET` | a long random string, the same as the API's |
+
+**API:**
+
+| Variable | Value / note |
+| --- | --- |
+| `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `UPLOAD_DIR`, `PUBLIC_MEDIA_BASE_URL` | as now, with production values |
+| `WEB_ORIGIN` | `https://homeinn-interior.com` (CORS allowlist; comma-separated) |
+| `NODE_ENV` | `production`, so the cookies are `Secure` |
+| `REVALIDATE_SECRET` | the same as the web's |
+| `WEB_REVALIDATE_URL` | `http://localhost:3000/api/revalidate` (the web app on the same Mac) |
+| `TRUST_PROXY` | leave unset: the default `loopback` suits a tunnel on the same machine |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `LEAD_NOTIFY_TO` | enquiry emails: `smtp.gmail.com`, `465`, the Gmail address, a Gmail **app password**, and who receives them |
+
+**Before the site is reachable:**
+
+1. **The admin password.** The default `ChangeMeNow!2026` is on GitHub.
+   Change it with:
+
+   ```
+   ADMIN_NEW_PASSWORD='…' pnpm --filter @homeinn/api admin:password admin@homeinnbd.com
+   ```
+
+   Or change it from the panel, under "Your password".
+2. **Migrations:** `pnpm --filter @homeinn/api prisma:deploy`. This includes
+   the new `admin_sessions_valid_after`.
+3. **The site and the API must be the same site,** so the login cookies
+   travel: `homeinn-interior.com` and `api.homeinn-interior.com` work. Two
+   different `*.trycloudflare.com` hostnames do **not**. They are separate
+   sites under the Public Suffix List, and nobody could sign in.
+
+### What is not done, and why
+
+- **SEO overrides** (the `Seo` rows) are not editable yet. Every page
+  generates its metadata already.
+- **Gallery order** cannot be set. The join table keeps no position;
+  supporting it needs a schema change.
+- **No password reset by email, and no second factor.** These were out of
+  scope. An admin can reset someone's password under Accounts, and
+  `admin:password` works from the shell.
+- **Two old test enquiries named "Playwright"** (9 Aug) are still in the dev
+  inbox. They are Muhammad's data; delete them from the panel if they are
+  not wanted.
