@@ -24,6 +24,10 @@ async function bootstrap(): Promise<void> {
     .map((origin) => origin.trim())
     .filter(Boolean);
   app.enableCors({ origin: origins, credentials: true });
-  await app.listen(Number(process.env.PORT ?? 4000));
+  // HOST=127.0.0.1 on the host: the only client there is the local proxy, and
+  // a wildcard bind would let anything on the LAN reach the API unproxied.
+  const port = Number(process.env.PORT ?? 4000);
+  if (process.env.HOST) await app.listen(port, process.env.HOST);
+  else await app.listen(port);
 }
 void bootstrap();

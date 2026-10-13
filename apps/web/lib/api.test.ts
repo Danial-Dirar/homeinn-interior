@@ -21,6 +21,16 @@ describe("apiGet", () => {
     expect(spy.mock.calls[0]?.[0]).toBe("http://localhost:4000/api/services");
   });
 
+  it("asks the API over the internal address when the server has one", async () => {
+    // On the host the web and API sit side by side; the server's own fetches
+    // need not leave the machine, and the build works before DNS is live.
+    vi.stubEnv("API_INTERNAL_URL", "http://127.0.0.1:4200/api/");
+    const spy = stubFetch(200, { ok: true });
+    await apiGet("/services");
+    expect(spy.mock.calls[0]?.[0]).toBe("http://127.0.0.1:4200/api/services");
+    vi.unstubAllEnvs();
+  });
+
   it("returns the parsed body", async () => {
     stubFetch(200, [{ slug: "a" }]);
     await expect(apiGet("/services")).resolves.toEqual([{ slug: "a" }]);

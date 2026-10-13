@@ -17,8 +17,19 @@ export interface FetchOptions {
   tags?: string[];
 }
 
+/**
+ * Where the server reaches the API. On the host the two run side by side, so
+ * API_INTERNAL_URL (server-only, read at run time) keeps those fetches on the
+ * machine instead of out through the public address and back — and lets the
+ * site build before its DNS is live. The browser always uses the public one.
+ */
+function serverApiBase(): string {
+  const internal = process.env.API_INTERNAL_URL;
+  return internal ? internal.replace(/\/+$/, "") : apiBaseUrl();
+}
+
 export async function apiGet<T>(path: string, options: FetchOptions = {}): Promise<T> {
-  const response = await fetch(`${apiBaseUrl()}${path}`, {
+  const response = await fetch(`${serverApiBase()}${path}`, {
     headers: { accept: "application/json" },
     next: { revalidate: options.revalidate ?? 300, tags: options.tags },
   });
