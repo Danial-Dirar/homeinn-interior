@@ -2500,3 +2500,29 @@ cloudflared itself needs no change.
 **Optional, later:** `SMTP_*` and `LEAD_NOTIFY_TO` in the Mac's `.env`, for
 enquiry emails (needs a Gmail app password). Then run
 `hosting deploy homeinn`.
+
+### Visitor log on the Mac — `generations.csv` — 2026-10-13
+
+Muhammad wanted one file in the Mac's hosting directory that logs everyone
+who visits: their device, their location, everything available. It lives in
+the Hosting repo, not here:
+
+- **Script and service:** `scripts/visitor_log.py`, run as the launchd
+  service `com.hosting.visitor-log`. It follows Caddy's access logs (all
+  sites) and appends one row per page view, enquiry sent and admin sign-in
+  (successful or failed) to `~/Development/Hosting/generations.csv`.
+- **What each row holds:**
+  - time (Dhaka), site, page
+  - IP, and the location from Cloudflare's headers
+  - device, OS, browser and language, parsed from the request
+  - referrer
+- **Privacy:** the file is mode 600 and never committed. A value that
+  starts like a formula is neutralised before it is written.
+- **Tests:** 21 unit tests, run on the Mac's own Python 3.9.
+- **Found on install, fixed:** launchd restarted the service while I was
+  replacing the file, and new rows went into the old, unnamed file. The
+  script now writes by file name, so moving or clearing the CSV by hand is
+  safe.
+- **Location:** country is always sent. City, region, coordinates and time
+  zone need Cloudflare's Managed Transform "Add visitor location headers",
+  turned on per domain.
