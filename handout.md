@@ -2526,3 +2526,41 @@ the Hosting repo, not here:
 - **Location:** country is always sent. City, region, coordinates and time
   zone need Cloudflare's Managed Transform "Add visitor location headers",
   turned on per domain.
+
+### Live on homeinn.xyz — two bugs found by the first real visits — 2026-10-13
+
+The Cloudflare zone went active. Muhammad opened homeinn.xyz from another
+device and was sent to **localhost**.
+
+1. **Locale redirects went to the server's own address.**
+   - **Cause:** next-intl builds the `/` → `/en` redirect from `request.url`,
+     which behind the proxy is `http://localhost:3200`. Next then rebuilds any
+     same-origin redirect on that address and ignores `Host` and
+     `X-Forwarded-Host` while doing so.
+   - **First fix (relative `Location`):** this broke Next's own middleware
+     adapter, which needs an absolute URL ("Invalid URL", a 500). Calling the
+     middleware directly in a unit test never runs that adapter.
+   - **Final fix (`f7457c6`):** the middleware rebuilds the redirect on the
+     visitor's own origin: the host and scheme Caddy forwards, accepted only
+     if it is a bare host name. The redirect stays absolute. The test also
+     checks that `Location` parses as a URL.
+   - **Also:** next-intl's `Link` hreflang header is off. It was built as
+     `http://`, and every page already declares its alternates in `<head>`.
+2. **Every image was a 404.**
+   - **Cause:** `main.ts` served `/media` from `join(cwd, UPLOAD_DIR)`. On the
+     Mac, `UPLOAD_DIR` is an absolute path, and `join` glues it under the
+     working directory. In dev it was relative, so this never showed.
+   - **Fix:** `uploadRoot()` uses `resolve()`, with a unit test. The storage
+     layer uses the same function.
+   - **Cloudflare cached the 404s for a few minutes.** Purge the cache once,
+     or wait.
+
+**Checked publicly through Cloudflare:**
+
+| Request | Result |
+| --- | --- |
+| `https://homeinn.xyz/` | 307 to `https://homeinn.xyz/en` (a Bangla browser goes to `/bn`) |
+| `www` | 301 to the apex |
+| `/admin` | 308 to `/admins` |
+| `/en`, `/admins/login`, API health | 200 |
+| an image at a fresh URL | 200 |
