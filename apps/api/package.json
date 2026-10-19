@@ -19,7 +19,8 @@
     "seed:products": "tsx prisma/seed-products.ts",
     "seed:architecture": "tsx prisma/seed-architecture.ts",
     "media:inventory": "tsx scripts/media-inventory.ts",
-    "admin:password": "tsx scripts/admin-password.ts"
+    "admin:password": "tsx scripts/admin-password.ts",
+    "product:views": "tsx scripts/product-views.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
