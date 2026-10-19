@@ -2564,3 +2564,68 @@ device and was sent to **localhost**.
 | `/admin` | 308 to `/admins` |
 | `/en`, `/admins/login`, API health | 200 |
 | an image at a fresh URL | 200 |
+
+---
+
+## Moderators, and an honest visitor log — 2026-10-19
+
+### Where things stood after a week live
+
+- **The site:** https://homeinn.xyz has been up the whole time on the Mac.
+  Every service is loaded, all three sites answer 200, and the Home Inn
+  checkout matched GitHub.
+- **Open on Muhammad's side:**
+  - Nobody has signed in to the panel yet. `~/homeinn-admin-password.txt`
+    is still there.
+  - The 8 enquiries in the inbox are all August test rows ("Playwright",
+    "Demo Visitor"). No real enquiry has arrived.
+  - Cloudflare's "Add visitor location headers" is still off: 1 row in
+    10,842 has a city.
+  - There is no Gmail app password yet, so no enquiry emails.
+  - The furniture prices are still placeholders.
+- **Error logs:** the web error log had "cachefn" server-action probes.
+  These are scanners trying the RSC hole of late 2025; Next 15.5.22 and
+  React 19.2.8 are patched against it. The API error log was clean.
+
+### Visitor log: scanners are now "probe" (Hosting repo `fefc576`)
+
+The first week counted scanners as page views. For example, `/.git/config`
+was requested 40 times, by clients claiming to be Chrome, from servers in
+the US, Poland and the Netherlands.
+
+- A 4xx response for a dotfile, a PHP or WordPress path, or a well-known
+  exploit target is now logged as event `probe`.
+- 1,056 earlier rows were relabelled. Home Inn now shows 1,770 page views
+  and 525 probes.
+- `logs/visitor-log.state.json` is gitignored. There are 23 tests.
+
+### Moderator role (`64ddf18`)
+
+Muhammad asked for full access for himself, and for moderators who can
+change prices and similar things but cannot touch how the site is built.
+
+| | Admin | Moderator (stored as `EDITOR`) |
+| --- | --- | --- |
+| Enquiries: read, status, notes | yes | yes |
+| Furniture (prices included), projects, testimonials, team, certifications, client logos, client lists, blog, images | yes | yes |
+| Services, working areas, home page hero (the site's structure) | yes | **no** |
+| Settings (phones, address, headline figures) | yes | **no** |
+| Accounts | yes | **no** |
+| Deleting anything | yes | **no** |
+
+- **API:** the services, working-areas and hero writes are now `ADMIN`
+  only. `test/roles.e2e-spec.ts` pins the whole table. API e2e: 143
+  passed (3 todo).
+- **Panel:**
+  - EDITOR is shown as "Moderator" everywhere. There is no migration.
+  - A moderator's menu has no Services, Working areas, Hero or Settings.
+  - Typing one of their addresses shows "Only an admin…" and loads nothing.
+  - The Accounts page explains both roles.
+  - Web tests: 407.
+- **Checked live on the Mac:** a temporary moderator account could save a
+  furniture price (the same value, so nothing changed: 200). It got 403 on
+  renaming a service, changing settings, listing accounts and deleting a
+  piece. The account was then deleted.
+
+To add one: **Admin → Accounts → Add an account**, role **Moderator**,
+then give the first password in person.
