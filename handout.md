@@ -2985,3 +2985,41 @@ whenever it is fully shown.
 - Web tests: 437.
 
 **ComfyUI** was stopped afterwards, to give the GPU back.
+
+## The furniture photo job, written up for Haifa Intelligence — 2026-10-19
+
+**Muhammad:** this is business-tailored AI, Haifa Intelligence work. Write it
+up as a .md file, keep the method as a skill, and put the .md on one of his
+drives (he chose shinrinyoku).
+
+- **Case study:**
+  `~/Development/Haifa Intelligence/docs/case-studies/home-inn-furniture-photos.md`,
+  with `before.jpg`, `after.jpg` and `trial-dressing-unit.jpg` in the folder
+  beside it.
+  - It is not committed in that repo; that is left to him.
+  - A copy is at `/mnt/shinrinyoku/Haifa Intelligence/Case studies/`,
+    byte-identical.
+- **Skill:** `~/.claude/skills/restaging-product-photos/` holds `SKILL.md`
+  and `scripts/` (`qwen_edit.py`, `batch.py`, `compose.py`).
+  - **Tested** with a fresh agent on a new client (cabinets and sofas):
+    - Without the skill, it refused the front view, gave a negative prompt
+      at cfg 1, upscaled from 1 MP, and laid the logo on as a faded
+      watermark.
+    - With the skill, it planned A as the cover and B as a disclosed second
+      view, 2K, no negative prompt, the logo composited at the same pixels,
+      a 4:5 frame, a one-transaction apply with rollback, and a live phone
+      check.
+  - **Gaps the testers found, now closed:**
+    - In `compose.py`:
+      - the logo's shape is read from the file;
+      - a cover can be stamped alone (`-`);
+      - 9:16 photos have their side walls extended;
+      - it refuses to mirror an edge that is not plain wall or floor (it
+        would copy the product), and photos wider than about 16:10;
+      - `auto light` works.
+    - In `batch.py`: per-piece `seed_a` and `seeds_b`.
+    - In `SKILL.md`: a pass mark for the faithfulness check, HEIC/EXIF, the
+      cut-out fallback tools, reflections in glossy surfaces, and what to do
+      when a site has only a cover.
+  - The changed `compose.py` reproduces the shipped Home Inn images
+    byte-for-byte.
