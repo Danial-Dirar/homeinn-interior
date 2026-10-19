@@ -1,0 +1,80 @@
+{
+ "applied": "2026-10-19",
+ "why": "Muhammad: the cover at its real angle with the logo, turning to a front view (also with the logo) on hover. Made with Qwen-Image 2.1 edit; see handout.md.",
+ "photos": {
+  "made_on": "~/Development/HomeInn-photos/ (Muhammad's PC): originals/, out/, final/, workflows/",
+  "uploaded_from": "~/Development/Hosting/sites/homeinn-product-views/2026-10-19/ (the Mac): manifest.json, manifest.rollback.json"
+ },
+ "undo": [
+  "Whole set, on the Mac: cd ~/Development/Hosting/sites/homeinn && set -a && . ./.env && set +a && export PATH=\"$NODE_BIN_DIR:$PATH\" && cd apps/api && npx --yes pnpm@11.18.0 product:views rollback ~/Development/Hosting/sites/homeinn-product-views/2026-10-19/manifest.rollback.json",
+  "One piece: in /admins, Furniture, open it, set Cover image back to the old media id below and clear Second view."
+ ],
+ "pieces": [
+  {
+   "slug": "mirrored-dressing-unit",
+   "before": {
+    "coverId": "cmspe4kvl00032jerp60a7074",
+    "secondViewId": null
+   },
+   "after": {
+    "coverId": "cmvfcrnu500001oh58p8bzuq8",
+    "secondViewId": "cmvfcrq1w00011oh5hw6n2gal"
+   }
+  },
+  {
+   "slug": "carved-wooden-wardrobe",
+   "before": {
+    "coverId": "cmspe4fmy00002jerr7xw2ypx",
+    "secondViewId": null
+   },
+   "after": {
+    "coverId": "cmvfcrtn900021oh5nl0l90t1",
+    "secondViewId": "cmvfcrxfa00031oh5br13xwh9"
+   }
+  },
+  {
+   "slug": "steel-display-shelving",
+   "before": {
+    "coverId": "cmspe4xzt000c2jeriyw480h0",
+    "secondViewId": null
+   },
+   "after": {
+    "coverId": "cmvfcrz5f00041oh5td49jsad",
+    "secondViewId": "cmvfcs19l00051oh5j1ewoeqm"
+   }
+  },
+  {
+   "slug": "office-workstation-desk",
+   "before": {
+    "coverId": "cmspe4oui00062jerrtzbgmr9",
+    "secondViewId": null
+   },
+   "after": {
+    "coverId": "cmvfcs4j300061oh5n4ttmsxa",
+    "secondViewId": "cmvfcs7ni00071oh5c7rerekv"
+   }
+  },
+  {
+   "slug": "executive-desk",
+   "before": {
+    "coverId": "cmspe4t3z00092jeroet93uhp",
+    "secondViewId": null
+   },
+   "after": {
+    "coverId": "cmvfcsav500081oh5fabrhmam",
+    "secondViewId": "cmvfcse1u00091oh52xjyx2dw"
+   }
+  },
+  {
+   "slug": "bedroom-wardrobe-wall",
+   "before": {
+    "coverId": "cmspe53pz000f2jergwxc7i1q",
+    "secondViewId": null
+   },
+   "after": {
+    "coverId": "cmvfcsfs8000a1oh5lknejxrw",
+    "secondViewId": "cmvfcshia000b1oh5hfotw0xr"
+   }
+  }
+ ]
+}

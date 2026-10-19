@@ -260,8 +260,10 @@
   }
 }
 
+/* `scale`, not `transform`: it is the property scale-[1.03] sets, so the
+   animation replaces it, and the logo in both views lines up. */
 @keyframes second-view {
-  0%, 40% { opacity: 0; transform: scale(1.03); }
-  50%, 90% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.03); }
+  0%, 40% { opacity: 0; scale: 1.03; }
+  50%, 90% { opacity: 1; scale: 1; }
+  100% { opacity: 0; scale: 1.03; }
 }

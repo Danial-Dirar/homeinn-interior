@@ -62,6 +62,15 @@ describe("a furniture piece's second view", () => {
     expect(css).toMatch(/@media \(hover: none\) and \(prefers-reduced-motion: no-preference\)\s*\{\s*\[data-second-view\]\s*\{[^}]*animation:\s*second-view/);
     expect(css).toMatch(/@keyframes second-view/);
   });
+
+  it("settles on the same scale property the hover uses, so the logo holds still", () => {
+    // Tailwind's scale-[1.03] sets `scale`, not `transform`. Animating
+    // transform left the phone's second view at 1.03 for good, and its logo
+    // sat 10px off the cover's.
+    const frames = /@keyframes second-view\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    expect(frames).toMatch(/scale:\s*1;/);
+    expect(frames).not.toMatch(/transform/);
+  });
 });
 
 describe("the dark: variant", () => {
