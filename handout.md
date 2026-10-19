@@ -3072,3 +3072,75 @@ been built.
 piece at home, or Home Inn's staff sitting with a client in the showroom?
 
 **Size:** a project. Next time, it gets a written design before any code.
+
+## Company profile 2026, in the new theme — 2026-10-20 — DONE
+
+**Muhammad:** the old profile is in the old format and logo (red, the "HI"
+house mark). Rebuild it in the new logo and theme, add architecture, fix or
+add whatever else needs it, with animation, as a PPTX and a PDF.
+
+**Delivered:**
+
+- `/mnt/shinrinyoku/Home Inn/Company Profile 2026/`:
+  `Home-Inn-Company-Profile-2026.pptx`, `.pdf`, and `fonts/` (Righteous,
+  Geist).
+- The old one is still in `Home Inn/ignore/`.
+
+**Generator** (outside the repo, because the old deck's documents carry
+personal details): `~/Development/HomeInn-profile/`
+
+- `build_profile.py` uses python-pptx in `.venv`, with brand fonts in
+  `~/.local/share/fonts/homeinn`.
+- The PDF comes from LibreOffice, installed as a user flatpak:
+  `flatpak run --filesystem=home org.libreoffice.LibreOffice --headless
+  --convert-to pdf --outdir out out/Home-Inn-Company-Profile-2026.pptx`.
+- Data comes from `data/*.json` (fetched from api.homeinn.xyz) and
+  `data/corporate-projects.json` (the old deck's client list, typos
+  corrected).
+- Documents were taken from the old PPTX's media.
+
+**The deck:** 20 slides, 16:9, in the site's palette, with Righteous
+headings and Geist text.
+
+- **Slides:**
+  - cover; contents; about (73 / 57 / 13 in a sentence); what we do
+    (architecture marked new)
+  - architecture: plan, model and render, with the floor plan drawing
+    itself like the site's blueprint; then the two villa designs
+  - mission and vision; quality and strengths; philosophy and values; where
+    we work
+  - two slides of selected work; the six restaged furniture photos
+  - two slides listing the 73 corporate projects, with client logos
+  - homes; documents (trade license, tax certificate, VAT); how a project
+    runs; work with us; contact with a QR code
+- **Motion:**
+  - Every slide fades in.
+  - Every element enters on its own after the slide arrives, as fades and
+    left-to-right or bottom-up wipes.
+  - Checked: LibreOffice reads all 219 effects and every transition.
+  - PowerPoint itself could not be tested here.
+
+**Rulings, made without asking:**
+
+- **Dropped "Clients profile":** its percentages were labelled "a
+  reasonable market estimate".
+- **Dropped "Business graph":** placeholder data, with series named "Series
+  1/2/3".
+- **Dropped "The aim of nature":** clip art with no content.
+- **Residential clients are not named.** The site's own rule is that names
+  appear only when a client is publicly listed. The slide gives the count
+  and the places instead. The one person named in the corporate list became
+  "Philosophy Department office, University of Dhaka".
+- **The closing slide** asks any organisation to enlist Home Inn. The old
+  one named the Human Development Foundation.
+- **Contacts come from the site's settings:**
+  - +880 1760-775454
+  - WhatsApp +880 1818-843999
+  - homeinn.xyz
+  - facebook.com/homeinn.xyz
+  The old deck said www.homeinnbd.com, and WhatsApp on the first number.
+- **"&" is written as "and" in headings.** Righteous's ampersand reads as a
+  "€", as on the site.
+- **The PPTX cannot embed fonts.** On a PC without Righteous and Geist,
+  PowerPoint will substitute them, so the fonts are shipped beside the deck.
+  The PDF embeds them.
