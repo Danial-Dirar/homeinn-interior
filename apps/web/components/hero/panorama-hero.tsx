@@ -113,7 +113,7 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
     );
   }
 
-  // A phone pans across each room and raises the next; see MobileHero.
+  // A phone fills the screen with each room and raises the next; see MobileHero.
   if (isMobile) return <MobileHero segments={shown} locale={locale} />;
 
   return (

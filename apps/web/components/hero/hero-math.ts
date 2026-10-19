@@ -86,68 +86,39 @@ export function lightPoolX(p: number, count: number): number {
  * Height of the pinned section, in vh.
  *
  * Desktop: one screenful of scroll per change of room, so a normal gesture
- * advances exactly one room. Phone: a screen to rest on, then 120vh per room
- * for its pan and the rise of the next — the phone hero moves through a room
- * rather than cutting between them, and that needs travel.
+ * advances exactly one room. Phone: a screen to rest on, then 80vh per change
+ * of room — one swipe each. (A pan across every room made it a long scroll.)
  */
 const DESKTOP_VH_PER_SEGMENT = 100;
-const MOBILE_VH_PER_ROOM = 120;
+const MOBILE_VH_PER_CHANGE = 80;
 
 export function scrollDistanceVh(count: number, target: "desktop" | "mobile"): number {
-  if (target === "mobile") return 100 + Math.max(1, count) * MOBILE_VH_PER_ROOM;
+  if (target === "mobile") return 100 + Math.max(1, count - 1) * MOBILE_VH_PER_CHANGE;
   return Math.max(100, (count - 1) * DESKTOP_VH_PER_SEGMENT);
 }
 
-/* ── The phone hero: pan across each room, then the next one rises ──────────
+/* ── The phone hero: each room fills the screen, the next rises over it ──────
 
-   A phone held upright shows about a third of a landscape photograph, so the
-   desktop crossfade left each room as a still, cropped middle. Here every
-   room owns an equal share of the scroll (room-position x runs 0 → count):
-
-     [k, k+1)              room k is on screen and the camera pans across it,
-                           left to right, showing the whole photograph;
-     [k+1−H, k+1]          the handover: room k+1 rises from below over it,
-                           while room k sinks back.
-
-   The handover is the only place two rooms share the screen, and
-   `mobileTarget` never lets the hero rest inside it. */
-
-/** Share of each room's scroll spent handing over to the next. */
-export const MOBILE_HANDOVER = 0.3;
+   A phone held upright shows about a third of a landscape photograph. Each
+   room is cropped to its main part (its focus point) and fills the screen;
+   rooms rest at room-positions 0 … count−1, like the desktop, and between two
+   rests the next room rises from below while the current one sinks back.
+   The phone hero snaps to whole rooms (`snappedProgress`), so one swipe plays
+   one whole rise and it never rests on half of each. */
 
 export interface MobileFrame {
   /** 0 → 1 as the room rises into view; 1 for the first room. */
   reveal: number;
-  /** 0 → 1 across the photograph, left edge to right edge. */
-  pan: number;
   /** 0 → 1 as the next room covers it; 0 for the last room. */
   depth: number;
 }
 
 export function mobileFrame(p: number, index: number, count: number): MobileFrame {
-  const x = clamp01(p) * Math.max(1, count);
-  const H = MOBILE_HANDOVER;
-  const reveal = index === 0 ? 1 : clamp01((x - (index - H)) / H);
-  const depth = index >= count - 1 ? 0 : clamp01((x - (index + 1 - H)) / H);
-  const start = index === 0 ? 0 : index - H;
-  const pan = clamp01((x - start) / (index + 1 - start));
-  return { reveal, pan, depth };
-}
-
-/**
- * Where the phone hero comes to rest for a raw scroll position. Inside a room
- * it follows the finger exactly; inside a handover it goes to the nearer end,
- * so a rise always completes or falls back on its own — crisp, never two half
- * rooms.
- */
-export function mobileTarget(p: number, count: number): number {
-  const n = Math.max(1, count);
-  const x = clamp01(p) * n;
-  const k = Math.floor(x);
-  if (k >= n - 1) return x / n;
-  const handoverStart = k + 1 - MOBILE_HANDOVER;
-  if (x < handoverStart) return x / n;
-  return (x - handoverStart < MOBILE_HANDOVER / 2 ? handoverStart : k + 1) / n;
+  if (count <= 1) return { reveal: 1, depth: 0 };
+  const x = clamp01(p) * (count - 1);
+  const reveal = index === 0 ? 1 : clamp01(x - (index - 1));
+  const depth = index >= count - 1 ? 0 : clamp01(x - index);
+  return { reveal, depth };
 }
 
 /**

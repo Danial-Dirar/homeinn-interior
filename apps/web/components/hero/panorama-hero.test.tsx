@@ -153,17 +153,20 @@ describe("PanoramaHero on a phone", () => {
         mobileSegments={[segment(0), segment(1)]}
         locale="en"
       />);
-    // A screen to rest on, then 120vh per room for its pan and handover.
-    expect(screen.getByRole("region")).toHaveStyle({ height: "340vh" });
+    // A screen to rest on, then 80vh per change of room: one swipe each.
+    expect(screen.getByRole("region")).toHaveStyle({ height: "180vh" });
   });
 
-  it("lets each photograph keep its own shape, wider than the phone, so the camera can pan across the room", () => {
+  it("fills the phone with each photograph's main part, cropped at its focus point, with no pan", () => {
     setMobile(true);
     const { container } = renderWithIntl(
-      <PanoramaHero segments={[segment(0), segment(1)]} mobileSegments={[segment(0), segment(1)]} locale="en" />);
-    const pans = container.querySelectorAll<HTMLElement>("[data-hero-pan]");
-    expect(pans).toHaveLength(2);
-    expect(pans[0]!.style.aspectRatio).toBe("1920 / 1080");
+      <PanoramaHero
+        segments={[segment(0), segment(1)]}
+        mobileSegments={[segment(0, { focalX: 0.3 }), segment(1)]}
+        locale="en"
+      />);
+    expect(container.querySelector("[data-hero-pan]")).toBeNull();
+    expect(screen.getByAltText("Room i0")).toHaveStyle({ objectPosition: "30% 50%" });
   });
 
   it("opens on the first room in place, with the next waiting below the screen to rise", () => {

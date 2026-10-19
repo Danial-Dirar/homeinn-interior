@@ -2,12 +2,12 @@
 
 import type { Locale } from "@homeinn/types";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { Picture } from "@/components/media/picture";
 import type { HeroSegmentView } from "@/lib/api.types";
 import { text, textOrNull } from "@/lib/locale-text";
 import { useSmoothProgress } from "@/hooks/use-smooth-progress";
-import { mobileFrame, mobileLabel, mobileTarget, objectPosition, scrollDistanceVh } from "./hero-math";
+import { mobileFrame, mobileLabel, objectPosition, scrollDistanceVh } from "./hero-math";
 
 /** How far a room sinks back (scale) while the next one rises over it. */
 const SINK = 0.06;
@@ -22,13 +22,13 @@ const r3 = (value: number) => Math.round(value * 1000) / 1000;
 
 /**
  * The phone hero. A phone held upright shows about a third of a landscape
- * photograph, so the desktop crossfade left each room as a still, cropped
- * middle. Here the camera pans across each room, left to right, as you
- * scroll, then the next room rises from below while the last one sinks back.
+ * photograph, so each room is cropped to its main part — its focus point,
+ * set per image in the admin panel — and fills the screen. One swipe raises
+ * the next room from below while the last one sinks back and darkens.
  *
- * Handovers never rest halfway (`mobileTarget`): let go mid-rise and it
- * finishes, or falls back, on its own. Everything moves by transform and
- * opacity, written straight to the DOM per frame — React renders this once.
+ * It snaps to whole rooms, like the desktop: let go mid-rise and it finishes,
+ * or falls back, on its own. Everything moves by transform and opacity,
+ * written straight to the DOM per frame — React renders this once.
  */
 export function MobileHero({ segments, locale }: { segments: HeroSegmentView[]; locale: Locale }) {
   const t = useTranslations("home");
@@ -36,27 +36,17 @@ export function MobileHero({ segments, locale }: { segments: HeroSegmentView[]; 
   const count = segments.length;
 
   const sectionRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
   const frames = useRef<(HTMLDivElement | null)[]>([]);
   const lifts = useRef<(HTMLDivElement | null)[]>([]);
-  const pans = useRef<(HTMLDivElement | null)[]>([]);
   const shades = useRef<(HTMLDivElement | null)[]>([]);
   const labels = useRef<(HTMLDivElement | null)[]>([]);
   const marks = useRef<(HTMLSpanElement | null)[]>([]);
-  /** How far, in px, each photograph can pan before its right edge arrives. */
-  const travel = useRef<number[]>([]);
-
-  const measure = useCallback(() => {
-    const width = stageRef.current?.clientWidth ?? 0;
-    travel.current = segments.map((_, i) => Math.max(0, (pans.current[i]?.offsetWidth ?? 0) - width));
-  }, [segments]);
 
   const draw = useCallback(
     (p: number) => {
-      if (travel.current.length !== count) measure();
       for (let i = 0; i < count; i++) {
         const state = mobileFrame(p, i, count);
-        const { reveal, pan, depth } = state;
+        const { reveal, depth } = state;
         const frame = frames.current[i];
         if (frame) {
           frame.style.transform = `translate3d(0px, ${r3((1 - reveal) * 100)}%, 0px) scale(${r3(1 - SINK * depth)})`;
@@ -68,8 +58,6 @@ export function MobileHero({ segments, locale }: { segments: HeroSegmentView[]; 
           lift.style.transform =
             `translate3d(0px, ${r3(-(1 - reveal) * 100 * PARALLAX)}%, 0px) scale(${r3(1 + 0.08 * (1 - reveal))})`;
         }
-        const panel = pans.current[i];
-        if (panel) panel.style.transform = `translate3d(${r3(-pan * (travel.current[i] ?? 0))}px, 0px, 0px)`;
         const shade = shades.current[i];
         if (shade) shade.style.opacity = String(r3(SHADE * depth));
 
@@ -83,23 +71,14 @@ export function MobileHero({ segments, locale }: { segments: HeroSegmentView[]; 
           else label.setAttribute("aria-hidden", "true");
         }
         const mark = marks.current[i];
-        if (mark) mark.style.transform = `scaleX(${r3(depth > 0 ? 1 : reveal > 0 ? pan : 0)})`;
+        if (mark) mark.style.transform = `scaleX(${r3(reveal)})`;
       }
     },
-    [count, measure],
+    [count],
   );
 
-  const restAt = useCallback((raw: number) => mobileTarget(raw, count), [count]);
-  useSmoothProgress(sectionRef, true, draw, restAt);
-
-  // The pan distance depends on the stage's size, which changes when the
-  // phone rotates or its toolbars come and go.
-  useEffect(() => {
-    if (typeof ResizeObserver === "undefined" || !stageRef.current) return;
-    const observer = new ResizeObserver(() => measure());
-    observer.observe(stageRef.current);
-    return () => observer.disconnect();
-  }, [measure]);
+  // `count` as the snap target: the hero rests on whole rooms only.
+  useSmoothProgress(sectionRef, true, draw, count);
 
   return (
     <>
@@ -109,7 +88,7 @@ export function MobileHero({ segments, locale }: { segments: HeroSegmentView[]; 
         data-hero="mobile"
         style={{ height: `${scrollDistanceVh(count, "mobile")}vh` }}
       >
-        <div ref={stageRef} className="ground-ink ground-photo sticky top-0 h-dvh overflow-hidden bg-ink">
+        <div className="ground-ink ground-photo sticky top-0 h-dvh overflow-hidden bg-ink">
           {segments.map((segment, index) => (
             <div
               key={segment.id}
@@ -130,25 +109,16 @@ export function MobileHero({ segments, locale }: { segments: HeroSegmentView[]; 
                 }}
                 className="absolute inset-0 will-change-transform"
               >
-                <div
-                  ref={(node) => {
-                    pans.current[index] = node;
-                  }}
-                  data-hero-pan
-                  className="h-full will-change-transform"
-                  // The photograph at full height in its own proportions: wider
-                  // than the phone, which is what the camera pans across.
-                  style={{ aspectRatio: `${segment.image.width} / ${segment.image.height}`, minWidth: "100%" }}
-                >
-                  <Picture
-                    media={segment.image}
-                    locale={locale}
-                    sizes="330vw"
-                    priority={index === 0}
-                    className="h-full w-full object-cover"
-                    style={{ objectPosition: objectPosition(segment.focalX) }}
-                  />
-                </div>
+                {/* Cropped to the room's main part: its focus point, set per
+                    image in the admin panel (Hero → Focus point). */}
+                <Picture
+                  media={segment.image}
+                  locale={locale}
+                  sizes="100vw"
+                  priority={index === 0}
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: objectPosition(segment.focalX) }}
+                />
               </div>
               <div
                 ref={(node) => {
@@ -202,7 +172,7 @@ export function MobileHero({ segments, locale }: { segments: HeroSegmentView[]; 
                         marks.current[index] = node;
                       }}
                       className="block h-full origin-left bg-accent"
-                      style={{ transform: "scaleX(0)" }}
+                      style={{ transform: `scaleX(${index === 0 ? 1 : 0})` }}
                     />
                   </span>
                 ))}
