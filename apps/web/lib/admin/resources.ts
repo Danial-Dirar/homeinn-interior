@@ -22,6 +22,8 @@ export interface ResourceDef {
   publicPath?: (row: AdminRow) => string | null;
   /** Shown above the list and the form. */
   intro?: string;
+  /** Part of the site's structure: admins only, never moderators (lib/admin/roles.ts). */
+  adminOnly?: boolean;
   fields: Field[];
 }
 
@@ -80,6 +82,7 @@ export const RESOURCES: ResourceDef[] = [
   },
   {
     name: "services",
+    adminOnly: true,
     label: "Services",
     singular: "service",
     group: "Work",
@@ -102,6 +105,7 @@ export const RESOURCES: ResourceDef[] = [
   },
   {
     name: "working-areas",
+    adminOnly: true,
     label: "Working areas",
     singular: "working area",
     group: "Work",
@@ -154,6 +158,7 @@ export const RESOURCES: ResourceDef[] = [
   },
   {
     name: "hero",
+    adminOnly: true,
     label: "Hero",
     singular: "hero image",
     group: "Home page",

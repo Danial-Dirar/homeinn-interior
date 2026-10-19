@@ -184,9 +184,9 @@ describe("services", () => {
     expect(await prisma.service.count()).toBe(1);
   });
 
-  it("lets an editor create a service", async () => {
+  it("lets an admin create a service; a moderator cannot (test/roles.e2e-spec.ts)", async () => {
     await request(server())
-      .post("/api/services").set("Cookie", await asEditor()).send(newService).expect(201);
+      .post("/api/services").set("Cookie", await asAdmin()).send(newService).expect(201);
   });
 });
 

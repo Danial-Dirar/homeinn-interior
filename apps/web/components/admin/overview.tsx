@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { adminGet } from "@/lib/admin/api";
 import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL, type AdminLead } from "@/lib/admin/leads";
 import { RESOURCES } from "@/lib/admin/resources";
+import { canEdit } from "@/lib/admin/roles";
 import { useAdmin } from "./admin-context";
 import { Badge, Loading, Notice, PageHeader, Panel, timeAgo } from "./ui";
 
@@ -44,8 +45,9 @@ export function Overview() {
 
   const firstName = user.name.split(" ")[0];
   const waiting = summary?.leads.NEW ?? 0;
+  const mine = RESOURCES.filter((r) => canEdit(r, user.role));
   const drafts = summary
-    ? RESOURCES.map((r) => ({ resource: r, count: summary.content[r.name]?.drafts ?? 0 })).filter((d) => d.count > 0)
+    ? mine.map((r) => ({ resource: r, count: summary.content[r.name]?.drafts ?? 0 })).filter((d) => d.count > 0)
     : [];
 
   return (
@@ -116,7 +118,7 @@ export function Overview() {
             <Panel>
               <h2 className="mb-3 text-xs uppercase tracking-[0.14em] text-ink/65">Edit the site</h2>
               <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                {RESOURCES.map((resource) => (
+                {mine.map((resource) => (
                   <li key={resource.name}>
                     <Link href={`/admins/${resource.name}`} className="inline-flex items-center gap-2 hover:text-brand">
                       <resource.icon aria-hidden="true" className="size-4 text-ink/65" />
@@ -126,7 +128,9 @@ export function Overview() {
                   </li>
                 ))}
                 <li><Link href="/admins/media" className="hover:text-brand">Media library</Link></li>
-                <li><Link href="/admins/settings" className="hover:text-brand">Contact details</Link></li>
+                {user.role === "ADMIN" ? (
+                  <li><Link href="/admins/settings" className="hover:text-brand">Contact details</Link></li>
+                ) : null}
               </ul>
             </Panel>
           </div>

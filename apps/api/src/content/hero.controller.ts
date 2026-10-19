@@ -23,14 +23,14 @@ export class HeroController {
 
   @Post()
   @UseGuards(JwtGuard, RolesGuard)
-  @Roles("ADMIN", "EDITOR")
+  @Roles("ADMIN") // site structure: not for moderators (EDITOR)
   create(@Body(new ZodValidationPipe(createHeroSegmentSchema)) body: CreateHeroSegmentInput) {
     return this.hero.create(body);
   }
 
   @Patch(":id")
   @UseGuards(JwtGuard, RolesGuard)
-  @Roles("ADMIN", "EDITOR")
+  @Roles("ADMIN") // site structure: not for moderators (EDITOR)
   update(
     @Param("id") id: string,
     @Body(new ZodValidationPipe(updateHeroSegmentSchema)) body: UpdateHeroSegmentInput,

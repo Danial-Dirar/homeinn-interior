@@ -30,14 +30,14 @@ export class ServicesController {
 
   @Post()
   @UseGuards(JwtGuard, RolesGuard)
-  @Roles("ADMIN", "EDITOR")
+  @Roles("ADMIN") // site structure: not for moderators (EDITOR)
   create(@Body(new ZodValidationPipe(createServiceSchema)) body: CreateServiceInput) {
     return this.services.create(body);
   }
 
   @Patch(":id")
   @UseGuards(JwtGuard, RolesGuard)
-  @Roles("ADMIN", "EDITOR")
+  @Roles("ADMIN") // site structure: not for moderators (EDITOR)
   update(
     @Param("id") id: string,
     @Body(new ZodValidationPipe(updateServiceSchema)) body: UpdateServiceInput,

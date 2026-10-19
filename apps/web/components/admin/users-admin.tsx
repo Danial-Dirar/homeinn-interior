@@ -3,6 +3,7 @@
 import { Button } from "@homeinn/ui";
 import { useEffect, useState, type FormEvent } from "react";
 import { adminGet, adminSend } from "@/lib/admin/api";
+import { ROLE_LABEL } from "@/lib/admin/roles";
 import { useAdmin } from "./admin-context";
 import { Badge, controlClass, FieldShell, Loading, Notice, PageHeader, Panel } from "./ui";
 
@@ -15,9 +16,10 @@ interface Account {
 }
 
 /**
- * Who can sign in. Editors change content; admins also delete, change the
- * settings and manage accounts. Resetting someone's password or changing their
- * role signs them out everywhere.
+ * Who can sign in. Moderators (stored as EDITOR) do the day-to-day work;
+ * admins also change the site's structure, the settings and the accounts,
+ * and delete. Resetting someone's password or changing their role signs them
+ * out everywhere.
  */
 export function UsersAdmin() {
   const { user } = useAdmin();
@@ -96,7 +98,13 @@ export function UsersAdmin() {
     <>
       <PageHeader
         title="Accounts"
-        description="Editors can change content. Admins can also delete, change the settings and manage accounts."
+        description={
+          <>
+            <strong>Moderators</strong> answer enquiries and keep the content current: prices, furniture, projects,
+            testimonials, team, clients, the blog and images. <strong>Admins</strong> can also change the site&apos;s
+            structure (services, working areas, the home page hero), the settings and the accounts, and delete things.
+          </>
+        }
       />
       {message ? <div className="mb-6"><Notice tone={message.tone}>{message.text}</Notice></div> : null}
       {!accounts ? <Loading /> : (
@@ -119,15 +127,15 @@ export function UsersAdmin() {
                     <td className="px-4 py-3 font-medium">{account.name} {me ? <Badge>You</Badge> : null}</td>
                     <td className="px-4 py-3">{account.email}</td>
                     <td className="px-4 py-3">
-                      {me ? (account.role === "ADMIN" ? "Admin" : "Editor") : (
+                      {me ? ROLE_LABEL[account.role] : (
                         <>
                           <label htmlFor={`role-${account.id}`} className="sr-only">Role for {account.name}</label>
                           <select
                             id={`role-${account.id}`} value={account.role} className={`${controlClass} w-auto py-1`}
                             onChange={(e) => update(account, { role: e.target.value as Account["role"] })}
                           >
-                            <option value="EDITOR">Editor</option>
-                            <option value="ADMIN">Admin</option>
+                            <option value="EDITOR">{ROLE_LABEL.EDITOR}</option>
+                            <option value="ADMIN">{ROLE_LABEL.ADMIN}</option>
                           </select>
                         </>
                       )}
@@ -159,8 +167,8 @@ export function UsersAdmin() {
           </FieldShell>
           <FieldShell id="new-role" label="Role">
             <select id="new-role" value={role} onChange={(e) => setRole(e.target.value as Account["role"])} className={controlClass}>
-              <option value="EDITOR">Editor</option>
-              <option value="ADMIN">Admin</option>
+              <option value="EDITOR">{ROLE_LABEL.EDITOR}</option>
+              <option value="ADMIN">{ROLE_LABEL.ADMIN}</option>
             </select>
           </FieldShell>
           <FieldShell id="new-password" label="First password" help="At least 10 characters. They can change it under “Your password”.">

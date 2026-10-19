@@ -76,4 +76,20 @@ describe("AdminShell", () => {
     screen.getByRole("button", { name: "Try again" }).click();
     expect(await screen.findByText("Panel")).toBeInTheDocument();
   });
+
+  it("shows a moderator the day-to-day work, not the site's structure", async () => {
+    adminGet.mockImplementation(async (path: string) => {
+      if (path === "/auth/me") return { user: { id: "m", name: "Moderator", email: "m@x.test", role: "EDITOR" } };
+      return { items: [], total: 0 };
+    });
+    render(<AdminShell><p>Panel</p></AdminShell>);
+    await screen.findByText("Panel");
+    for (const label of ["Projects", "Furniture", "Testimonials", "Media"]) {
+      expect(screen.getAllByRole("link", { name: label }).length, label).toBeGreaterThan(0);
+    }
+    for (const label of ["Services", "Working areas", "Hero", "Settings", "Accounts"]) {
+      expect(screen.queryByRole("link", { name: label }), label).not.toBeInTheDocument();
+    }
+    expect(screen.getByText(/· Moderator/)).toBeInTheDocument();
+  });
 });

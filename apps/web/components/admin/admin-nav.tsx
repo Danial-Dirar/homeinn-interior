@@ -7,6 +7,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { RESOURCES, type ResourceGroup } from "@/lib/admin/resources";
+import { ROLE_LABEL } from "@/lib/admin/roles";
 import { useAdmin } from "./admin-context";
 
 interface NavItem {
@@ -31,13 +32,13 @@ const NAV: { label: string; items: NavItem[] }[] = [
   ...GROUP_ORDER.map((group) => ({
     label: group,
     items: RESOURCES.filter((r) => r.group === group)
-      .map((r) => ({ href: `/admins/${r.name}`, label: r.label, icon: r.icon })),
+      .map((r) => ({ href: `/admins/${r.name}`, label: r.label, icon: r.icon, adminOnly: r.adminOnly })),
   })),
   { label: "Library", items: [{ href: "/admins/media", label: "Media", icon: Images }] },
   {
     label: "Site",
     items: [
-      { href: "/admins/settings", label: "Settings", icon: Settings },
+      { href: "/admins/settings", label: "Settings", icon: Settings, adminOnly: true },
       { href: "/admins/users", label: "Accounts", icon: UserCog, adminOnly: true },
       { href: "/admins/account", label: "Your password", icon: KeyRound },
     ],
@@ -102,7 +103,7 @@ export function AdminNav({ newCount, onNavigate, onSignOut }: {
 
       <div className="border-t border-white/10 px-6 py-5 text-sm">
         <p className="truncate text-bone">{user.name}</p>
-        <p className="truncate text-xs text-bone/70">{user.email} · {user.role === "ADMIN" ? "Admin" : "Editor"}</p>
+        <p className="truncate text-xs text-bone/70">{user.email} · {ROLE_LABEL[user.role]}</p>
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
           <a href="/en" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-bone/80 hover:text-bone">
             <ExternalLink aria-hidden="true" className="size-3.5" /> View site

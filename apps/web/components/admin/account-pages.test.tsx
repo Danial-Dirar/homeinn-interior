@@ -100,4 +100,16 @@ describe("UsersAdmin", () => {
     expect(screen.queryByRole("button", { name: /Delete/ })).not.toBeInTheDocument();
     expect(screen.getByText("You")).toBeInTheDocument();
   });
+
+describe("UsersAdmin roles", () => {
+  it("offers Moderator and Admin, and explains what a moderator may do", async () => {
+    adminGet.mockResolvedValue([{ id: "me", name: "Me", email: "me@x.test", role: "ADMIN", createdAt: "2026-10-01T00:00:00Z" }]);
+    render(<UsersAdmin />);
+    await screen.findByText("me@x.test");
+    const options = [...(screen.getByLabelText("Role") as HTMLSelectElement).options].map((o) => o.textContent);
+    expect(options).toEqual(["Moderator", "Admin"]);
+    expect(document.body).toHaveTextContent(/Moderators answer enquiries and keep the content current: prices/);
+    expect(document.body).toHaveTextContent(/Admins can also change the site's structure/);
+  });
+});
 });
