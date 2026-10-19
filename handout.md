@@ -2887,7 +2887,7 @@ because the images are large.
 **Parked:** Muhammad's idea of clicking into a product and turning it round
 (360°).
 
-## Furniture: the cover with the logo, turning to a front view on hover — 2026-10-19 — in progress
+## Furniture: the cover with the logo, turning to a front view on hover — 2026-10-19 — DONE, live
 
 **Muhammad, after the trial:** go with C, the photo at its real angle with
 the logo. On hover it should animate between B (the front view) and C. Put
@@ -2935,3 +2935,53 @@ furniture.
   - It writes `final/<slug>/cover.png`, `second.png` and `placement.json`.
 - ComfyUI runs from the Python in `~/AI/ComfyUI/venv`, which also has PIL;
   the system Python has none.
+
+### What went live
+
+**The six pairs** (`final/overview.jpg`). For each piece, the cover is A and
+the second view is the B seed that matched the original best:
+
+| Piece | Second view | Notes |
+| --- | --- | --- |
+| Dressing unit | b-20261019 | Seed 7 turned the two-block handles into a bow-tie. |
+| Carved wardrobe | b-7 | Its crest is closest, and the logo clears it. |
+| Steel shelving | b-20261019 | The original is two units side by side. A keeps them; the front view draws one frame. |
+| Office desk | b-20261019 | It keeps the walnut panel at the junction. |
+| Executive desk | b-20261019 | The plastic film and the loose leaning panel are gone; the structure is the original's. |
+| Bedroom wall unit | b-20261019 | Its window grille matches. |
+
+**Wide photos:** the two desks were wider than the site's 4:5 frame, which
+cut off their ends. `compose.py` now reflects the plain wall upward and the
+floor downward to make them 4:5. The furniture itself is untouched.
+
+**The bedroom wall unit:** its top right is ceiling, not wall. There the logo
+is set by hand (`0.47,0.295`) on the teal feature wall, with "Home" turned
+cream so it reads on teal.
+
+**Applied on the Mac:**
+
+- Ran `pnpm product:views apply` with
+  `~/Development/Hosting/sites/homeinn-product-views/2026-10-19/manifest.json`.
+- It added 12 new images, changed 6 pieces in one transaction, and
+  revalidated the `products` tag (200).
+- `docs/product-views/2026-10-19.json` records every piece's media ids
+  before and after, and how to undo the change: for the whole set, or one
+  piece from the admin panel.
+
+**A bug found live, then fixed (`c3ff3aa`):** Tailwind's `scale-[1.03]`
+sets the `scale` property, but the touch-screen keyframes animated
+`transform`. So on a phone the second view stayed at 1.03, and its logo sat
+about 10px off the cover's. The keyframes now animate `scale`, and
+`theme.test.ts` pins it. On a phone, the second view is now at scale 1
+whenever it is fully shown.
+
+**Checked live:**
+
+- Desktop hover turns the wardrobe to its front view with the logo still.
+- The phone turns on its own.
+- The product page shows the pair.
+- axe is clean on `/en/furniture`, `/bn/furniture` and a product page, in
+  light and dark, at 1440 and 393.
+- Web tests: 437.
+
+**ComfyUI** was stopped afterwards, to give the GPU back.
