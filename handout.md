@@ -2828,3 +2828,61 @@ literal charcoal (`#14181A`, 9.7:1). Light mode had no violations.
 **Tests:** `statement.test.tsx` (the cream plan), `theme.test.ts` (the
 variant follows the lamp) and `whatsapp-float.test.tsx` (charcoal in either
 theme). Each was seen failing first. Web: 430 tests, typecheck clean.
+
+## Furniture photos with Qwen-Image 2.1: the dressing table trial — 2026-10-19 — trial only, nothing on the site
+
+**Muhammad:** the furniture photos look bad: shot at an angle, in workshops
+and half-finished rooms. Could the local AI models (Qwen Image) show them
+from the front on a better background, maybe with a small Home Inn logo, with
+the furniture kept as close to the original as possible, and in a way that
+can be rolled back? Think it through first, then try the dressing table.
+
+**Where the work lives:** `~/Development/HomeInn-photos/`, outside the repo
+because the images are large.
+
+- `originals/`: the source JPEG, found at full size (3120×4160) in
+  `/mnt/volume100/HomeInn Interior and Furniture/IMG_20240608_160758.jpg`,
+  plus the logo.
+- `trial/`: every output. Each comes with a `.json` holding the prompt, seed
+  and settings, so it can be made again.
+- `workflows/qwen_edit.py`: runs Qwen-Image 2.1 edit through ComfyUI's API.
+  Model `qwen_image_2.1_int8_convrot`, encoder `qwen3vl_8b_int8_convrot`,
+  cfg 1, euler/simple, 40 steps, resolution 2048 (1760×2368 out). It takes
+  about 4.5 minutes per image on the 3090.
+- ComfyUI runs from `~/AI/ComfyUI`:
+  `venv/bin/python main.py --listen 127.0.0.1 --port 8188`.
+
+**Results** (`trial/compare-dressing-unit.jpg`):
+
+- **A, same angle, new background** (`a-bg-2k.png`). Faithful: the stepped
+  block frame, the two-block carved handles, the keyhole, the grain and the
+  open drawer all match. Door and wardrobe are gone; the wall is off-white
+  and the floor light stone. The mirror reflects the new room.
+- **B, front view** (`b-front-2k.png`). The model handled the stepped
+  corners, but the handles became four-block squares (two blocks in the
+  original), and it invented the base, which the original never shows. Not
+  the same piece, so not usable as a product photo as it stands.
+- **C, A plus the logo** (`c-logo-2k.png`). The real logo file is
+  composited onto the wall with a soft shadow, like raised letters. It is
+  not drawn by the model, which would misspell it.
+
+**Rulings:**
+
+- The logo is composited, not generated. A model can garble text, and a
+  composite is the exact mark.
+- Asking Qwen to turn the composited logo into a 3D sign broke the whole
+  image (oversharpened, noisy). The input PNG carried an alpha channel from
+  the composite, and was itself an AI output. Next time, flatten inputs
+  (`-alpha off`) and edit from the original photo.
+
+**Rollback plan, for when a version is chosen:**
+
+- New images go into the media library as new rows.
+- Only the product's cover switches to the new image.
+- The old images stay in the library, so rolling back is pointing the cover
+  back from the admin panel.
+- A manifest of product → old media id → new media id will be kept in the
+  repo.
+
+**Parked:** Muhammad's idea of clicking into a product and turning it round
+(360°).
