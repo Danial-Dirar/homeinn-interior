@@ -57,6 +57,14 @@ describe("the light theme", () => {
   });
 });
 
+describe("the dark: variant", () => {
+  it("follows the lamp in the header, not the operating system", () => {
+    // Tailwind's own dark: reads prefers-color-scheme, which would disagree
+    // with the switch whenever a visitor's system and choice differ.
+    expect(css).toContain('@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));');
+  });
+});
+
 describe("the dark theme", () => {
   // Lights off should mean a dark screen. The cream grounds stayed cream, so
   // most of every page was still lit; now they go dark too.

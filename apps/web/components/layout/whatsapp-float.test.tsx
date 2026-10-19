@@ -10,6 +10,15 @@ describe("WhatsAppFloat", () => {
       .toHaveAttribute("href", "https://wa.me/8801818843999");
   });
 
+  it("stays charcoal on the green in either theme", () => {
+    // text-ink turns cream when the lights are off: 1.59:1 on WhatsApp green,
+    // which axe caught on every page in dark mode.
+    renderWithIntl(<WhatsAppFloat settings={settingsFixture} />);
+    const link = screen.getByRole("link", { name: "Chat on WhatsApp" });
+    expect(link).toHaveClass("text-[#14181A]");
+    expect(link).not.toHaveClass("text-ink");
+  });
+
   it("is hidden at the top of the home page so it never covers the hero", () => {
     // The mocked pathname is "/", and nothing has scrolled.
     renderWithIntl(<WhatsAppFloat settings={settingsFixture} />);

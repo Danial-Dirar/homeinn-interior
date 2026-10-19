@@ -3,6 +3,10 @@
 /* packages/ui ships class names Tailwind must see; it is outside this app's tree. */
 @source "../../../packages/ui/src";
 
+/* dark: means the lamp in the header is off (`<html data-theme="dark">`), not
+   that the visitor's system prefers dark: the switch is the only authority. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   /* Taken from the cream Home Inn logo (assets/): charcoal, cream and burnt
      orange. The dark cover's amber was dropped at Muhammad's call. No accent

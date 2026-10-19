@@ -2779,3 +2779,52 @@ Intelligence").
 
 Web: 426 tests, typecheck and lint clean. Deployed, and checked live in
 both languages.
+
+### The footer credit's link is underlined (`7bf1d71`)
+
+axe on the live site flagged the credit link in light mode
+(`link-in-text-block`): its colour is only 2.26:1 against the surrounding
+text, so colour alone does not mark it as a link. It is now always
+underlined. `site-footer.test.tsx` pins the underline.
+
+## The new Facebook page — 2026-10-19 — DONE, live (`d6b970d`)
+
+Muhammad: the Facebook link is now https://www.facebook.com/homeinn.xyz.
+
+- **Live:** updated `SiteSettings.facebookUrl` in the Mac's database and
+  revalidated the `settings` tag, so the header and footer changed at once,
+  in both languages. No redeploy was needed.
+- **Repo:** `apps/api/prisma/seed.ts`, and the test fixtures that mirror it
+  (`test/render.tsx`, `lib/seo.test.ts`, `site-header.test.tsx`).
+- **Leftover:** the "homeinnbd14" still on each page is the email
+  `homeinnbd14@gmail.com` in the structured data. That is correct, not the
+  old link.
+
+## Dark mode: the blueprint shows, and WhatsApp stays readable — 2026-10-19
+
+**Muhammad, with a screenshot of the statement section:** the blueprint
+drawing behind it could not be seen at all with the lights off. He asked for
+just its lines to take the light theme's colour.
+
+**Why it vanished:** the plan is drawn in `currentColor` at 7%
+(`text-ink/[0.07]`). On cream that is a faint charcoal drawing. Dark mode
+turns ink light, and 7% of light on charcoal all but disappears.
+
+**The fix:**
+
+- With the lights off, the plan is now drawn in the logo's cream (`#F3EDE2`)
+  at 20%. That value was chosen from live previews at 14%, 20% and 28%: at 20%
+  the drawing reads about as strongly as it does on cream, and 28% starts to
+  compete with the copy.
+- New `dark:` variant in `app/globals.css`. It follows `<html
+  data-theme="dark">`, the lamp in the header. Tailwind's own `dark:` reads
+  the operating system's preference, which would disagree with the switch.
+
+**Found by the live axe sweep (dark mode):** the WhatsApp button's label was
+cream on WhatsApp green, 1.59:1, on every page at desktop width. The cause:
+the button used `text-ink`, which dark mode turns cream. It now uses a
+literal charcoal (`#14181A`, 9.7:1). Light mode had no violations.
+
+**Tests:** `statement.test.tsx` (the cream plan), `theme.test.ts` (the
+variant follows the lamp) and `whatsapp-float.test.tsx` (charcoal in either
+theme). Each was seen failing first. Web: 430 tests, typecheck clean.

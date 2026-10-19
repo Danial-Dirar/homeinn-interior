@@ -56,6 +56,15 @@ describe("Statement", () => {
       .toContain("first-floor");
   });
 
+  it("draws the plan in the logo's cream when the lights are off", () => {
+    // Charcoal at 7% is a drawing on cream; the same 7% of the light ink that
+    // dark mode swaps in vanished into the charcoal ground (Muhammad, 2026-10-19).
+    const { container } = renderWithIntl(<Statement locale="en" settings={settingsFixture} />);
+    const plan = container.querySelector("[data-blueprint-lines]")?.parentElement as HTMLElement;
+    expect(plan.className).toContain("text-ink/[0.07]");
+    expect(plan.className).toContain("dark:text-[#F3EDE2]/20");
+  });
+
   it("keeps the backdrop plan inside the page, so it never scrolls sideways", () => {
     // Nothing above the statement clips overflow and the container pads only
     // 20px, so a negative right offset pushed the plan past the viewport edge
