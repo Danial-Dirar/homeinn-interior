@@ -2735,3 +2735,47 @@ the rest.
   - Locally as an iPhone 13: the crop, the rises, and stopping 60% into a
     change (it goes on) or 36% in (it goes back).
   - Live after deploy. Web: 421 tests.
+
+---
+
+## Dark mode is dark everywhere, and the footer credit — 2026-10-19 — DONE, live (`4671eae`)
+
+**Muhammad's two asks:**
+
+1. A small line at the very bottom, in the site's own style: "site is
+   developed and maintained by Haifa Intelligence".
+2. "Lights off" should make the screen dark. In dark mode, much of the site
+   was still lit.
+
+**Why dark mode was half lit:** only the ink grounds (hero, header, footer,
+the ink sections) were dark. Every cream section stayed cream: the
+statement, the services, the project grid, and every inner page.
+
+**The fix is a token swap in `app/globals.css`,** the light theme's swap run
+the other way, so no component changed.
+
+- `[data-theme="dark"]` turns:
+  - the cream ground to charcoal (`#1B1F22`, a step above ink, so sections
+    still alternate)
+  - its charcoal text to warm light (`#ECE6DA`)
+  - the light panels and hovers to raised charcoal (`#2A3034`)
+  - walnut icons lighter (`#C99A6B`)
+  - the accent to ember
+- `color-scheme: dark` makes the form's native controls dark too.
+- `[data-theme="dark"] .ground-ink` keeps the ink grounds as they were.
+- `app/theme.test.ts` pins the tokens and the contrast on the new ground:
+  body text 13:1, 65% muted text 6.5:1, ember 4.9:1, icons above 3:1.
+- **Checked:** sampling the backgrounds down each page in dark mode found 0
+  light areas on home, services, contact and furniture. The only light
+  points on the projects and villa pages were photographs.
+
+**The credit:** the footer now ends with "Site developed and maintained by
+Haifa Intelligence" (Bangla: "সাইটটি তৈরি ও রক্ষণাবেক্ষণ করেছে Haifa
+Intelligence").
+
+- Set in the footer's small muted type, with the name as a link to
+  https://haifa-ai.com in a new tab.
+- The message key is `common.credit`, in both catalogues.
+
+Web: 426 tests, typecheck and lint clean. Deployed, and checked live in
+both languages.
