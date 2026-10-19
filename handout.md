@@ -2629,3 +2629,20 @@ change prices and similar things but cannot touch how the site is built.
 
 To add one: **Admin → Accounts → Add an account**, role **Moderator**,
 then give the first password in person.
+
+### Setting the admin password without it passing through anyone — 2026-10-19
+
+Muhammad's `ssh mac cat ~/homeinn-admin-password.txt` failed: his own shell
+expanded `~` to `/home/muhammad` before ssh ran. Quote it:
+`ssh mac 'cat ~/homeinn-admin-password.txt'`.
+
+He asked for the password to be changed. Choosing it for him would have put
+it in the chat. Instead, the Hosting repo now has
+`scripts/homeinn-admin-password.sh` (`8ea7905`). It reads the new password
+twice from a hidden prompt, sets it through `admin:password`, signs out the
+account's other sessions, and deletes the first-password file only after
+the change succeeds. It was dry-run against a nonexistent account, a
+mismatch and a short password, and refused all three without changing
+anything. To use it:
+
+    ssh -t mac 'bash ~/Development/Hosting/scripts/homeinn-admin-password.sh'
