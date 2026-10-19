@@ -2886,3 +2886,52 @@ because the images are large.
 
 **Parked:** Muhammad's idea of clicking into a product and turning it round
 (360°).
+
+## Furniture: the cover with the logo, turning to a front view on hover — 2026-10-19 — in progress
+
+**Muhammad, after the trial:** go with C, the photo at its real angle with
+the logo. On hover it should animate between B (the front view) and C. Put
+the logo in B too, so it is always there. Do this for every piece of
+furniture.
+
+### The site (`2fc088c`, `82f2768`)
+
+- **Data:** `ShopProduct.secondViewId`, nullable, `ON DELETE SET NULL`.
+  - Migration `20261019131718_add_product_second_view` only adds a column.
+  - The public list and detail, and the admin read surface, return
+    `secondView`.
+- **Admin:** a "Second view" media field on the furniture editor. Clearing
+  it takes the piece back to the cover alone.
+- **`components/furniture/product-views.tsx`:**
+  - The second view is laid over the cover. Hover or keyboard focus brings
+    it in from a slight zoom.
+  - It is `aria-hidden`, so the piece is not described twice.
+  - The card and the product page both use it.
+- **Touch screens** cannot hover, so the two views take turns on their own:
+  an 8-second cycle in `globals.css`, off when motion is reduced. This was
+  my call, made without asking.
+- **`pnpm product:views apply <manifest>` / `rollback <file>`** (API):
+  - Every photo goes into the library as a new image first. Then every
+    piece changes in one transaction.
+  - It writes a rollback file of the ids it replaced, and rollback restores
+    them.
+  - Old images are never deleted.
+- **Tests:** web 436, API e2e 147 + 3, unit 98, typecheck and lint clean.
+  `accounts.e2e-spec.ts`'s "ends a demoted admin's session" failed once in
+  a full run, then passed twice on its own. It is a timing flake from
+  before this work.
+
+### The photos (`~/Development/HomeInn-photos/`)
+
+- **`workflows/batch.py`** makes, for each piece:
+  - A: the same angle on the new background
+  - B: the front view, two seeds
+  Each prompt names the piece's own details (handles, carving, drawers), so
+  the model keeps them. Run log: `out-batch.log`.
+- **`workflows/compose.py`** puts the real logo on both views at the same
+  spot, so it holds still while they cross-fade.
+  - It picks the quietest stretch of wall near the top right of what the
+    site shows (the 4:5 frame), judged across both images.
+  - It writes `final/<slug>/cover.png`, `second.png` and `placement.json`.
+- ComfyUI runs from the Python in `~/AI/ComfyUI/venv`, which also has PIL;
+  the system Python has none.
