@@ -63,6 +63,13 @@ describe("SiteFooter", () => {
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
 
+  it("underlines the credit's link, so it stands out by more than colour", () => {
+    // axe (link-in-text-block): the link's colour is only 2.26:1 against the
+    // muted sentence around it; an underline is what makes it a link.
+    renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
+    expect(screen.getByRole("link", { name: "Haifa Intelligence" })).toHaveClass("underline");
+  });
+
   it("credits them in Bangla on Bangla pages", () => {
     renderWithIntl(<SiteFooter locale="bn" settings={settingsFixture} />, { locale: "bn" });
     expect(screen.getByText(/তৈরি ও রক্ষণাবেক্ষণ/)).toBeInTheDocument();

@@ -86,7 +86,7 @@ export function SiteFooter({ locale, settings }: { locale: Locale; settings: Sit
                 href="https://haifa-ai.com"
                 target="_blank"
                 rel="noreferrer noopener"
-                className="text-sand underline-offset-4 hover:text-accent hover:underline"
+                className="text-sand underline underline-offset-4 hover:text-accent"
               >
                 {chunks}
               </a>
