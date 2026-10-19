@@ -2711,3 +2711,27 @@ any case. **Cost if wrong:** a wordmark slightly harder to read over a dark
 photograph.
 
 Deployed with `hosting deploy homeinn` (`0184bb5`).
+
+### Phone hero, second pass: no pan, a shorter scroll — 2026-10-19 — DONE, live (`40e1382`)
+
+Muhammad tried the pan. The landscape photographs scrolled across, then
+scrolled again to reach the next room, so the hero was a long scroll and did
+not look good. He suggested keeping each photograph's main part and cropping
+the rest.
+
+- **Crop instead of pan.** Each room is cropped to its main part, its focus
+  point, and fills the screen. The focus point can be set per image under
+  Admin → Hero → Focus point.
+- **Kept:**
+  - the rise: one swipe raises the next room, with a slight parallax and
+    zoom, while the last one sinks back and darkens
+  - names that change one at a time
+  - a mark per room
+- **Snapping:** the hero snaps to whole rooms like the desktop, so a short
+  swipe finishes the change or falls back.
+- **Shorter:** 80vh per change of room instead of 120vh per room. Three rooms
+  now take 1.6 screens of scroll instead of 3.6.
+- **Checked:**
+  - Locally as an iPhone 13: the crop, the rises, and stopping 60% into a
+    change (it goes on) or 36% in (it goes back).
+  - Live after deploy. Web: 421 tests.
