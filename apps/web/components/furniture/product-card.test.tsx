@@ -11,7 +11,7 @@ function product(over: Partial<ProductView> = {}): ProductView {
     summaryEn: "Solid teak", summaryBn: "নিরেট সেগুন",
     descriptionEn: "<p>x</p>", descriptionBn: "<p>x</p>",
     priceBdt: null, madeToOrder: false, leadTimeDays: null,
-    sortOrder: 0, featured: false, cover: null,
+    sortOrder: 0, featured: false, cover: null, secondView: null,
     ...over,
   };
 }
@@ -25,12 +25,20 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 
-function renderCard() {
+function renderCard(over: Partial<ProductView> = {}) {
   return renderWithIntl(
     <ul>
-      <ProductCard product={product()} locale="en" index={0} />
+      <ProductCard product={product(over)} locale="en" index={0} />
     </ul>,
   );
+}
+
+function image(id: string): NonNullable<ProductView["cover"]> {
+  return {
+    id, storageKey: id, mimeType: "image/png", width: 1760, height: 2368, bytes: 1000, blurhash: null,
+    altEn: `Armchair ${id}`, altBn: `চেয়ার ${id}`, createdAt: "2026-10-19T00:00:00.000Z",
+    sources: [{ type: "image/webp", srcset: `https://api.test/media/${id}/960.webp 960w` }],
+  };
 }
 
 describe("ProductCard", () => {
@@ -39,6 +47,14 @@ describe("ProductCard", () => {
     // order: Tab went from the second card straight to the footer.
     renderCard();
     expect(screen.getByRole("link", { name: /Teak Armchair/ })).toBeInTheDocument();
+  });
+
+  it("turns to the piece's second view when it has one", () => {
+    // Muhammad, 2026-10-19: the cover at its real angle, the front view on hover.
+    const { container } = renderCard({ cover: image("angled"), secondView: image("front") });
+    const second = container.querySelector("[data-second-view] img");
+    expect(second).toHaveAttribute("src", "https://api.test/media/front/960.webp");
+    expect(container.querySelector("[data-second-view]")?.closest(".group")).toBe(container.querySelector("li"));
   });
 
   it("finishes its entrance as soon as keyboard focus reaches it", () => {

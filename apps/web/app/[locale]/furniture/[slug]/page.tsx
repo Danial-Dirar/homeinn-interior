@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { LeadForm } from "@/components/forms/lead-form";
+import { ProductViews } from "@/components/furniture/product-views";
 import { Picture } from "@/components/media/picture";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Link } from "@/i18n/navigation";
@@ -60,13 +61,15 @@ export default async function ProductPage({
       <div className="mx-auto grid max-w-7xl gap-14 px-5 py-28 lg:grid-cols-2 lg:gap-20">
         <div>
           {product.cover ? (
-            <Picture
-              media={product.cover}
-              locale={locale}
-              sizes="(min-width: 1024px) 45vw, 90vw"
-              priority
-              className="aspect-[4/5] w-full object-cover"
-            />
+            <div className="group relative aspect-[4/5] overflow-hidden">
+              <ProductViews
+                cover={product.cover}
+                secondView={product.secondView}
+                locale={locale}
+                sizes="(min-width: 1024px) 45vw, 90vw"
+                priority
+              />
+            </div>
           ) : null}
 
           {product.gallery.length > 0 ? (

@@ -150,6 +150,10 @@ export const RESOURCES: ResourceDef[] = [
         nullable: true, optionLabel: (row) => str(row.titleEn),
       },
       { name: "cover", key: "coverId", label: "Cover image", kind: "media", nullable: true },
+      {
+        name: "secondView", key: "secondViewId", label: "Second view", kind: "media", nullable: true,
+        help: "The same piece from another angle. It takes the cover's place while someone hovers over it; on a phone the two take turns.",
+      },
       gallery,
       featured,
       published,

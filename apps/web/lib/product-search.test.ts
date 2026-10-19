@@ -9,7 +9,7 @@ function product(over: Partial<ProductView>): ProductView {
     summaryEn: "Three-door wardrobe in solid wood.", summaryBn: "নিরেট কাঠের তিন-দরজার আলমারি।",
     descriptionEn: "", descriptionBn: "",
     priceBdt: 7_800_000, madeToOrder: true, leadTimeDays: 21,
-    sortOrder: 0, featured: false, cover: null,
+    sortOrder: 0, featured: false, cover: null, secondView: null,
     ...over,
   };
 }

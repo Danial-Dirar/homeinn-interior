@@ -247,3 +247,21 @@
   --color-sand: #E7DFD2;
   --color-walnut: #7A5537;
 }
+
+/* ---------- A furniture piece's second view ----------
+
+   Hover and keyboard focus bring it in (components/furniture/product-views).
+   A touch screen has neither, so there the two views take turns on their
+   own: a slow cycle, half the time on each. With motion reduced, the cover
+   simply stays. */
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+  [data-second-view] {
+    animation: second-view 8s ease-in-out infinite;
+  }
+}
+
+@keyframes second-view {
+  0%, 40% { opacity: 0; transform: scale(1.03); }
+  50%, 90% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.03); }
+}

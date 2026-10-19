@@ -37,6 +37,7 @@ model Media {
   clientLogos        ClientLogo[]    @relation("ClientLogoImage")
   shopProductCovers  ShopProduct[]   @relation("ShopProductCover")
   shopProductGallery ShopProduct[]   @relation("ShopProductGallery")
+  shopProductSecondViews ShopProduct[] @relation("ShopProductSecondView")
 }
 
 model Seo {
@@ -109,6 +110,9 @@ model ShopProduct {
   coverId       String?
   cover         Media?   @relation("ShopProductCover", fields: [coverId], references: [id])
   gallery       Media[]  @relation("ShopProductGallery")
+  /// The same piece from another angle, shown when the cover is hovered.
+  secondViewId  String?
+  secondView    Media?   @relation("ShopProductSecondView", fields: [secondViewId], references: [id])
   sortOrder     Int      @default(0)
   featured      Boolean  @default(false)
   published     Boolean  @default(false)

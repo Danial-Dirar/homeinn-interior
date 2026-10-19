@@ -17,6 +17,12 @@ describe("write schemas the admin panel saves through", () => {
     expect(createProductSchema.parse(product)).toMatchObject({ descriptionEn: "", descriptionBn: "" });
   });
 
+  it("keep a furniture piece's second view, and let it be cleared", () => {
+    const id = "ckxxxxxxxxxxxxxxxxxxxxxxx";
+    expect(createProductSchema.parse({ ...product, secondViewId: id }).secondViewId).toBe(id);
+    expect(createProductSchema.parse({ ...product, secondViewId: null }).secondViewId).toBeNull();
+  });
+
   it("refuse a price the database column cannot hold, rather than failing with a 500", () => {
     expect(() => createProductSchema.parse({ ...product, priceBdt: 2_147_483_647 })).not.toThrow();
     expect(() => createProductSchema.parse({ ...product, priceBdt: 2_147_483_648 })).toThrow();

@@ -79,6 +79,26 @@ describe("furniture", () => {
   it("refuses writes without a session", async () => {
     await request(server()).post("/api/products").send(product).expect(401);
   });
+
+  it("carries a second view of the piece, shown when the cover is hovered, and can drop it", async () => {
+    // Muhammad, 2026-10-19: the cover at its real angle, the front view on hover.
+    const cover = await seedMedia("Teak armchair, angled");
+    const front = await seedMedia("Teak armchair, from the front");
+    const created = await request(server()).post("/api/products").set("Cookie", editor)
+      .send({ ...product, published: true, coverId: cover.id, secondViewId: front.id }).expect(201);
+
+    const list = await request(server()).get("/api/products").expect(200);
+    expect(list.body[0].secondView.altEn).toBe("Teak armchair, from the front");
+    const detail = await request(server()).get("/api/products/teak-armchair").expect(200);
+    expect(detail.body.secondView.altEn).toBe("Teak armchair, from the front");
+    const edit = await request(server()).get(`/api/admin/products/${created.body.id}`).set("Cookie", editor).expect(200);
+    expect(edit.body.secondView.altEn).toBe("Teak armchair, from the front");
+
+    await request(server()).patch(`/api/products/${created.body.id}`).set("Cookie", editor)
+      .send({ secondViewId: null }).expect(200);
+    const after = await request(server()).get("/api/products/teak-armchair").expect(200);
+    expect(after.body.secondView).toBeNull();
+  });
 });
 
 describe("client logos", () => {

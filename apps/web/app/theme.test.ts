@@ -57,6 +57,13 @@ describe("the light theme", () => {
   });
 });
 
+describe("a furniture piece's second view", () => {
+  it("takes turns with the cover on touch screens, which cannot hover", () => {
+    expect(css).toMatch(/@media \(hover: none\) and \(prefers-reduced-motion: no-preference\)\s*\{\s*\[data-second-view\]\s*\{[^}]*animation:\s*second-view/);
+    expect(css).toMatch(/@keyframes second-view/);
+  });
+});
+
 describe("the dark: variant", () => {
   it("follows the lamp in the header, not the operating system", () => {
     // Tailwind's own dark: reads prefers-color-scheme, which would disagree

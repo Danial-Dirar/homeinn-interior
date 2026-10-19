@@ -120,6 +120,8 @@ export interface ProductView {
   sortOrder: number;
   featured: boolean;
   cover: MediaView | null;
+  /** The same piece from another angle, shown when the cover is hovered. */
+  secondView: MediaView | null;
 }
 export type ProductDetailView = ProductView & { gallery: MediaView[] };
 

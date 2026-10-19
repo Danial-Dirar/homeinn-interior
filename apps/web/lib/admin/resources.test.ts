@@ -37,6 +37,11 @@ describe("the admin resource registry", () => {
     }
   });
 
+  it("lets a furniture piece carry a second view, sent as secondViewId and clearable", () => {
+    const field = resourceNamed("products")!.fields.find((f) => f.name === "secondView");
+    expect(field).toMatchObject({ key: "secondViewId", kind: "media", nullable: true });
+  });
+
   it("lets settings be saved with no WhatsApp on the first line", () => {
     expect(SETTINGS_FIELDS.find((f) => f.name === "whatsapp")?.required).toBeFalsy();
   });

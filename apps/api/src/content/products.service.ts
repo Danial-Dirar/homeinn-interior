@@ -19,11 +19,13 @@ export interface PublicProduct {
   sortOrder: number;
   featured: boolean;
   cover: PublicMedia | null;
+  /** The same piece from another angle, shown when the cover is hovered. */
+  secondView: PublicMedia | null;
   gallery?: PublicMedia[];
 }
 
-const LIST_INCLUDE = { cover: true } as const;
-const DETAIL_INCLUDE = { cover: true, gallery: true } as const;
+const LIST_INCLUDE = { cover: true, secondView: true } as const;
+const DETAIL_INCLUDE = { cover: true, secondView: true, gallery: true } as const;
 
 @Injectable()
 export class ProductsService {
@@ -38,7 +40,7 @@ export class ProductsService {
       orderBy: [{ featured: "desc" }, { sortOrder: "asc" }],
       include: LIST_INCLUDE,
     });
-    return rows.map((r) => ({ ...r, cover: this.media.view(r.cover) }));
+    return rows.map((r) => ({ ...r, cover: this.media.view(r.cover), secondView: this.media.view(r.secondView) }));
   }
 
   async findPublicBySlug(slug: string) {
@@ -50,6 +52,7 @@ export class ProductsService {
     return {
       ...row,
       cover: this.media.view(row.cover),
+      secondView: this.media.view(row.secondView),
       gallery: this.media.viewMany(row.gallery),
     };
   }

@@ -209,6 +209,8 @@ export const createProductSchema = bilingualText("name", 200)
       serviceId: clearableId,
       coverId: clearableId,
       galleryIds,
+      /** The same piece from another angle, shown when the cover is hovered. */
+      secondViewId: clearableId,
       featured: z.boolean().default(false),
       sortOrder: z.number().int().min(0).default(0),
       published: z.boolean().default(false),

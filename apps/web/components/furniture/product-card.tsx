@@ -2,12 +2,12 @@
 
 import type { Locale } from "@homeinn/types";
 import { useTranslations } from "next-intl";
-import { Picture } from "@/components/media/picture";
 import { Link } from "@/i18n/navigation";
 import type { ProductView } from "@/lib/api.types";
 import { text } from "@/lib/locale-text";
 import { formatTaka } from "@/lib/money";
 import { useReveal } from "@/hooks/use-reveal";
+import { ProductViews } from "./product-views";
 
 /**
  * One furniture piece.
@@ -43,14 +43,13 @@ export function ProductCard({
     >
       <Link href={`/furniture/${product.slug}`} className="block">
         <div className="relative aspect-[4/5] overflow-hidden bg-ink-raised">
-          {product.cover ? (
-            <Picture
-              media={product.cover}
-              locale={locale}
-              sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-              className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
-            />
-          ) : null}
+          <ProductViews
+            cover={product.cover}
+            secondView={product.secondView}
+            locale={locale}
+            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+            className="transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
+          />
 
           {product.madeToOrder ? (
             <span className="absolute left-4 top-4 bg-bone/90 px-3 py-1 text-[0.65rem] uppercase tracking-[0.14em] text-ink">
