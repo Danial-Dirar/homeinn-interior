@@ -3023,3 +3023,52 @@ drives (he chose shinrinyoku).
       when a site has only a cover.
   - The changed `compose.py` reproduces the shipped Home Inn images
     byte-for-byte.
+
+## Next: "Haifa AI", furniture from a sketch — 2026-10-19 — idea only, parked
+
+**Muhammad's idea:**
+
+- On the Home Inn site, a visitor draws a piece of furniture, or uploads a
+  hand drawing or a screenshot as a reference.
+- We generate several versions.
+- They choose the wood, its colour, and other options. For example, a cradle
+  (dolna) can be wood or bamboo.
+
+Is it possible? **Yes.** He wants to sit down on it next time. Nothing has
+been built.
+
+**What already exists:** Haifa Intelligence's AI Studio bridge.
+
+- Code: `~/Development/Haifa Intelligence/apps/api`.
+- It runs beside ComfyUI on the GPU PC, with a queue, live progress and
+  image upload.
+- Sites on the Mac reach it over Tailscale through `STUDIO_BRIDGE_URL` and
+  `STUDIO_BRIDGE_KEY`.
+- The Home Inn site could use the same bridge, with Qwen-Image 2.1 edit and
+  the sketch as image 1. No paid API.
+
+**The shape I proposed (not agreed):**
+
+- The visitor draws on a canvas or uploads an image.
+- They pick from structured options: type, wood (teak, mahogany, gamari, oak,
+  bamboo, cane), colour and finish, and upholstery.
+- We make 3–4 variants.
+- "Send to Home Inn for a quote" turns the chosen one into a lead in the
+  admin inbox, with the image attached.
+
+**Known limits:**
+
+- About 25–30 seconds per draft image, so about 2 minutes for four. One GPU
+  means a queue.
+- When the PC is off, the feature shows "GPU offline".
+- It makes a picture, not a construction drawing. Dimensions, joinery and
+  price stay with the carpenter.
+- The model can drift from the sketch. Qwen 2.1 FunControl in ComfyUI is
+  worth trying to hold the shape.
+- Public uploads need structured options rather than free text, a limit per
+  IP, size limits, and no long-term keeping of uploads.
+
+**The open question to start with:** who uses it? A customer planning a
+piece at home, or Home Inn's staff sitting with a client in the showroom?
+
+**Size:** a project. Next time, it gets a written design before any code.
