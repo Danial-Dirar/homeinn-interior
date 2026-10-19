@@ -57,6 +57,55 @@ describe("the light theme", () => {
   });
 });
 
+describe("the dark theme", () => {
+  // Lights off should mean a dark screen. The cream grounds stayed cream, so
+  // most of every page was still lit; now they go dark too.
+  const root = /\[data-theme="dark"\]\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+  const keep = /\[data-theme="dark"\] \.ground-ink\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+  const token = (block: string, name: string) =>
+    new RegExp(`--color-${name}:\\s*(#[0-9A-Fa-f]{6})`).exec(block)?.[1] ?? "";
+
+  function luminance(hex: string): number {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+      const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+  }
+  const contrast = (a: string, b: string) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi! + 0.05) / (lo! + 0.05);
+  };
+  /** A colour at `alpha` over a ground, as the eye sees it. */
+  function over(hex: string, alpha: number, ground: string): string {
+    const mix = [1, 3, 5].map((i) =>
+      Math.round(parseInt(hex.slice(i, i + 2), 16) * alpha + parseInt(ground.slice(i, i + 2), 16) * (1 - alpha)));
+    return `#${mix.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+  }
+
+  it("turns the cream grounds dark, and their charcoal text light", () => {
+    expect(luminance(token(root, "bone"))).toBeLessThan(0.03);
+    expect(luminance(token(root, "ink"))).toBeGreaterThan(0.6);
+    expect(root).toMatch(/--color-accent:\s*var\(--color-ember\)/);
+    expect(root).toMatch(/color-scheme:\s*dark/);
+  });
+
+  it("keeps body text, muted text and the accent readable on the dark ground", () => {
+    const ground = token(root, "bone");
+    const text = token(root, "ink");
+    expect(contrast(text, ground)).toBeGreaterThan(7);
+    expect(contrast(over(text, 0.65, ground), ground)).toBeGreaterThan(4.5);
+    expect(contrast("#D86A27", ground)).toBeGreaterThan(4.5);
+    expect(contrast(token(root, "walnut"), ground)).toBeGreaterThan(3);
+  });
+
+  it("leaves the dark grounds as they were: the hero, the header and the footer", () => {
+    expect(token(keep, "ink")).toBe("#14181A");
+    expect(token(keep, "bone")).toBe("#F3EDE2");
+    expect(token(keep, "sand")).toBe("#E7DFD2");
+  });
+});
+
 describe("type", () => {
   it("sets headings in Righteous, the logo's face, with Bangla falling back to Anek", () => {
     // Righteous has no Bangla glyphs; without Anek in the same stack a bn

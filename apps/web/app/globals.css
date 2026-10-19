@@ -214,3 +214,32 @@
     transition: none;
   }
 }
+
+/* ---------- The dark theme ----------
+
+   `<html data-theme="dark">`, the lamp switched off. Lights off should mean
+   a dark screen, but only the dark grounds were dark: every cream section —
+   the statement, the services, the project grid, every inner page — stayed
+   lit. Here the cream ground itself turns to charcoal, a step above ink so
+   sections still alternate, and the charcoal written on it turns light. The
+   same token swap the light theme uses, the other way round, so no
+   component changes. Buttons written bg-ink / text-bone invert with it.
+
+   The dark grounds (`.ground-ink`: the hero, header, footer and the ink
+   sections) keep their own values. Contrast on the new ground: body text
+   13:1, 65% muted text 6.5:1, ember 4.9:1. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bone: #1B1F22;
+  --color-ink: #ECE6DA;
+  --color-sand: #2A3034;
+  --color-walnut: #C99A6B;
+  --color-accent: var(--color-ember);
+}
+
+[data-theme="dark"] .ground-ink {
+  --color-ink: #14181A;
+  --color-bone: #F3EDE2;
+  --color-sand: #E7DFD2;
+  --color-walnut: #7A5537;
+}

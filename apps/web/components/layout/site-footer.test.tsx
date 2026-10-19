@@ -53,4 +53,19 @@ describe("SiteFooter", () => {
     renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
     expect(screen.getByText(/2015/)).toBeInTheDocument();
   });
+
+  it("credits Haifa Intelligence, small, with a link to their site", () => {
+    renderWithIntl(<SiteFooter locale="en" settings={settingsFixture} />);
+    expect(screen.getByText(/Site developed and maintained by/)).toBeInTheDocument();
+    const link = screen.getByRole("link", { name: "Haifa Intelligence" });
+    expect(link).toHaveAttribute("href", "https://haifa-ai.com");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+  });
+
+  it("credits them in Bangla on Bangla pages", () => {
+    renderWithIntl(<SiteFooter locale="bn" settings={settingsFixture} />, { locale: "bn" });
+    expect(screen.getByText(/তৈরি ও রক্ষণাবেক্ষণ/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Haifa Intelligence" })).toBeInTheDocument();
+  });
 });
