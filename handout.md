@@ -2646,3 +2646,68 @@ mismatch and a short password, and refused all three without changing
 anything. To use it:
 
     ssh -t mac 'bash ~/Development/Hosting/scripts/homeinn-admin-password.sh'
+
+---
+
+## The phone hero: pan and rise — 2026-10-19 — DONE, live
+
+Muhammad: on a phone the hero looked bland. He wanted the rooms to change
+with a beautiful, crisp, smooth animation as you scroll down, as alive as
+the left-to-right movement on desktop.
+
+**Why it looked bland:** an upright phone shows about a third of a landscape
+photograph (2560×1690 on a 390px screen). Each room was a still, cropped
+middle, and its 4vw drift barely moved before it snapped to the next room.
+
+**What it does now** (`components/hero/mobile-hero.tsx`, phones only):
+
+- **Pan.** Each room's photograph is shown at full height in its own
+  proportions, about 1,000px wide. The camera pans across it left to right
+  with the scroll, so the whole room is seen.
+- **Rise.** The next room rises from below. Its photograph moves a little
+  slower than its window opens (parallax) and settles from a slight zoom.
+  Meanwhile the previous room sinks back (scale 0.94) and darkens, like a
+  stack of cards.
+- **Crisp handovers.** `mobileTarget` follows the finger inside a room. A
+  handover never rests halfway: let go mid-rise and it finishes or falls back
+  on its own, so the hero always settles on one whole room.
+- **Names.** The old name leaves through the top in the first half of the
+  rise, and the new one comes up through a mask in the second half. Only one
+  name shows at a time (`mobileLabel`).
+- **Progress.** One mark per room fills as its pan goes, in place of the
+  single line.
+- **Pacing:** 100vh pinned plus 120vh of scroll per room.
+- **Performance:** transforms and opacity only, written to the DOM each
+  frame. React renders it once.
+- **Unchanged:** desktop and reduced motion.
+
+**Also:** the WhatsApp button stays hidden until the hero has scrolled away
+(`usePastHero`). On a phone it used to appear after 300px, on top of the
+rooms' names.
+
+**Tests:**
+
+- `hero-math`: frames, handover snapping, one name at a time, pacing.
+- `panorama-hero`: pan shape, rooms waiting below, masked names, marks.
+- `whatsapp-float`: stays hidden over the hero.
+- Web total: 425.
+
+**Checked in Brave as an iPhone 13, locally and then live:**
+
+- every room pans
+- a handover caught mid-rise shows one name at a time
+- stopping inside a handover settles on a whole room
+- the WhatsApp button is hidden during the hero and shown after
+- reduced motion gives the static stack
+- desktop still has the six-room panorama
+- no page errors
+
+**Ruling — axe on the phone home page:** axe flags the logo's orange "inn" at
+1.57:1 against a computed #91918e. It cannot see the photograph under the
+translucent header, so it assumes the stage's ink behind it. The real pixels
+behind "inn" are cream in every room (#ECE1D1–#F8F4EA), giving 3.9–4.5:1,
+which is above 3:1 for 24px text. Logo text is exempt from WCAG contrast in
+any case. **Cost if wrong:** a wordmark slightly harder to read over a dark
+photograph.
+
+Deployed with `hosting deploy homeinn` (`0184bb5`).
