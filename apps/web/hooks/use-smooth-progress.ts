@@ -38,11 +38,13 @@ export function useSmoothProgress(
   enabled: boolean,
   onFrame: (progress: number) => void,
   /**
-   * When set, scroll chooses the nearest of this many whole steps rather than
-   * any position between them. The hero passes its segment count, which is what
-   * stops it resting on half of one photograph and half of the next.
+   * Where the motion comes to rest for a raw scroll position. A number snaps
+   * to that many whole steps (the desktop hero passes its room count, so it
+   * never rests on half of one photograph and half of the next); a function
+   * maps raw progress itself (the phone hero follows the finger inside a room
+   * and snaps only its handovers). Keep a function stable: it restarts the loop.
    */
-  snapTo?: number,
+  snapTo?: number | ((raw: number) => number),
 ): void {
   // Kept in a ref so changing the callback never restarts the loop.
   const callback = useRef(onFrame);
@@ -65,7 +67,8 @@ export function useSmoothProgress(
     const readTarget = () => {
       const rect = element.getBoundingClientRect();
       const raw = pinProgress(rect.top, rect.height, window.innerHeight);
-      target = snapTo && snapTo > 1 ? snappedProgress(raw, snapTo) : raw;
+      if (typeof snapTo === "function") target = snapTo(raw);
+      else target = snapTo && snapTo > 1 ? snappedProgress(raw, snapTo) : raw;
     };
 
     const tick = (time: number) => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  approach, clamp01, driftX, lightPoolX, objectPosition, pinProgress, scrollDistanceVh,
-  segmentOpacity, snapIndex, snappedProgress,
+  approach, clamp01, driftX, lightPoolX, MOBILE_HANDOVER, mobileFrame, mobileLabel, mobileTarget, objectPosition,
+  pinProgress, scrollDistanceVh, segmentOpacity, snapIndex, snappedProgress,
 } from "./hero-math";
 
 describe("clamp01", () => {
@@ -134,8 +134,10 @@ describe("scrollDistanceVh", () => {
     expect(scrollDistanceVh(6, "desktop")).toBe(500);
   });
 
-  it("gives mobile more room per change of view", () => {
-    expect(scrollDistanceVh(3, "mobile")).toBe(300);
+  it("gives each room on a phone a screen to rest on plus its own pan and handover", () => {
+    // 100vh pinned, then 120vh of scroll per room: the pan across it and the
+    // rise of the next one.
+    expect(scrollDistanceVh(3, "mobile")).toBe(460);
   });
 
   it("never collapses to nothing", () => {
@@ -206,3 +208,93 @@ describe("approach", () => {
     expect(approach(0.3, 1, 9, -0.5)).toBe(0.3);
   });
 });
+
+describe("the phone hero: pan across each room, then the next one rises", () => {
+  // Three rooms. Each owns an equal share of the scroll: it pans across its
+  // photograph, and the last part of its share hands over to the next room.
+  const at = (x: number) => x / 3; // progress at room-position x (0…3)
+  const H = MOBILE_HANDOVER;
+
+  it("opens on the first room, fully shown, at the left of its photograph", () => {
+    expect(mobileFrame(0, 0, 3)).toEqual({ reveal: 1, pan: 0, depth: 0 });
+    expect(mobileFrame(0, 1, 3).reveal).toBe(0);
+  });
+
+  it("pans a room left to right, steadily, while it is on screen", () => {
+    let last = -1;
+    for (let x = 0; x <= 1; x += 0.05) {
+      const pan = mobileFrame(at(x), 0, 3).pan;
+      expect(pan).toBeGreaterThanOrEqual(last);
+      last = pan;
+    }
+    expect(mobileFrame(at(1), 0, 3).pan).toBe(1);
+  });
+
+  it("raises the next room only during the handover, as the current one sinks back", () => {
+    expect(mobileFrame(at(1 - H - 0.01), 1, 3).reveal).toBe(0);
+    const mid = at(1 - H / 2);
+    expect(mobileFrame(mid, 1, 3).reveal).toBeCloseTo(0.5);
+    expect(mobileFrame(mid, 0, 3).depth).toBeCloseTo(0.5);
+    expect(mobileFrame(at(1), 1, 3).reveal).toBe(1);
+    expect(mobileFrame(at(1), 0, 3).depth).toBe(1);
+  });
+
+  it("ends on the last room, panned to its right edge, with nothing after it", () => {
+    expect(mobileFrame(1, 2, 3)).toEqual({ reveal: 1, pan: 1, depth: 0 });
+  });
+
+  it("never has more than two rooms in view", () => {
+    for (let p = 0; p <= 1; p += 0.01) {
+      const inView = [0, 1, 2].filter((i) => {
+        const f = mobileFrame(p, i, 3);
+        return f.reveal > 0 && f.depth < 1;
+      });
+      expect(inView.length, `p=${p}`).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it("keeps a lone room still and whole", () => {
+    expect(mobileFrame(0.5, 0, 1)).toEqual({ reveal: 1, pan: 0.5, depth: 0 });
+  });
+});
+
+describe("mobileTarget", () => {
+  const at = (x: number) => x / 3;
+  const H = MOBILE_HANDOVER;
+
+  it("lets a room pan freely with the finger", () => {
+    expect(mobileTarget(at(0.3), 3)).toBeCloseTo(at(0.3));
+    expect(mobileTarget(at(2.5), 3)).toBeCloseTo(at(2.5));
+  });
+
+  it("finishes or undoes a handover by itself, so it never rests halfway between rooms", () => {
+    expect(mobileTarget(at(1 - H + 0.02), 3)).toBeCloseTo(at(1 - H));
+    expect(mobileTarget(at(1 - 0.02), 3)).toBeCloseTo(at(1));
+  });
+
+  it("stays inside the range", () => {
+    expect(mobileTarget(-1, 3)).toBe(0);
+    expect(mobileTarget(2, 3)).toBe(1);
+  });
+});
+
+describe("mobileLabel", () => {
+  it("never shows two rooms' names at once: the old one leaves before the new one arrives", () => {
+    for (let p = 0; p <= 1; p += 0.005) {
+      const shown = [0, 1, 2].filter((i) => mobileLabel(mobileFrame(p, i, 3)).opacity > 0);
+      expect(shown.length, `p=${p}`).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("is fully there while its room is on screen", () => {
+    expect(mobileLabel(mobileFrame(0, 0, 3))).toEqual({ opacity: 1, y: 0 });
+    expect(mobileLabel(mobileFrame(1, 2, 3))).toEqual({ opacity: 1, y: 0 });
+  });
+
+  it("rises out through the top, and in from below", () => {
+    const H = MOBILE_HANDOVER;
+    expect(mobileLabel(mobileFrame((1 - H * 0.8) / 3, 0, 3)).y).toBeLessThan(0);
+    expect(mobileLabel(mobileFrame((1 - H * 0.2) / 3, 1, 3)).y).toBeGreaterThan(0);
+  });
+});
+

@@ -153,8 +153,41 @@ describe("PanoramaHero on a phone", () => {
         mobileSegments={[segment(0), segment(1)]}
         locale="en"
       />);
-    // 2 segments at 150vh each — spec §7's mobile pacing, not the desktop 100.
-    expect(screen.getByRole("region")).toHaveStyle({ height: "150vh" });
+    // A screen to rest on, then 120vh per room for its pan and handover.
+    expect(screen.getByRole("region")).toHaveStyle({ height: "340vh" });
+  });
+
+  it("lets each photograph keep its own shape, wider than the phone, so the camera can pan across the room", () => {
+    setMobile(true);
+    const { container } = renderWithIntl(
+      <PanoramaHero segments={[segment(0), segment(1)]} mobileSegments={[segment(0), segment(1)]} locale="en" />);
+    const pans = container.querySelectorAll<HTMLElement>("[data-hero-pan]");
+    expect(pans).toHaveLength(2);
+    expect(pans[0]!.style.aspectRatio).toBe("1920 / 1080");
+  });
+
+  it("opens on the first room in place, with the next waiting below the screen to rise", () => {
+    setMobile(true);
+    const { container } = renderWithIntl(
+      <PanoramaHero segments={[segment(0), segment(1)]} mobileSegments={[segment(0), segment(1)]} locale="en" />);
+    const frames = container.querySelectorAll<HTMLElement>("[data-hero-frame]");
+    expect(frames[0]!.style.transform).toContain("translate3d(0px, 0%, 0px)");
+    expect(frames[1]!.style.transform).toContain("translate3d(0px, 100%, 0px)");
+  });
+
+  it("names one room at a time, the rest masked away", () => {
+    setMobile(true);
+    renderWithIntl(
+      <PanoramaHero segments={[segment(0), segment(1)]} mobileSegments={[segment(0), segment(1)]} locale="en" />);
+    expect(screen.getByText("Room 0").closest("[data-hero-label]")).not.toHaveAttribute("aria-hidden");
+    expect(screen.getByText("Room 1").closest("[data-hero-label]")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("shows how far along the rooms it is, one mark per room", () => {
+    setMobile(true);
+    const { container } = renderWithIntl(
+      <PanoramaHero segments={[segment(0), segment(1), segment(2)]} mobileSegments={[]} locale="en" />);
+    expect(container.querySelectorAll("[data-hero-progress] > *")).toHaveLength(3);
   });
 
   it("falls back to the full strip when the CMS flagged none for mobile", () => {

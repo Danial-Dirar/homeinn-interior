@@ -10,6 +10,7 @@ import { useSmoothProgress } from "@/hooks/use-smooth-progress";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { HeroStack } from "./hero-stack";
+import { MobileHero } from "./mobile-hero";
 import {
   driftX, lightPoolX, objectPosition, scrollDistanceVh, segmentOpacity,
 } from "./hero-math";
@@ -83,8 +84,9 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
     [count],
   );
 
-  // `count` as the snap target: the hero rests on whole rooms only.
-  useSmoothProgress(sectionRef, animated, draw, count);
+  // `count` as the snap target: the hero rests on whole rooms only. Off on a
+  // phone, whose hero (MobileHero) runs its own.
+  useSmoothProgress(sectionRef, animated && !isMobile, draw, count);
 
   if (count === 0) {
     return (
@@ -110,6 +112,9 @@ export function PanoramaHero({ segments, mobileSegments, locale }: PanoramaHeroP
       </>
     );
   }
+
+  // A phone pans across each room and raises the next; see MobileHero.
+  if (isMobile) return <MobileHero segments={shown} locale={locale} />;
 
   return (
     <>

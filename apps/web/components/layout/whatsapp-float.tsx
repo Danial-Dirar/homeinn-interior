@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
-import { useScrolled } from "@/hooks/use-scrolled";
+import { usePastHero } from "@/hooks/use-past-hero";
 import type { SiteSettingsView } from "@/lib/api.types";
 import { whatsappHref } from "@/lib/whatsapp";
 import { companyWhatsapp } from "./phone-lines";
@@ -11,15 +11,15 @@ import { WhatsAppIcon } from "./whatsapp-icon";
 /**
  * The persistent WhatsApp affordance spec §6 asks for, as a floating button.
  *
- * Hidden at the top of the home page so it never lands on the hero's first
- * frame, and shown everywhere else — which is exactly where it earns its keep,
- * once someone is reading about the work or looking for a way to get in touch.
- * The same rule the header uses to decide whether it is over the hero.
+ * Hidden on the home page until the hero has scrolled away, so it never lands
+ * on the rooms or their names — the phone hero is several screens long — and
+ * shown everywhere else, which is exactly where it earns its keep, once
+ * someone is reading about the work or looking for a way to get in touch.
  */
 export function WhatsAppFloat({ settings }: { settings: SiteSettingsView }) {
   const t = useTranslations("common");
-  const scrolled = useScrolled(300);
-  const overHero = usePathname() === "/" && !scrolled;
+  const pastHero = usePastHero(300);
+  const overHero = usePathname() === "/" && !pastHero;
 
   // Whichever line carries WhatsApp, not simply the first one.
   const number = companyWhatsapp(settings);
