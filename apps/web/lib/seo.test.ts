@@ -12,7 +12,7 @@ const settings: SiteSettingsView = {
   addressEn: "Plot# 18, Road# 03, Block# KHA, Section# 06, Mirpur-10, Dhaka-1216",
   addressBn: "প্লট# ১৮, মিরপুর-১০, ঢাকা-১২১৬",
   hoursEn: "Open every day", hoursBn: "প্রতিদিন খোলা",
-  facebookUrl: "https://www.facebook.com/homeinnbd14",
+  facebookUrl: "https://www.facebook.com/homeinn.xyz",
   instagramUrl: "https://www.instagram.com/homeinnbd",
   youtubeUrl: null,
   establishedYear: 2015, corporateProjectCount: 73,
@@ -97,7 +97,7 @@ describe("localBusinessJsonLd", () => {
 
   it("lists only the social profiles that exist", () => {
     expect(localBusinessJsonLd(settings, "en").sameAs).toEqual([
-      "https://www.facebook.com/homeinnbd14",
+      "https://www.facebook.com/homeinn.xyz",
       "https://www.instagram.com/homeinnbd",
     ]);
   });

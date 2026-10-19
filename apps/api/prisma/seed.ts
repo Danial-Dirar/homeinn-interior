@@ -41,7 +41,7 @@ export async function seed(prisma: PrismaClient): Promise<void> {
       addressBn: "প্লট# ১৮, রোড# ০৩, ব্লক# খ, সেকশন# ০৬, মিরপুর-১০, ঢাকা-১২১৬",
       hoursEn: "Open every day",
       hoursBn: "প্রতিদিন খোলা",
-      facebookUrl: "https://www.facebook.com/homeinnbd14",
+      facebookUrl: "https://www.facebook.com/homeinn.xyz",
       instagramUrl: "https://www.instagram.com/homeinnbd",
       establishedYear: 2015,
       // The profile's stated track record. These counts are the source of truth

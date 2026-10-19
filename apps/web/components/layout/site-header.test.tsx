@@ -43,7 +43,7 @@ describe("SiteHeader", () => {
   it("links to the social profiles that exist, and no others", () => {
     renderWithIntl(<SiteHeader locale="en" settings={settingsFixture} />);
     expect(screen.getByRole("link", { name: "Facebook" }))
-      .toHaveAttribute("href", "https://www.facebook.com/homeinnbd14");
+      .toHaveAttribute("href", "https://www.facebook.com/homeinn.xyz");
     expect(screen.getByRole("link", { name: "Instagram" })).toBeInTheDocument();
     // The fixture has no YouTube URL; a dead link is worse than no link.
     expect(screen.queryByRole("link", { name: "YouTube" })).not.toBeInTheDocument();
